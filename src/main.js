@@ -14,6 +14,11 @@ import { ModelLibrary } from './client/render/ModelLibrary.js';
 import { setModelLibrary } from './client/render/AnimalModels.js';
 import { IMAGE_DEFS } from './config/assets.js';
 import { loadImages, url } from './client/render/Images.js';
+import { UpdateWatcher } from './client/UpdateWatcher.js';
+
+// 새 배포 감지 (서비스 워커 등록·배포 전용 주소는 index.html 이 한다)
+const updates = new UpdateWatcher({ base: window.BUILD_STAMP });
+updates.start();
 
 // 3D 모델 파일(GLB): 기다리지 않고 불러오기 시작. 늦게 끝나면 임시 모델을 바꿔 끼운다.
 const models = new ModelLibrary(MODEL_DEFS);
@@ -36,6 +41,7 @@ const app = new App({
     joinRoom: PeerNetwork.joinRoom,
   },
   sfx: new Sfx(),
+  updates,
 });
 
 window.addEventListener('pointerdown', () => app.sfx.unlock(), { once: true });

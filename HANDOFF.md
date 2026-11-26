@@ -110,6 +110,17 @@ URL=https://dhshlove01-lang.github.io/Ink-Escape/ NODE_PATH=$(npm root -g) node 
 
 ## 작업 기록
 
+### 2026-11-26 · 옛 화면 절대 안 뜨게 (자동 새로고침)
+- **문제**: GitHub Pages 는 파일을 10분 캐시(`max-age=600`) → 배포 직후 옛 화면. 게다가 크롬은 한 번 받은 CSS·JS 를 메모리 캐시에 두고 F5 에도 재사용(서비스 워커보다 앞단)해서 서비스 워커만으로는 부족했음.
+- **해결**:
+  1. `sw.js` (서비스 워커): 이 사이트 파일은 매번 서버에 확인(`cache: 'no-cache'`, 안 바뀌면 304). `v/<배포시각>/…` 주소를 진짜 파일로 연결(응답을 `new Response` 로 감싸 모듈 기준 주소가 v/… 로 남음 → 안쪽 import 도 전부 v/…).
+  2. `index.html` 로더: 배포 시각 = `document.lastModified`(GitHub Pages 는 배포마다 모든 파일 Last-Modified 를 배포 시각으로). `style.css`·`src/main.js` 를 `v/<시각>/` 로 불러 배포마다 주소가 새로움. 서비스 워커를 못 쓰면 `?v=<시각>`. `window.BUILD_STAMP`.
+  3. `src/client/UpdateWatcher.js`: 1분마다·창으로 돌아올 때 `index.html` HEAD 의 Last-Modified 가 BUILD_STAMP 보다 새로우면 'update'.
+  4. `App.onUpdate`: 시작 화면이면 즉시 새로고침, 방·경기 중이면 알림(`common.updateReady`) 후 시작 화면으로 돌아갈 때 새로고침. `ensureLatest()`: 방 만들기·참가·혼자 테스트 직전에 한 번 더 확인 → 새 버전이면 들어가지 않고 새로고침.
+- **주의**: `index.html` 에 `<script type="module" src="src/main.js">`·`style.css` 링크를 다시 넣지 말 것(로더가 넣음). `sw.js` 는 되도록 고치지 않음. 그림·모델(assets/)은 주소가 안 바뀌니 바꿀 땐 새 파일 이름 권장.
+- **검증**: GitHub Pages 처럼 `max-age=600` 주는 로컬 서버로 — 배포 흉내(css·js·index.html 변경) 후 시작 화면 자동 새로고침 → 새 CSS·새 문구 적용, F5 도 새 파일, 로비에선 알림만·나가면 새로고침, 혼자 테스트 누를 때 새 버전이면 새로고침. 첫 방문 0.4~0.5초. `npm test` 12/12, smoke 통과, pageerror 0.
+
+
 ### 2026-11-26 · 시작 화면 소개 문구 5개 무작위
 - **무엇을**: 로고 아래 소개 문구를 유저 친화 문구 5개(`title.sub1`~`sub5`, ko·en) 중 하나로, 시작 화면에 들어올 때마다 무작위. 언어를 바꿔도 같은 번호 유지.
 - **어디**: `screens.js` (`SUB_COUNT`, `TitleView.subNo`), `strings.js` (옛 `title.sub` 삭제).

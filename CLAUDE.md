@@ -20,4 +20,5 @@
 
 ## 배포
 - GitHub Pages (main 브랜치 루트). 빌드 없음 — 커밋·푸시하면 그대로 반영.
+- 옛 화면 방지: `index.html` 로더가 코드를 `v/<배포시각>/` 주소로 부르고 `sw.js` 가 진짜 파일로 연결, `UpdateWatcher` 가 새 배포를 보면 자동 새로고침 (HANDOFF 2026-11-26). `index.html` 에 main.js·style.css 를 직접 넣지 말 것.
 - 작업 기록은 `HANDOFF.md` "작업 기록" 맨 위에 (무엇을·왜·어디·검증).
