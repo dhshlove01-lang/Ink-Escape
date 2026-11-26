@@ -32,6 +32,8 @@ export const BALANCE = {
     rps: 10,
     dmg: 10,
     range: 90,
+    holeSec: 5, // 벽·바닥 총알 자국이 남는 시간(초)
+    holeMax: 60, // 동시에 남는 자국 최대 개수 (넘으면 오래된 것부터 지움)
   },
 
   grenade: {

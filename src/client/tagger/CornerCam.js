@@ -31,7 +31,7 @@ export class CornerCam extends Emitter {
     this.renderer.setPixelRatio(1) // 고해상도 모니터에서 픽셀 수가 2배 넘게 늘지 않게;
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.root.append(this.renderer.domElement);
-    this.view3d = new WorldRenderer({ session: this.session, palette: this.palette, attributes: this.attributes, sfx: SILENT, skipPlayerId: null });
+    this.view3d = new WorldRenderer({ session: this.session, palette: this.palette, attributes: this.attributes, balance: this.b, sfx: SILENT, skipPlayerId: null });
     this.scene = this.view3d.scene;
     this.camera = new THREE.PerspectiveCamera(55, 1, 0.1, 220);
     this.camPos = new THREE.Vector3();

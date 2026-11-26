@@ -226,6 +226,7 @@ export function createViewModel(kind) {
   const pawL = sphere(0.05, L.fur, 1.1, 1, 1.2);
   pawL.position.set(-0.02, -0.07, -0.2);
   g.add(pawR, pawL);
+  g.userData.paws = [pawR, pawL];
   toViewModelMaterial(g);
   return g;
 }

@@ -3,9 +3,11 @@ import { EV, MSG, PSTATE } from '../../shared/protocol.js';
 import { el, Banner } from '../ui/dom.js';
 import { WorldRenderer } from '../render/WorldRenderer.js';
 import { CEILING_LAYER } from './SceneBuilder.js';
+import { WALL_H } from '../../shared/map/GameMap.js';
 import { FpsController } from './FpsController.js';
 import { Weapon } from './Weapon.js';
 import { Hud } from './Hud.js';
+import { surfaceAt } from './surface.js';
 import { t } from '../i18n.js';
 
 // 플레이어 1인칭 화면. 하위 부품을 조립하고 입력·네트워크를 잇는다.
@@ -24,7 +26,7 @@ export class PlayerView {
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.root.append(this.renderer.domElement);
 
-    this.view3d = new WorldRenderer({ session, palette, attributes, sfx, skipPlayerId: session.me });
+    this.view3d = new WorldRenderer({ session, palette, attributes, balance, sfx, skipPlayerId: session.me });
     this.scene = this.view3d.scene;
     this.effects = this.view3d.effects;
     this.monsters = this.view3d.monsters;
@@ -155,6 +157,7 @@ export class PlayerView {
     const h = Math.hypot(dir.x, dir.z);
     if (h > 1e-6) best = Math.min(best, this.session.map.raycast(origin.x, origin.z, dir.x, dir.z, range * h) / h);
     if (dir.y < -1e-6) best = Math.min(best, -origin.y / dir.y);
+    if (dir.y > 1e-6) best = Math.min(best, (WALL_H - origin.y) / dir.y); // 천장
     const a = dir.x * dir.x + dir.z * dir.z;
     if (a > 1e-8) {
       for (const tg of this.monsters.targets()) {
@@ -176,8 +179,12 @@ export class PlayerView {
     return { point: origin.clone().addScaledVector(dir, best), monsterId, dist: best };
   }
 
-  onShot({ muzzle, point, monsterId }) {
-    this.effects.tracer(muzzle, point);
+  onShot({ origin, muzzle, point, monsterId, follow }) {
+    this.effects.tracer(muzzle, point, undefined, follow);
+    if (!monsterId) {
+      const s = surfaceAt(this.session.map, point, new THREE.Vector3().subVectors(point, origin));
+      if (s) this.effects.bulletHole(point, s.normal, s.kind);
+    }
     this.effects.spark(point, monsterId ? 0xff5050 : 0xffe0a0);
     if (monsterId) {
       this.session.send({ t: MSG.HIT, id: monsterId });
