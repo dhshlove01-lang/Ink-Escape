@@ -144,11 +144,18 @@ URL=https://dhshlove01-lang.github.io/Ink-Escape/ NODE_PATH=$(npm root -g) node 
   - 천장(레이어 1)은 플레이어 카메라만 보므로 탑뷰에서 던전이 다 보인다. 탑뷰에서는 `scene.fog` 를 끈다(카메라가 멀어 안개에 다 잠김).
   - 뷰모델은 이제 조명을 받는다(`Weapon.vmScene` 에 앰비언트·키·림). 새 손·총 메시를 추가하면 `userData.vm` 을 세워 `toViewModelMaterial` 이 건드리지 않게 할 것.
   - `TopDownMap` 의 `this.mini` 는 **불리언**(미니맵 모드)이다. 몬스터 미니 그림 함수는 `monsterMini(id)` 로 이름을 바꿨다(예전 `mini(id)`).
+- **main 최신과 통합** (2026-11-26): 그 사이 다른 세션이 올린 보급·증강·UI 키트·그래픽 품질·총 조준/탄흔/빛줄기 커밋을 병합했다.
+  - `Effects`: 그쪽 `tracer`(원기둥 두 겹, 내 총은 총구를 따라감)·`bulletHole` 을 그대로 쓰고, 내 `muzzle()`(총구 불꽃 두 겹)만 더했다.
+  - `Weapon`: 그쪽 `aimGun`(총신을 조준점으로)·`VIEW_POS`·`muzzleWorld` 위에 내 뷰모델 조명·불꽃 두 겹·레드도트를 얹었다. **레드도트 사이트와 빨간 점은 `aimGun` 의 회전 대상에 포함**(`userData.paws` 는 배열, `userData.sightObj`)시켜야 총과 같이 움직인다.
+  - `CornerCam` 은 `TaggerCam` 으로 합치면서 그쪽의 `gfx`(안티앨리어스·픽셀 비율)와 `WorldRenderer` 의 `balance` 인자를 옮겼다. `CornerCam.js` 는 삭제.
+  - `style.css`: UI 키트 블록은 그대로 두고 술래 화면 블록만 내 것으로 교체. `.toggle` 은 내 블록에서 정의(키트에 없음).
 - **검증** (헤드리스 크로미엄 + swiftshader, 1600×900)
+  - **로컬 확인은 서비스 워커를 끄고 해야 한다**(`sw.js` 가 `v/<배포시각>/` 주소로 옛 코드를 계속 준다 — Playwright 는 `new_context(service_workers='block')`). 끄지 않으면 코드를 고쳐도 화면이 그대로여서 "수정이 안 먹는다"고 착각하게 된다.
   - 시바·곰·토끼·삼색고양이 1인칭: 손+총 정지/사격(불꽃·궤적) 스크린샷을 직접 눈으로 확인. 동물별 털색·무늬·소매·발바닥 확인.
   - 술래: 3D 탑뷰(DIRECTOR 전체·왼쪽·오른쪽·미니맵) / 플레이어 카드 → 따라가기 / 그림 → SPAWN → 화면 클릭 소환(잉크 99%, 재소환 칸 생성, 빈 자리 토스트) / 한국어 화면.
-  - `pageerror 0`, 4xx·404 0 (모든 실행).
-  - 스크린샷: `downloads/ink_escape_ui_hands/` (`player_{동물}_{hands,hands_zoom,fire}.png`, `tagger_director/left_topview/right_director/minimap/follow/placing/spawned/ko.png`).
+  - `pageerror 0`, 4xx·404 0 (모든 실행 — 병합 뒤 다시 촬영).
+  - 배포 사이트 `https://dhshlove01-lang.github.io/Ink-Escape/` 에서도 같은 화면 확인(pageerror 0, 4xx 0). Pages 빌드 `built`(커밋 3f2dc83, 66초).
+  - 스크린샷: `downloads/ink_escape_ui_hands/` (`live_tagger.png`·`live_player.png` = 실제 배포 사이트) (`player_{동물}_{hands,hands_zoom,fire}.png`, `tagger_director/left_topview/right_director/minimap/follow/placing/spawned/ko.png`).
   - **이 작업 환경에는 node 가 없어 `npm test`·`tools/smoke.cjs` 를 못 돌렸다 — 다음 AI 는 먼저 돌릴 것.** (모듈 로드는 브라우저에서 전부 성공, pageerror 0 이라 문법 오류는 없다.)
 - **알려진 다듬을 점**
   - 3D 탑뷰는 맵 전체가 들어오게 맞추면 카메라가 멀어 평면 지도처럼 보인다. 기본 0.82배(휠로 더 당길 수 있음)로 두었고, 그 상태에서도 벽 옆면은 얕게 보인다. 더 입체적으로 보이려면 기본 배율을 0.6 근처로 낮추거나 탑뷰 전용 벽 높이/그림자를 키우면 된다.
