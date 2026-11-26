@@ -5,6 +5,7 @@ import { GameSession } from './state/GameSession.js';
 import { TitleView, LobbyView, ResultView } from './ui/screens.js';
 import { PlayerView } from './player/PlayerView.js';
 import { TaggerView } from './tagger/TaggerView.js';
+import { AugmentPicker } from './ui/AugmentPicker.js';
 import { toast, el } from './ui/dom.js';
 import { t, tr } from './i18n.js';
 import { gfx } from './render/GraphicsSettings.js';
@@ -170,6 +171,7 @@ export class App {
     this.views = { holder };
     if (session.isTagger) this.views.tagger = new TaggerView({ ...common, judge: this.judge });
     if (session.isPlayer) this.views.player = new PlayerView(common);
+    if (session.role !== 'spectator') this.views.picker = new AugmentPicker({ parent: holder, session, balance: this.balance, sfx: this.sfx });
     if (session.role === 'both') {
       this.views.tagger.setActive(false);
       this.views.player.setActive(true);
@@ -190,6 +192,7 @@ export class App {
     if (!this.views) return;
     this.views.player?.dispose();
     this.views.tagger?.dispose();
+    this.views.picker?.dispose();
     this.views.holder.remove();
     this.views = null;
     this.session?.dispose();

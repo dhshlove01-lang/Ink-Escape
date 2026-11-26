@@ -22,6 +22,7 @@ const Z_AXIS = new THREE.Vector3(0, 0, 1);
 
 // 총알 자국 그림 (처음 쓸 때 한 번 그림): 까만 구멍 + 그을음 + 금
 let holeTex = null;
+let puddleTex = null;
 function bulletHoleTexture() {
   if (holeTex) return holeTex;
   const c = document.createElement('canvas');
@@ -105,6 +106,36 @@ export class Effects {
     it.obj.position.copy(it.a).addScaledVector(d, 0.5);
     it.obj.quaternion.setFromUnitVectors(Y_AXIS, d.multiplyScalar(1 / len));
     it.obj.scale.set(1, len, 1);
+  }
+
+  // 끈적 잉크 웅덩이 (바닥, sec 초 뒤 사라짐)
+  puddle(x, z, r, sec) {
+    if (!puddleTex) {
+      const c = document.createElement('canvas');
+      c.width = c.height = 128;
+      const g = c.getContext('2d');
+      g.fillStyle = 'rgba(52,16,70,0.85)';
+      g.beginPath();
+      for (let i = 0; i <= 24; i++) {
+        const a = (i / 24) * Math.PI * 2, rr = 50 + Math.sin(i * 2.7) * 8 + Math.cos(i * 1.3) * 5;
+        g.lineTo(64 + Math.cos(a) * rr, 64 + Math.sin(a) * rr);
+      }
+      g.fill();
+      g.fillStyle = 'rgba(160,90,220,0.35)';
+      g.beginPath();
+      g.ellipse(52, 50, 18, 9, -0.5, 0, Math.PI * 2);
+      g.fill();
+      puddleTex = new THREE.CanvasTexture(c);
+      puddleTex.colorSpace = THREE.SRGBColorSpace;
+    }
+    const mat = new THREE.MeshBasicMaterial({ map: puddleTex, transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -3 });
+    const m = new THREE.Mesh(HOLE_GEO, mat);
+    m.rotation.x = -Math.PI / 2;
+    m.scale.setScalar(r * 2);
+    m.position.set(x, 0.03, z);
+    this.scene.add(m);
+    this.items.push({ obj: m, life: sec, max: sec, kind: 'hole', mats: [mat] });
+    this.holes++;
   }
 
   // 벽·기둥·바닥·천장에 총알 자국 (holeSec 동안, 마지막 1초에 흐려짐)

@@ -1,4 +1,5 @@
 import { Emitter } from '../Emitter.js';
+import { minPlayerDist } from '../../shared/augmentMath.js';
 import { CELL, TILE } from '../../shared/map/GameMap.js';
 import { PSTATE, EV } from '../../shared/protocol.js';
 import { buildCutout } from '../render/PaperCutout.js';
@@ -246,7 +247,7 @@ export class TopDownMap extends Emitter {
   validSpot(p) {
     if (!p || !this.map.isFloor(p.x, p.z)) return false;
     for (const pl of this.session.players()) {
-      if (pl.st === PSTATE.ALIVE && !(pl.bits & 16) && Math.hypot(pl.x - p.x, pl.z - p.z) < this.b.spawn.minPlayerDist) return false;
+      if (pl.st === PSTATE.ALIVE && !(pl.bits & 16) && Math.hypot(pl.x - p.x, pl.z - p.z) < minPlayerDist(this.b, this.session.taggerAugs)) return false;
     }
     return true;
   }
@@ -512,9 +513,44 @@ export class TopDownMap extends Emitter {
       if (p.st !== PSTATE.ALIVE || p.bits & 16) continue;
       const pp = S.playerPos(p.id) || p;
       g.beginPath();
-      g.arc(pp.x, pp.z, this.b.spawn.minPlayerDist, 0, Math.PI * 2);
+      g.arc(pp.x, pp.z, minPlayerDist(this.b, S.taggerAugs), 0, Math.PI * 2); // 그림자 소환이면 작아짐
       g.fill();
       g.stroke();
+    }
+
+    // 끈적 잉크 웅덩이 (술래 증강)
+    const nowMs = performance.now();
+    for (const w of S.puddles) {
+      if (w.until <= nowMs) continue;
+      g.fillStyle = `rgba(70,22,96,${Math.min(0.7, (w.until - nowMs) / 1000) })`;
+      g.beginPath();
+      g.arc(w.x, w.z, w.r, 0, Math.PI * 2);
+      g.fill();
+    }
+
+    // 보급 상자: 상자 그림 + 퍼지는 노란 고리 + 연 사람 수
+    const alivePlayers = players.filter((p) => p.st !== PSTATE.OUT && p.st !== PSTATE.ESCAPED).length;
+    for (const c of S.crates.values()) {
+      const ph = (time * 0.9) % 1;
+      g.strokeStyle = `rgba(255,210,122,${0.85 * (1 - ph)})`;
+      g.lineWidth = 2.5 * u * dpr;
+      g.beginPath();
+      g.arc(c.x, c.z, 1.6 + ph * 3, 0, Math.PI * 2);
+      g.stroke();
+      const icon = crateIcon();
+      const sz = 3.2;
+      g.drawImage(icon, c.x - sz / 2, c.z - sz / 2, sz, sz);
+      const fs = 12 * u * dpr;
+      g.font = `${fs}px Jua, "Malgun Gothic", sans-serif`;
+      g.textAlign = 'center';
+      g.textBaseline = 'top';
+      g.lineWidth = 3 * u * dpr;
+      g.strokeStyle = 'rgba(8,6,12,0.9)';
+      const label = `📦 ${c.opened.size}/${alivePlayers}`;
+      g.strokeText(label, c.x, c.z + sz / 2 + 0.2);
+      g.fillStyle = '#ffd27a';
+      g.fillText(label, c.x, c.z + sz / 2 + 0.2);
+      g.textBaseline = 'alphabetic';
     }
 
     // 빨간 장판 (대기 중 소환)
@@ -619,4 +655,40 @@ export class TopDownMap extends Emitter {
     g.fillStyle = vg;
     g.fillRect(0, 0, W, H);
   }
+}
+
+// 술래 지도용 보급 상자 그림 (위에서 본 나무 상자 + 빨간 잉크 느낌표). 한 번만 그린다.
+let _crate = null;
+function crateIcon() {
+  if (_crate) return _crate;
+  const c = document.createElement('canvas');
+  c.width = c.height = 96;
+  const g = c.getContext('2d');
+  g.fillStyle = 'rgba(0,0,0,0.45)';
+  g.fillRect(12, 14, 78, 78);
+  g.fillStyle = '#8a5a2e';
+  g.fillRect(8, 8, 78, 78);
+  for (let i = 0; i < 4; i++) {
+    g.fillStyle = i % 2 ? '#7c4f27' : '#9a6838';
+    g.fillRect(8, 8 + i * 19.5 + 1, 78, 17.5);
+  }
+  g.strokeStyle = '#2e1b0c';
+  g.lineWidth = 7;
+  g.strokeRect(11, 11, 72, 72);
+  g.beginPath();
+  g.moveTo(14, 80);
+  g.lineTo(80, 14);
+  g.stroke();
+  g.fillStyle = '#d8283f';
+  g.beginPath();
+  g.arc(47, 47, 19, 0, Math.PI * 2);
+  g.fill();
+  g.strokeStyle = '#1a0a0e';
+  g.lineWidth = 3;
+  g.stroke();
+  g.fillStyle = '#fff3e0';
+  g.fillRect(43, 34, 8, 16);
+  g.fillRect(43, 54, 8, 6);
+  _crate = c;
+  return _crate;
 }

@@ -24,11 +24,16 @@ export class GameSession extends Emitter {
     this.projectiles = new Map();
     this.doorRevealed = -1;
     this.doorOpen = false;
+    this.crates = new Map(); // 보급 상자 id → { x, z, opened:Set, born }
+    this.playerAugs = new Map(); // 플레이어 id → { 증강키: 개수 }
+    this.taggerAugs = {}; // 술래 증강
+    this.puddles = []; // 끈적 잉크 웅덩이 { x, z, r, until }
 
     this._off = [
       conn.on(MSG.SNAP, (s) => this.onSnap(s)),
       conn.on(MSG.EVENT, (ev) => this.onEvent(ev)),
       conn.on(MSG.SPAWN_RESULT, (r) => this.emit('spawnResult', r)),
+      conn.on(MSG.OFFER, (o) => this.emit('offer', o)), // 나에게 온 증강 카드 (AugmentPicker 가 보여 줌)
     ];
   }
 
@@ -43,6 +48,15 @@ export class GameSession extends Emitter {
 
   get isTagger() {
     return this.role === 'tagger' || this.role === 'both';
+  }
+
+  // 증강 개수 (augmentMath 에 넘기는 모양)
+  augOf(id) {
+    return this.playerAugs.get(id) || {};
+  }
+
+  pickAugment(side, key) {
+    this.send({ t: MSG.AUG_PICK, side, key });
   }
 
   get isPlayer() {
@@ -100,6 +114,27 @@ export class GameSession extends Emitter {
         break;
       case EV.PROJ_END:
         this.projectiles.delete(ev.id);
+        break;
+      case EV.SUPPLY:
+        this.crates.set(ev.id, { x: ev.x, z: ev.z, opened: new Set(), born: now });
+        break;
+      case EV.SUPPLY_TAKE:
+        this.crates.get(ev.id)?.opened.add(ev.by);
+        break;
+      case EV.SUPPLY_GONE:
+        this.crates.delete(ev.id);
+        break;
+      case EV.AUG:
+        if (ev.side === 'tagger') this.taggerAugs[ev.key] = ev.n;
+        else {
+          const a = { ...this.augOf(ev.id) };
+          a[ev.key] = ev.n;
+          this.playerAugs.set(ev.id, a);
+        }
+        break;
+      case EV.PUDDLE:
+        this.puddles = this.puddles.filter((w) => w.until > now);
+        this.puddles.push({ x: ev.x, z: ev.z, r: ev.r, until: now + ev.sec * 1000 });
         break;
     }
     this.emit(ev.e, ev);

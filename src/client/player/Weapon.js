@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { createViewModel } from '../render/AnimalModels.js';
 import { texture } from '../render/Images.js';
+import { fireRate, reloadSec } from '../../shared/augmentMath.js';
 
 // 공통 총 1종: 30발, 예비 탄약 무한, 재장전 1초. 발사 판정(히트스캔)은 주입된 raycast 가 한다.
 
@@ -8,8 +9,10 @@ const VIEW_POS = [0.25, -0.23, -0.52]; // 손·총 위치 (카메라 기준)
 const AIM_DIST = 15; // 총신이 화면 가운데 이 거리(m)의 점을 겨눈다
 
 export class Weapon {
-  constructor({ balance, camera, animal, raycast, onShot, sfx }) {
+  constructor({ balance, camera, animal, raycast, onShot, sfx, getAug = () => ({}) }) {
+    this.b = balance;
     this.g = balance.gun;
+    this.getAug = getAug; // 내 보급 증강 (빠른 앞발: 연사·재장전)
     this.camera = camera;
     this.raycast = raycast;
     this.onShot = onShot;
@@ -115,7 +118,7 @@ export class Weapon {
 
   reload(now) {
     if (this.reloading || this.ammo === this.g.mag) return;
-    this.reloadUntil = now + this.g.reloadSec;
+    this.reloadUntil = now + reloadSec(this.b, this.getAug());
     this.sfx.play('reload');
   }
 
@@ -129,7 +132,7 @@ export class Weapon {
       if (this.ammo <= 0) {
         this.reload(now);
       } else {
-        this.cooldown = 1 / this.g.rps;
+        this.cooldown = 1 / fireRate(this.b, this.getAug());
         this.ammo--;
         this.fire();
         if (this.ammo === 0) this.reload(now);
@@ -139,7 +142,7 @@ export class Weapon {
     this.kick = Math.max(0, this.kick - dt * 10);
     if (moving) this.bobT += dt * 9;
     const bob = moving ? Math.sin(this.bobT) * 0.012 : 0;
-    const dip = this.reloading ? Math.sin(((this.reloadUntil - now) / this.g.reloadSec) * Math.PI) * 0.25 : 0;
+    const dip = this.reloading ? Math.sin(((this.reloadUntil - now) / reloadSec(this.b, this.getAug())) * Math.PI) * 0.25 : 0;
     this.view.position.set(VIEW_POS[0] + Math.cos(this.bobT * 0.5) * (moving ? 0.008 : 0), VIEW_POS[1] + bob - dip, VIEW_POS[2] + this.kick * 0.06);
     this.view.rotation.x = this.kick * 0.03 + dip * 0.8; // 반동은 주로 뒤로 (위로 많이 들리면 총알이 총구보다 아래로 나가 보임)
     this.placeFlash();
@@ -158,7 +161,7 @@ export class Weapon {
     dir.y += (Math.random() - 0.5) * 0.012;
     dir.normalize();
     const hit = this.raycast(origin, dir, this.g.range);
-    this.onShot({ origin, muzzle: this.muzzleWorld(), point: hit.point, monsterId: hit.monsterId, follow: () => this.muzzleWorld() });
+    this.onShot({ origin, muzzle: this.muzzleWorld(), point: hit.point, monsterId: hit.monsterId, monsterIds: hit.monsterIds, follow: () => this.muzzleWorld() });
   }
 
   // 지금 총구 끝의 전장 좌표 (뷰모델 층 좌표 = 카메라 기준 → 카메라 행렬로 변환)

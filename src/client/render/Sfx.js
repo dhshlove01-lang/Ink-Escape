@@ -112,6 +112,14 @@ export class Sfx {
       case 'tick':
         this._tone('sine', 1000, 1000, t, 0.04, 0.1);
         break;
+      case 'pickup': // 보급 카드가 열림
+        this._tone('triangle', 520, 780, t, 0.12, 0.25);
+        this._tone('triangle', 780, 1170, t + 0.1, 0.16, 0.22);
+        break;
+      case 'crate': // 보급 상자 착지
+        this._tone('square', 160, 70, t, 0.25, 0.3);
+        this._tone('sine', 880, 1320, t + 0.18, 0.2, 0.15);
+        break;
     }
   }
 }

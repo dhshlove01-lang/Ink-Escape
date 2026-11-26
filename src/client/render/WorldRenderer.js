@@ -5,6 +5,7 @@ import { MonsterRenderer } from '../player/MonsterRenderer.js';
 import { RemotePlayers } from '../player/RemotePlayers.js';
 import { Effects } from '../player/Effects.js';
 import { surfaceAt } from '../player/surface.js';
+import { SupplyCrates } from './SupplyCrates.js';
 
 // 3D 전장 그리기 묶음: 맵 + 몬스터 + 동물 플레이어 + 연출 + 문 상태.
 // 카메라는 모른다 — 플레이어 1인칭(PlayerView)과 술래 구석 카메라(CornerCam)가 같이 쓴다.
@@ -25,6 +26,7 @@ export class WorldRenderer {
     this.effects = new Effects(this.scene, { holeSec: balance?.gun.holeSec, holeMax: balance?.gun.holeMax });
     this.monsters = new MonsterRenderer({ scene: this.scene, session, palette, attributes, sfx, effects: this.effects });
     this.remotes = new RemotePlayers({ scene: this.scene, session, skipId: skipPlayerId });
+    this.crates = new SupplyCrates({ scene: this.scene, session, sfx });
 
     if (session.doorRevealed >= 0) this.world.revealDoor(session.doorRevealed);
     // 이미 열린 뒤에 화면이 만들어진 경우(늦게 접속·화면 전환)는 연출 없이 열린 모습으로
@@ -43,6 +45,12 @@ export class WorldRenderer {
         this.effects.boom(e.x, e.z, e.r);
         this.sfx.play('boom');
       }),
+      session.on(EV.SPLASH, (e) => this.effects.boom(e.x, e.z, e.r)), // 지우개 탄
+      session.on(EV.PUDDLE, (e) => this.effects.puddle(e.x, e.z, e.r, e.sec)), // 끈적 잉크
+      session.on(EV.HEART, (e) => {
+        const p = session.playerPos(e.id);
+        if (p) for (let i = 0; i < 4; i++) this.effects.spark(new THREE.Vector3(p.x + (Math.random() - 0.5), 1 + Math.random(), p.z + (Math.random() - 0.5)), 0xff7aa8);
+      }),
       session.on(EV.DOOR_REVEAL, (e) => this.world.revealDoor(e.door)),
       session.on(EV.DOOR_OPEN, (e) => this.world.openDoor(e.door)),
     ];
@@ -53,11 +61,13 @@ export class WorldRenderer {
     this.monsters.update(dt, camera, time);
     this.remotes.update(dt, time);
     this.effects.update(dt);
+    this.crates.update(time);
   }
 
   dispose() {
     this._off.forEach((f) => f());
     this.monsters.dispose();
+    this.crates.dispose();
   }
 }
 

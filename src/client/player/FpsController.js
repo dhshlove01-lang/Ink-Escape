@@ -21,6 +21,10 @@ export class FpsController {
     this.exhausted = false; // 바닥난 뒤 restart 만큼 찰 때까지 못 달림
     this.running = false;
     this._restAt = 0;
+    this.moveMult = 1; // 보급 증강 (날쌘 발)
+    this.maxJumps = 1; // 2 = 2단 점프
+    this.jumpsLeft = 0;
+    this._space = false;
     camera.rotation.order = 'YXZ';
 
     this._onKey = (e) => {
@@ -78,7 +82,7 @@ export class FpsController {
     const len = Math.hypot(fx, fz);
     this.moving = len > 0;
     this.updateStamina(dt, this.moving && (k.has('ShiftLeft') || k.has('ShiftRight')));
-    const speed = (this.running ? this.b.run : this.b.walk) * (1 - slow);
+    const speed = (this.running ? this.b.run : this.b.walk) * this.moveMult * (1 - slow);
     if (len > 0) {
       fx /= len;
       fz /= len;
@@ -93,10 +97,15 @@ export class FpsController {
       this.x = p.x;
       this.z = p.z;
     }
-    if (this.enabled && k.has('Space') && this.onGround) {
+    // 점프: 누른 순간에만. 땅에서 한 번 + (2단 점프면) 공중에서 한 번 더
+    const space = this.enabled && k.has('Space');
+    if (space && !this._space && (this.onGround || this.jumpsLeft > 0)) {
+      if (!this.onGround) this.jumpsLeft--;
+      else this.jumpsLeft = this.maxJumps - 1;
       this.vy = this.b.jumpV;
       this.onGround = false;
     }
+    this._space = space;
     this.vy -= this.b.gravity * dt;
     this.y += this.vy * dt;
     if (this.y <= 0) {

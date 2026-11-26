@@ -10,6 +10,8 @@ import { Hud } from './Hud.js';
 import { surfaceAt } from './surface.js';
 import { t } from '../i18n.js';
 import { gfx } from '../render/GraphicsSettings.js';
+import { moveMult, jumps, pierces } from '../../shared/augmentMath.js';
+import { augName } from '../ui/AugmentPicker.js';
 
 // 플레이어 1인칭 화면. 하위 부품을 조립하고 입력·네트워크를 잇는다.
 
@@ -48,8 +50,9 @@ export class PlayerView {
       sfx,
       raycast: (o, d, r) => this.raycast(o, d, r),
       onShot: (s) => this.onShot(s),
+      getAug: () => session.augOf(session.me),
     });
-    this.hud = new Hud(this.root, session, attributes);
+    this.hud = new Hud(this.root, session, attributes, balance);
     this.banner = new Banner(this.root);
     this.lockHint = el('div', { class: 'lock-hint' }, el('b', {}, t('player.clickToStart')), el('span', {}, t('player.controls'), session.solo ? t('player.controlsSolo') : ''));
     this.root.append(this.lockHint);
@@ -125,6 +128,18 @@ export class PlayerView {
       }),
       s.on(EV.PESCAPE, (e) => this.banner.show(t('player.escaped', { name: name(e.id) }), { kind: 'good' })),
       s.on(EV.PDAMAGE, (e) => e.id === s.me && this.sfx.play('hurt')),
+      // 보급
+      s.on(EV.SUPPLY, () => this.banner.show(t('supply.drop'), { kind: 'good', ms: 3500 })),
+      s.on(EV.AUG, (e) => {
+        if (e.side !== 'player') return;
+        if (e.id === s.me) {
+          const a = s.augOf(s.me);
+          this.ctrl.moveMult = moveMult(this.b, a);
+          this.ctrl.maxJumps = jumps(a);
+          this.hud.setAugments(a);
+        } else this.banner.show(t('supply.got', { name: name(e.id), aug: augName(e.key) }), { kind: 'info', ms: 1800 });
+      }),
+      s.on(EV.HEART, (e) => this.banner.show(t('supply.heart', { name: name(e.id) }), { kind: 'good', ms: 2200 })),
     ];
   }
 
@@ -156,6 +171,7 @@ export class PlayerView {
   raycast(origin, dir, range) {
     let best = range;
     let monsterId = null;
+    const hits = []; // 벽 앞의 몬스터들 [{ id, tt }] (관통 탄)
     const h = Math.hypot(dir.x, dir.z);
     if (h > 1e-6) best = Math.min(best, this.session.map.raycast(origin.x, origin.z, dir.x, dir.z, range * h) / h);
     if (dir.y < -1e-6) best = Math.min(best, -origin.y / dir.y);
@@ -174,14 +190,20 @@ export class PlayerView {
         if (tt < 0 || tt >= best) continue;
         const y = origin.y + dir.y * tt;
         if (y < tg.y0 || y > tg.y1) continue;
-        best = tt;
-        monsterId = tg.id;
+        hits.push({ id: tg.id, tt });
       }
     }
-    return { point: origin.clone().addScaledVector(dir, best), monsterId, dist: best };
+    hits.sort((a, b) => a.tt - b.tt);
+    // 관통 탄이면 두 마리까지, 아니면 맨 앞 한 마리
+    const taken = hits.slice(0, pierces(this.session.augOf(this.session.me)) ? 2 : 1);
+    if (taken.length) {
+      best = taken[taken.length - 1].tt;
+      monsterId = taken[0].id;
+    }
+    return { point: origin.clone().addScaledVector(dir, best), monsterId, monsterIds: taken.map((h) => h.id), dist: best };
   }
 
-  onShot({ origin, muzzle, point, monsterId, follow }) {
+  onShot({ origin, muzzle, point, monsterId, monsterIds = monsterId ? [monsterId] : [], follow }) {
     this.effects.tracer(muzzle, point, undefined, follow);
     if (!monsterId) {
       const s = surfaceAt(this.session.map, point, new THREE.Vector3().subVectors(point, origin));
@@ -189,7 +211,7 @@ export class PlayerView {
     }
     this.effects.spark(point, monsterId ? 0xff5050 : 0xffe0a0);
     if (monsterId) {
-      this.session.send({ t: MSG.HIT, id: monsterId });
+      for (const id of monsterIds) this.session.send({ t: MSG.HIT, id });
       this.hud.hit(false);
       this.sfx.play('hit');
     }
@@ -267,7 +289,7 @@ export class PlayerView {
     }
 
     this.view3d.update(dt, this.time, this.camera);
-    this.hud.update({ weapon: this.weapon, me, prompt: rev.prompt, center, revive: rev.ring, boss: this.monsters.bossInfo(), stamina: { value: this.ctrl.stamina, exhausted: this.ctrl.exhausted } });
+    this.hud.update({ weapon: this.weapon, me, prompt: rev.prompt, center, revive: rev.ring, boss: this.monsters.bossInfo(), stamina: { value: this.ctrl.stamina, exhausted: this.ctrl.exhausted }, crate: this.crateGuide() });
     if (this.active) {
       // 전장 → 깊이 지우고 → 손·총 (낙서·이펙트가 손 위에 덮이지 않게)
       const r = this.renderer;
@@ -279,6 +301,21 @@ export class PlayerView {
         r.render(this.weapon.vmScene, this.weapon.vmCam);
       }
     }
+  }
+
+  // 아직 안 연 가장 가까운 보급 상자: 거리와 화면 기준 방향(0 = 정면, 라디안)
+  crateGuide() {
+    let best = null;
+    for (const c of this.session.crates.values()) {
+      if (c.opened.has(this.session.me)) continue;
+      const d = Math.hypot(c.x - this.ctrl.x, c.z - this.ctrl.z);
+      if (!best || d < best.d) best = { d, x: c.x, z: c.z };
+    }
+    if (!best) return null;
+    const world = Math.atan2(-(best.x - this.ctrl.x), -(best.z - this.ctrl.z)); // 앞(-z) 기준 yaw
+    let rel = this.ctrl.yaw - world;
+    rel = Math.atan2(Math.sin(rel), Math.cos(rel));
+    return { dist: best.d, angle: rel };
   }
 
   // 죽었을 때: 살아 있는 팀원 시점으로 관전

@@ -4,6 +4,7 @@ import { WALL_H } from '../../shared/map/GameMap.js';
 import { PSTATE, STATUS_BIT } from '../../shared/protocol.js';
 import { WorldRenderer, SILENT } from '../render/WorldRenderer.js';
 import { gfx } from '../render/GraphicsSettings.js';
+import { minPlayerDist } from '../../shared/augmentMath.js';
 
 // 술래 왼쪽 화면의 3D 따라가기 카메라: 고른 플레이어의 머리 위·뒤에서 실제 전장을 내려다보며 따라간다.
 // 바닥을 클릭하면 소환 위치를 고른다 ('pick' 이벤트, 탑뷰와 같은 형식).
@@ -111,6 +112,7 @@ export class CornerCam extends Emitter {
       }
       const pp = this.session.playerPos(p.id) || p;
       ring.position.set(pp.x, 0.06, pp.z);
+      ring.scale.setScalar(minPlayerDist(this.b, this.session.taggerAugs) / this.b.spawn.minPlayerDist); // 그림자 소환이면 작아짐
     }
     for (const [id, ring] of this.noRings) {
       if (!live.has(id)) {

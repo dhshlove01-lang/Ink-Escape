@@ -8,6 +8,7 @@ import { nearestPaletteIndex } from '../../shared/attributes.js';
 import { buildCutout } from '../render/PaperCutout.js';
 import { faceCanvas } from '../render/AnimalModels.js';
 import { t, tr } from '../i18n.js';
+import { augChips, augName } from '../ui/AugmentPicker.js';
 
 // 술래 화면 (2분할): 왼쪽 탑뷰 관전·소환 위치, 오른쪽 도화지·팔레트·잉크·미리보기·재소환·SPAWN.
 
@@ -61,6 +62,17 @@ export class TaggerView {
       session.on(EV.ONE_MIN, () => this.banner.show(t('game.oneMin'), { kind: 'warn' })),
       session.on(EV.PDEATH, (e) => this.banner.show(t('tagger.downed', { name: session.nameOf(e.id) }), { kind: 'good', ms: 1800 })),
       session.on(EV.PESCAPE, (e) => this.banner.show(t('tagger.escapedBanner', { name: session.nameOf(e.id) }), { kind: 'warn' })),
+      // 보급: 상자 위치 알림, 내 카드, 누가 무엇을 얻었나 (플레이어 카드·내 증강 줄)
+      session.on(EV.SUPPLY, () => this.banner.show(t('supply.dropTagger'), { kind: 'warn', ms: 3500 })),
+      session.on('offer', (o) => o.side === 'tagger' && this.banner.show(t('supply.cards'), { kind: 'good', ms: 2200 })),
+      session.on(EV.AUG, (e) => {
+        if (e.side === 'tagger') this.myAugs.replaceChildren(...augChips(session.taggerAugs, this.b, { small: true }));
+        else {
+          const r = this.prows.get(e.id);
+          if (r) r.augs.replaceChildren(...augChips(session.augOf(e.id), this.b, { small: true }));
+          if (!(session.role === 'both')) this.banner.show(t('supply.got', { name: session.nameOf(e.id), aug: augName(e.key) }), { kind: 'warn', ms: 1800 });
+        }
+      }),
     ];
     this._key = (e) => this.onKey(e);
     window.addEventListener('keydown', this._key);
@@ -77,11 +89,12 @@ export class TaggerView {
     for (const p of S.roster.players) {
       const hp = el('div', { class: 'mini-fill' });
       const info = el('span', { class: 'tg-pinfo' });
+      const augs = el('span', { class: 'tg-paugs' }); // 그 플레이어가 가진 보급 증강
       const face = faceCanvas(p.animal, 36);
       // 카드를 누르면 그 플레이어를 머리 위에서 따라가는 화면
-      const row = el('button', { class: 'tg-prow', title: t('tagger.followTitle', { name: p.name }), onclick: () => this.setView(this.leftViews.indexOf(p.id)) }, face, el('div', { class: 'tg-pbody' }, el('div', {}, el('b', {}, p.name), info), el('div', { class: 'mini-bar' }, hp)));
+      const row = el('button', { class: 'tg-prow', title: t('tagger.followTitle', { name: p.name }), onclick: () => this.setView(this.leftViews.indexOf(p.id)) }, face, el('div', { class: 'tg-pbody' }, el('div', {}, el('b', {}, p.name), info, augs), el('div', { class: 'mini-bar' }, hp)));
       this.plist.append(row);
-      this.prows.set(p.id, { row, hp, info });
+      this.prows.set(p.id, { row, hp, info, augs });
     }
     this.viewLabel = el('div', { class: 'view-label' });
     const arrow = (dir, text) => el('button', { class: `view-arrow ${dir < 0 ? 'left' : 'right'}`, title: dir < 0 ? t('tagger.prevView') : t('tagger.nextView'), onclick: () => this.setView(this.viewIdx + dir) }, text);
@@ -128,7 +141,7 @@ export class TaggerView {
     const right = el(
       'section',
       { class: 'tg-right' },
-      el('header', { class: 'tg-ink' }, el('span', { class: 'ink-label' }, t('tagger.ink')), this.inkBar, this.inkText),
+      el('header', { class: 'tg-ink' }, el('span', { class: 'ink-label' }, t('tagger.ink')), this.inkBar, this.inkText, (this.myAugs = el('span', { class: 'tg-myaugs' }))),
       el('div', { class: 'tg-padrow' }, el('div', { class: 'tg-padwrap' }, this.pad.canvas), tools),
       this.attrRow,
       this.previewEl,

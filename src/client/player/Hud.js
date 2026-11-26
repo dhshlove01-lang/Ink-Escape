@@ -2,11 +2,13 @@ import { el, fmtTime, icon } from '../ui/dom.js';
 import { faceCanvas } from '../render/AnimalModels.js';
 import { PSTATE, STATUS_BIT } from '../../shared/protocol.js';
 import { t } from '../i18n.js';
+import { augChips } from '../ui/AugmentPicker.js';
 
 // 플레이어 HUD: 타이머, 보스 HP, 팀원, 내 HP·상태이상·하트, 탄약·지우개, 조준점, 부활 게이지, 안내.
 
 export class Hud {
-  constructor(parent, session, attributes) {
+  constructor(parent, session, attributes, balance) {
+    this.b = balance;
     this.session = session;
     this.attributes = attributes;
     this.root = el('div', { class: 'hud' });
@@ -38,9 +40,13 @@ export class Hud {
     this.hpText = el('div', { class: 'hp-text' });
     this.hearts = el('div', { class: 'hearts' });
     this.status = el('div', { class: 'status-icons' });
+    // 가진 보급 증강 (HP 위 아이콘 줄) + 보급 상자 방향 안내 (위쪽 가운데)
+    this.augs = el('div', { class: 'hud-augs' });
+    this.crate = el('div', { class: 'hud-crate', hidden: true }, (this.crateArrow = el('span', { class: 'crate-arrow' }, '▲')), el('span', {}, '📦 '), (this.crateDist = el('b', {})));
+    this.root.append(this.crate);
     this.stamFill = el('div', { class: 'stam-fill' });
     this.stam = el('div', { class: 'stam-bar' }, this.stamFill);
-    this.root.append(el('div', { class: 'hud-bl' }, this.status, this.hearts, el('div', { class: 'hp-row' }, el('span', { class: 'hp-label' }, 'HP'), this.hpText), el('div', { class: 'hp-bar' }, this.hpFill), this.stam));
+    this.root.append(el('div', { class: 'hud-bl' }, this.augs, this.status, this.hearts, el('div', { class: 'hp-row' }, el('span', { class: 'hp-label' }, 'HP'), this.hpText), el('div', { class: 'hp-bar' }, this.hpFill), this.stam));
 
     this.ammo = el('div', { class: 'ammo' });
     this.gren = el('div', { class: 'gren' });
@@ -58,7 +64,16 @@ export class Hud {
     this.lastHp = null;
   }
 
-  update({ weapon, me, prompt, center, revive, boss, stamina }) {
+  setAugments(aug) {
+    this.augs.replaceChildren(...augChips(aug, this.b, { small: true }));
+  }
+
+  update({ weapon, me, prompt, center, revive, boss, stamina, crate }) {
+    this.crate.hidden = !crate;
+    if (crate) {
+      this.crateArrow.style.transform = `rotate(${crate.angle}rad)`; // 오른쪽에 있으면 오른쪽을 가리킴
+      this.crateDist.textContent = `${Math.round(crate.dist)}m`;
+    }
     // 달리기 기력 (가득이면 흐리게, 바닥나 쉬는 중이면 빨갛게)
     if (stamina) {
       this.stamFill.style.width = `${stamina.value * 100}%`;
