@@ -6,7 +6,7 @@ import { RemotePlayers } from '../player/RemotePlayers.js';
 import { Effects } from '../player/Effects.js';
 
 // 3D 전장 그리기 묶음: 맵 + 몬스터 + 동물 플레이어 + 연출 + 문 상태.
-// 카메라는 모른다 — 플레이어 1인칭(PlayerView)과 술래 구석 카메라(CornerCam)가 같이 쓴다.
+// 카메라는 모른다 — 플레이어 1인칭(PlayerView)과 술래 무대(TaggerCam)가 같이 쓴다.
 
 const SILENT = { play() {}, unlock() {} };
 
@@ -32,7 +32,9 @@ export class WorldRenderer {
     this._off = [
       session.on(EV.SHOT, (e) => {
         if (e.from === skipPlayerId) return; // 내 총알은 1인칭 쪽에서 바로 그린다
-        this.effects.tracer(new THREE.Vector3(...e.a), new THREE.Vector3(...e.b), 0xffc46b);
+        const a = new THREE.Vector3(...e.a);
+        this.effects.muzzle(a, 0.5);
+        this.effects.tracer(a, new THREE.Vector3(...e.b), 0xffc46b);
       }),
       session.on(EV.GREN_THROW, (e) => this.effects.grenade(e.sx, e.sz, e.x, e.z, e.fuse)),
       session.on(EV.GREN_BOOM, (e) => {

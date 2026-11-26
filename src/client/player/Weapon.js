@@ -22,6 +22,14 @@ export class Weapon {
     // 이 카메라는 원점에서 -Z 를 보므로, 여기 좌표 = 플레이어 카메라 기준 좌표.
     this.vmScene = new THREE.Scene();
     this.vmCam = new THREE.PerspectiveCamera(camera.fov, camera.aspect, 0.01, 10);
+    // 뷰모델 전용 조명 (전장 조명과 무관 — 손·총만 밝힌다)
+    this.vmScene.add(new THREE.AmbientLight(0xffe9d6, 2.1));
+    const key = new THREE.DirectionalLight(0xfff1de, 3.1);
+    key.position.set(-0.5, 1.1, 1.4);
+    this.vmScene.add(key);
+    const rim = new THREE.DirectionalLight(0x9fd0ff, 1.1);
+    rim.position.set(0.9, 0.2, -1);
+    this.vmScene.add(rim);
     this.view = createViewModel(animal);
     this.view.position.set(0.25, -0.23, -0.52);
     this.view.scale.setScalar(0.85);
@@ -38,12 +46,46 @@ export class Weapon {
       g.fillRect(0, 0, 64, 64);
       return new THREE.CanvasTexture(c);
     })();
+    // 총구 불꽃: 별 모양(사용자 이미지) + 노란 빛무리 두 겹 — IMG_1240 처럼 선명하게
     this.flash = new THREE.Sprite(new THREE.SpriteMaterial({ map: flashTex, blending: THREE.AdditiveBlending, depthTest: false, transparent: true }));
-    this.flash.scale.set(0.25, 0.25, 1);
+    this.flash.scale.set(0.34, 0.34, 1);
     this.flash.position.set(0.02, 0.015, -0.48);
     this.flash.renderOrder = 11;
     this.flash.visible = false;
     this.view.add(this.flash);
+    const halo = document.createElement('canvas');
+    halo.width = halo.height = 128;
+    const hg = halo.getContext('2d');
+    const hgrad = hg.createRadialGradient(64, 64, 0, 64, 64, 64);
+    hgrad.addColorStop(0, 'rgba(255,246,200,0.95)');
+    hgrad.addColorStop(0.28, 'rgba(255,190,70,0.55)');
+    hgrad.addColorStop(1, 'rgba(255,120,0,0)');
+    hg.fillStyle = hgrad;
+    hg.fillRect(0, 0, 128, 128);
+    this.flashHalo = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(halo), blending: THREE.AdditiveBlending, depthTest: false, transparent: true }));
+    this.flashHalo.scale.set(0.62, 0.62, 1);
+    this.flashHalo.renderOrder = 10;
+    this.flashHalo.visible = false;
+    this.view.add(this.flashHalo);
+    this.flashT = 0;
+
+    // 레드도트 사이트의 빨간 점 (살짝 숨쉬듯 밝아진다)
+    const sight = this.view.userData.sight;
+    const dotCanvas = document.createElement('canvas');
+    dotCanvas.width = dotCanvas.height = 64;
+    const dg = dotCanvas.getContext('2d');
+    const dgrad = dg.createRadialGradient(32, 32, 0, 32, 32, 32);
+    dgrad.addColorStop(0, 'rgba(255,255,255,1)');
+    dgrad.addColorStop(0.16, 'rgba(255,90,90,1)');
+    dgrad.addColorStop(0.34, 'rgba(235,25,45,0.75)');
+    dgrad.addColorStop(1, 'rgba(200,10,30,0)');
+    dg.fillStyle = dgrad;
+    dg.fillRect(0, 0, 64, 64);
+    this.sightDot = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(dotCanvas), blending: THREE.AdditiveBlending, depthTest: false, transparent: true }));
+    this.sightDot.scale.set(0.012, 0.012, 1);
+    this.sightDot.renderOrder = 12;
+    if (sight) this.sightDot.position.set(sight.x, sight.y, sight.z);
+    this.view.add(this.sightDot);
   }
 
   // 총 모델의 실제 총구 끝에 불꽃을 둔다 (모델이 늦게 바뀌어도 매 프레임 따라감)
@@ -55,6 +97,7 @@ export class Weapon {
     const v = src.localToWorld(new THREE.Vector3(tip.x, tip.y, tip.z));
     this.flash.position.copy(this.view.worldToLocal(v));
     this.flash.position.z -= 0.04; // 총구 바로 앞
+    this.flashHalo.position.copy(this.flash.position);
   }
 
   resize(aspect) {
@@ -96,11 +139,26 @@ export class Weapon {
     this.view.position.set(0.25 + Math.cos(this.bobT * 0.5) * (moving ? 0.008 : 0), -0.23 + bob - dip, -0.52 + this.kick * 0.04);
     this.view.rotation.x = this.kick * 0.08 + dip * 0.8;
     this.placeFlash();
-    this.flash.visible = this.kick > 0.75;
+    // 총구 불꽃은 한 번의 사격에 55ms 남짓, 그 사이 부풀었다 줄어든다
+    this.flashT = Math.max(0, this.flashT - dt);
+    const fk = this.flashT > 0 ? 1 - this.flashT / 0.055 : 1;
+    this.flash.visible = this.flashT > 0;
+    this.flashHalo.visible = this.flashT > 0;
+    if (this.flash.visible) {
+      const s = 0.26 + 0.3 * fk;
+      this.flash.scale.set(s, s, 1);
+      const hs = 0.5 + 0.5 * fk;
+      this.flashHalo.scale.set(hs, hs, 1);
+      this.flash.material.opacity = 1 - fk * 0.7;
+      this.flashHalo.material.opacity = (1 - fk) * 0.9;
+    }
+    if (this.sightDot) this.sightDot.material.opacity = 0.72 + Math.sin(now * 2.2) * 0.12 + this.kick * 0.3;
   }
 
   fire() {
     this.kick = 1;
+    this.flashT = 0.055;
+    this.flash.material.rotation = Math.random() * Math.PI * 2;
     this.sfx.play('shot');
     const origin = new THREE.Vector3();
     const dir = new THREE.Vector3();

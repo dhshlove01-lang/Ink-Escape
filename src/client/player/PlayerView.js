@@ -177,6 +177,7 @@ export class PlayerView {
   }
 
   onShot({ muzzle, point, monsterId }) {
+    this.effects.muzzle(muzzle, 0.75);
     this.effects.tracer(muzzle, point);
     this.effects.spark(point, monsterId ? 0xff5050 : 0xffe0a0);
     if (monsterId) {

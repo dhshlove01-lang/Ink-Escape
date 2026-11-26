@@ -21,11 +21,45 @@ export class Effects {
     this.items = [];
   }
 
+  // 사격 궤적: 가산 합성 빛줄기(굵은 심 + 밝은 심지) — 어두운 던전에서도 또렷하게 보인다
   tracer(a, b, color = 0xffd27a) {
-    const geo = new THREE.BufferGeometry().setFromPoints([a, b]);
-    const line = new THREE.Line(geo, new THREE.LineBasicMaterial({ color, transparent: true, opacity: 0.9 }));
-    this.scene.add(line);
-    this.items.push({ obj: line, life: 0.07, max: 0.07, kind: 'fade' });
+    const dir = new THREE.Vector3().subVectors(b, a);
+    const len = dir.length();
+    if (len < 1e-4) return;
+    const mid = new THREE.Vector3().addVectors(a, b).multiplyScalar(0.5);
+    const q = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir.clone().normalize());
+    const geo = new THREE.CylinderGeometry(1, 1, 1, 6, 1, true);
+    const beam = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.5, blending: THREE.AdditiveBlending, depthWrite: false }));
+    beam.position.copy(mid);
+    beam.quaternion.copy(q);
+    beam.scale.set(0.02, len, 0.02);
+    this.scene.add(beam);
+    this.items.push({ obj: beam, life: 0.1, max: 0.1, kind: 'fade' });
+    const core = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ color: 0xfff6da, transparent: true, opacity: 0.95, blending: THREE.AdditiveBlending, depthWrite: false }));
+    core.position.copy(mid);
+    core.quaternion.copy(q);
+    core.scale.set(0.007, len, 0.007);
+    this.scene.add(core);
+    this.items.push({ obj: core, life: 0.07, max: 0.07, kind: 'fade' });
+  }
+
+  // 총구에서 번쩍이는 불꽃 (별 모양 스프라이트 + 빛무리)
+  muzzle(p, size = 0.6) {
+    const sp = vfxSprite('vfx.muzzle', size);
+    if (sp) {
+      sp.position.copy(p);
+      sp.material.rotation = Math.random() * Math.PI * 2;
+      sp.renderOrder = 6;
+      this.scene.add(sp);
+      this.items.push({ obj: sp, life: 0.06, max: 0.06, kind: 'burst', from: 0.75, to: 1.35 });
+    }
+    const glow = vfxSprite('vfx.spark', size * 0.8);
+    if (glow) {
+      glow.position.copy(p);
+      glow.renderOrder = 5;
+      this.scene.add(glow);
+      this.items.push({ obj: glow, life: 0.08, max: 0.08, kind: 'burst', from: 0.9, to: 1.8 });
+    }
   }
 
   spark(p, color = 0xffffff) {

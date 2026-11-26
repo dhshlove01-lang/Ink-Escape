@@ -212,7 +212,7 @@ function primitiveAnimal(kind, { gun = true } = {}) {
   return g;
 }
 
-// 1인칭 앞발 + 총
+// 1인칭 앞발 + 총 (카메라 기준 뷰모델). 동물마다 털색·무늬·소매·발바닥이 다르다.
 export function createViewModel(kind) {
   const L = ANIMAL_LOOK[kind] || ANIMAL_LOOK.shiba;
   const g = new THREE.Group();
@@ -221,12 +221,208 @@ export function createViewModel(kind) {
   gun.scale.setScalar(0.7);
   gun.rotation.y = 0.05; // 총구가 조준점 쪽, 옆면이 살짝 보이게
   g.add(gun);
-  const pawR = sphere(0.055, L.fur, 1.1, 1, 1.2);
-  pawR.position.set(0.01, -0.085, 0.06);
-  const pawL = sphere(0.05, L.fur, 1.1, 1, 1.2);
-  pawL.position.set(-0.02, -0.07, -0.2);
-  g.add(pawR, pawL);
+
+  // 방아쇠를 쥔 오른발 (총 손잡이 뒤) · 총열을 받치는 왼발 (앞몸통 아래)
+  // 좌표는 view 기준(m). 총은 대각선(-z 쪽이 왼쪽 위)이라 발도 그 각도에 맞춘다.
+  const rearWrist = new THREE.Vector3(-0.07, -0.094, -0.028);
+  const rearElbow = new THREE.Vector3(0.02, -0.5, 0.06);
+  const frontWrist = new THREE.Vector3(-0.106, -0.056, -0.15);
+  const frontElbow = new THREE.Vector3(-0.15, -0.5, -0.01);
+  g.add(buildArm(rearWrist, rearElbow, L, kind));
+  g.add(buildArm(frontWrist, frontElbow, L, kind));
+
+  const rear = buildPawView(L, kind, { size: 0.05, padsUp: false });
+  rear.position.copy(rearWrist);
+  rear.rotation.set(1.05, 0.12, 0.32);
+  g.add(rear);
+
+  const front = buildPawView(L, kind, { size: 0.047, padsUp: true });
+  front.position.copy(frontWrist);
+  front.rotation.set(1.0, 0.12, 0.75);
+  g.add(front);
+  // QA·튜닝용 참조 (배치 값을 화면에서 바꿔 보기 위해)
+  g.userData.paws = { rear, front, rearArm: g.children[1], frontArm: g.children[2] };
+
+  // 레드도트 사이트 (총 위) — 빛나는 점의 위치를 Weapon 이 받아 쓴다
+  const sight = buildRedDotSight();
+  sight.position.set(-0.014, 0.085, 0.03);
+  g.add(sight);
+  g.userData.sight = { x: -0.014, y: 0.087, z: 0.062 };
+
   toViewModelMaterial(g);
+  return g;
+}
+
+// 1인칭 동물 앞발 ────────────────────────────────────────────
+// 1 단위 = 손바닥 반지름. 다 만든 뒤 size 로 줄여 쓴다.
+// 뷰모델 전용 조명(Weapon.vmScene)을 받는 Lambert 재질이라 부피가 산다.
+const INK_MAT = new THREE.MeshBasicMaterial({ color: 0x0e0910, side: THREE.BackSide });
+const PAD = 0xff9db0;
+const PAD_DARK = 0xdf6b86;
+const CLAW = 0xfff4dc;
+
+function vmMat(color, k = 1) {
+  const c = new THREE.Color(color);
+  c.multiplyScalar(k);
+  const m = new THREE.MeshLambertMaterial({ color: c });
+  m.userData.vm = true;
+  return m;
+}
+
+function vmSphere(color, r, sx = 1, sy = 1, sz = 1, k = 1) {
+  const m = new THREE.Mesh(new THREE.SphereGeometry(r, 14, 11), vmMat(color, k));
+  m.scale.set(sx, sy, sz);
+  m.userData.vm = true;
+  return m;
+}
+
+// 메시들에 굵은 잉크 외곽선(BackSide 확대 복제)을 붙인다
+function addInk(parent, k = 1.07, skip = []) {
+  for (const m of [...parent.children]) {
+    if (!m.isMesh || skip.includes(m)) continue;
+    const o = new THREE.Mesh(m.geometry, INK_MAT);
+    o.position.copy(m.position);
+    o.rotation.copy(m.rotation);
+    o.scale.copy(m.scale).multiplyScalar(k);
+    o.renderOrder = -1;
+    o.userData.vm = true;
+    parent.add(o);
+  }
+}
+
+/// 동물 앞발 하나 (손바닥·발가락·발톱·발바닥 젤리)
+function buildPawView(L, kind, { size = 0.05, padsUp = false } = {}) {
+  const root = new THREE.Group();
+  const fur = L.fur;
+  const light = L.belly;
+  const sy = padsUp ? 1 : -1; // 발바닥 젤리가 향하는 쪽
+
+  // 손바닥
+  const palm = vmSphere(fur, 1, 1.08, 0.86, 1.02, 0.98);
+  palm.position.set(0, 0, 0.12);
+  root.add(palm);
+  // 손등 하이라이트 (털 밝은 부분) — 발바닥 젤리가 위를 보면 반대쪽에
+  const back = vmSphere(light, 0.72, 1, 0.5, 0.86, 1);
+  back.position.set(0, sy * 0.5, 0.2);
+  root.add(back);
+
+  // 발가락 3개 (앞쪽 -z 로 굽어 감싼다)
+  const toes = [-0.62, 0, 0.62];
+  toes.forEach((x, i) => {
+    const r = 0.5 - Math.abs(i - 1) * 0.045;
+    const toe = vmSphere(fur, r, 1, 0.94, 1.18, 1.06);
+    toe.position.set(x, -0.14, -0.72 - (i === 1 ? 0.06 : 0));
+    root.add(toe);
+    // 발톱
+    const claw = new THREE.Mesh(new THREE.ConeGeometry(0.13, 0.34, 6), vmMat(CLAW, 1));
+    claw.position.set(x, -0.1, -1.26 - (i === 1 ? 0.06 : 0));
+    claw.rotation.x = -Math.PI / 2;
+    root.add(claw);
+    // 발가락 젤리
+    const bean = vmSphere(PAD, 0.21, 1, 0.5, 1.15, 1);
+    bean.position.set(x, sy * 0.4, -0.78 - (i === 1 ? 0.06 : 0));
+    root.add(bean);
+  });
+  // 엄지
+  const thumb = vmSphere(fur, 0.44, 1, 0.9, 1.05, 0.92);
+  thumb.position.set(1.02, -0.18, 0.06);
+  thumb.rotation.z = -0.5;
+  root.add(thumb);
+  // 손바닥 젤리
+  const pad = vmSphere(PAD_DARK, 0.5, 1, 0.42, 1.05, 1);
+  pad.position.set(0, sy * 0.62, 0.1);
+  root.add(pad);
+  // 발가락 사이 홈 (잉크 선)
+  for (const x of [-0.31, 0.31]) {
+    const gap = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.5, 0.5), vmMat(0x1a1218, 1));
+    gap.position.set(x, sy * 0.16, -0.62);
+    root.add(gap);
+  }
+
+  // 무늬: 삼색고양이 = 주황·검정 얼룩, 시바 = 크림 양말, 곰 = 진한 발끝, 토끼 = 흰 발
+  if (L.patch) {
+    const p1 = vmSphere(L.patch[0], 0.42, 1, 0.5, 0.8, 1);
+    p1.position.set(-0.45, 0.56, 0.16);
+    root.add(p1);
+    const p2 = vmSphere(L.patch[1], 0.34, 1, 0.5, 0.75, 1);
+    p2.position.set(0.5, 0.5, 0.05);
+    root.add(p2);
+    const p3 = vmSphere(L.patch[0], 0.2, 1, 0.6, 1, 1);
+    p3.position.set(-0.62, 0.02, -0.95);
+    root.add(p3);
+  } else if (kind === 'shiba') {
+    for (const x of toes) {
+      const sock = vmSphere(light, 0.27, 1, 0.7, 0.9, 1);
+      sock.position.set(x, -0.34, -1.02);
+      root.add(sock);
+    }
+  } else if (kind === 'bear') {
+    for (const x of toes) {
+      const tip = vmSphere(0x4a2c18, 0.24, 1, 0.8, 0.9, 1);
+      tip.position.set(x, -0.28, -1.06);
+      root.add(tip);
+    }
+  }
+
+  // 소매(팔)는 createViewModel 이 따로 만든다
+  addInk(root, 1.12, [pad]);
+  root.scale.setScalar(size);
+  root.userData.paw = true;
+  return root;
+}
+
+// 동물 팔: 털 팔목 + 팔 끝 쪽에 천 소매 단. 손목에서 화면 아래로 빠져나간다.
+function buildArm(wrist, elbow, L, kind) {
+  const g = new THREE.Group();
+  const dir = new THREE.Vector3().subVectors(elbow, wrist);
+  const len = dir.length();
+  const unit = dir.clone().normalize();
+  const q = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), unit);
+  const mid = new THREE.Vector3().addVectors(wrist, elbow).multiplyScalar(0.5);
+
+  // 털 팔 (손목 쪽이 가늘고 팔꿈치 쪽이 두룹다)
+  const arm = new THREE.Mesh(new THREE.CylinderGeometry(0.022, 0.032, len, 14, 1, true), vmMat(L.fur, 0.95));
+  arm.userData.vm = true;
+  arm.position.copy(mid);
+  arm.quaternion.copy(q);
+  g.add(arm);
+  // 손목 털 (복슬한 단)
+  const fluff = new THREE.Mesh(new THREE.CylinderGeometry(0.029, 0.027, 0.04, 14), vmMat(L.belly, 1));
+  fluff.userData.vm = true;
+  fluff.position.copy(wrist).addScaledVector(unit, 0.03);
+  fluff.quaternion.copy(q);
+  g.add(fluff);
+  // 소매 (손목 아래에서 보이는 색 단) + 접힌 끝
+  const cuffLen = 0.075;
+  const sleeve = new THREE.Mesh(new THREE.CylinderGeometry(0.033, 0.035, cuffLen, 14, 1, true), vmMat(L.hat, 0.6));
+  sleeve.userData.vm = true;
+  sleeve.position.copy(wrist).addScaledVector(unit, 0.052 + cuffLen / 2);
+  sleeve.quaternion.copy(q);
+  g.add(sleeve);
+  const trim = new THREE.Mesh(new THREE.CylinderGeometry(0.036, 0.036, 0.014, 14), vmMat(L.belly, 0.9));
+  trim.userData.vm = true;
+  trim.position.copy(wrist).addScaledVector(unit, 0.05);
+  trim.quaternion.copy(q);
+  g.add(trim);
+  return g;
+}
+
+// 레드도트 사이트: 검은 몸통 + 빛나는 빨간 렌즈 (뷰모델의 다른 것과 같은 조명 없는 재질)
+function buildRedDotSight() {
+  const g = new THREE.Group();
+  const body = new THREE.Mesh(new THREE.BoxGeometry(0.042, 0.024, 0.05), vmMat(0x18161c, 1));
+  g.add(body);
+  const hood = new THREE.Mesh(new THREE.CylinderGeometry(0.017, 0.017, 0.014, 12), vmMat(0x0d0b10, 1));
+  hood.rotation.x = Math.PI / 2;
+  hood.position.set(0, 0.002, -0.012);
+  g.add(hood);
+  const lens = new THREE.Mesh(new THREE.CircleGeometry(0.012, 16), new THREE.MeshBasicMaterial({ color: 0xff2333, transparent: true, opacity: 0.9 }));
+  lens.position.set(0, 0.002, 0.026);
+  lens.userData.vm = true;
+  g.add(lens);
+  const rail = new THREE.Mesh(new THREE.BoxGeometry(0.026, 0.01, 0.06), vmMat(0x24202a, 1));
+  rail.position.set(0, -0.022, 0);
+  g.add(rail);
   return g;
 }
 
@@ -234,8 +430,10 @@ export function createViewModel(kind) {
 function toViewModelMaterial(root) {
   root.traverse((o) => {
     if (!o.isMesh || o.userData.vm) return;
-    const src = o.material;
-    o.material = new THREE.MeshBasicMaterial({ color: src.color.clone().multiplyScalar(src.map ? 1 : 0.8), map: src.map || null });
+    const src = Array.isArray(o.material) ? o.material[0] : o.material;
+    if (!src?.color) return;
+    // 뷰모델 조명을 받는 Lambert 로 바꿔 총이 어둠에 잠기지 않게 (텍스처는 그대로)
+    o.material = new THREE.MeshLambertMaterial({ color: src.color.clone().multiplyScalar(1.5), map: src.map || null });
     o.userData.vm = true;
   });
 }
