@@ -1,7 +1,7 @@
 import { GRAPHICS, GRAPHICS_DEFAULT, BACKGROUND_FPS } from '../../config/graphics.js';
 
 // 그래픽 품질 고르기 + 화면 크기·창 포커스에 맞춘 그리기 해상도·빈도 계산.
-// 3D 화면(PlayerView·CornerCam·CharacterStage)은 여기서 숫자만 받아 쓴다.
+// 3D 화면(PlayerView·TaggerCam·CharacterStage)은 여기서 숫자만 받아 쓴다.
 
 const KEY = 'inkEscape.gfx';
 const listeners = new Set();

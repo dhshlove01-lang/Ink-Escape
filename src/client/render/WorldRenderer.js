@@ -8,7 +8,7 @@ import { surfaceAt } from '../player/surface.js';
 import { SupplyCrates } from './SupplyCrates.js';
 
 // 3D 전장 그리기 묶음: 맵 + 몬스터 + 동물 플레이어 + 연출 + 문 상태.
-// 카메라는 모른다 — 플레이어 1인칭(PlayerView)과 술래 구석 카메라(CornerCam)가 같이 쓴다.
+// 카메라는 모른다 — 플레이어 1인칭(PlayerView)과 술래 무대(TaggerCam)가 같이 쓴다.
 
 const SILENT = { play() {}, unlock() {} };
 
@@ -36,6 +36,7 @@ export class WorldRenderer {
       session.on(EV.SHOT, (e) => {
         if (e.from === skipPlayerId) return; // 내 총알은 1인칭 쪽에서 바로 그린다
         const a = new THREE.Vector3(...e.a), b = new THREE.Vector3(...e.b);
+        this.effects.muzzle(a, 0.5);
         this.effects.tracer(a, b, 0xffc46b);
         const s = surfaceAt(session.map, b, new THREE.Vector3().subVectors(b, a));
         if (s) this.effects.bulletHole(b, s.normal, s.kind);

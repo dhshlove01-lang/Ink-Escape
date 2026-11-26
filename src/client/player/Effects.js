@@ -157,6 +157,25 @@ export class Effects {
     this.items.push({ obj: m, life: this.holeSec, max: this.holeSec, kind: 'hole', mats: [mat] });
   }
 
+  // 총구에서 번쩍이는 불꽃 (별 모양 스프라이트 + 빛무리) — 사용자 IMG_1240 분위기
+  muzzle(p, size = 0.6) {
+    const sp = vfxSprite('vfx.muzzle', size);
+    if (sp) {
+      sp.position.copy(p);
+      sp.material.rotation = Math.random() * Math.PI * 2;
+      sp.renderOrder = 6;
+      this.scene.add(sp);
+      this.items.push({ obj: sp, life: 0.06, max: 0.06, kind: 'burst', from: 0.75, to: 1.35 });
+    }
+    const glow = vfxSprite('vfx.spark', size * 0.8);
+    if (glow) {
+      glow.position.copy(p);
+      glow.renderOrder = 5;
+      this.scene.add(glow);
+      this.items.push({ obj: glow, life: 0.08, max: 0.08, kind: 'burst', from: 0.9, to: 1.8 });
+    }
+  }
+
   spark(p, color = 0xffffff) {
     const sp = vfxSprite('vfx.spark', 0.5);
     if (sp) {

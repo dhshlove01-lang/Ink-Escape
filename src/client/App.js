@@ -175,7 +175,9 @@ export class App {
     if (session.role === 'both') {
       this.views.tagger.setActive(false);
       this.views.player.setActive(true);
-      holder.append(el('div', { class: 'solo-hint' }, t('game.soloHint')));
+      // Tab 안내는 플레이어 화면에만 (술래 화면은 머리글에 따로 표시)
+      this.views.hint = el('div', { class: 'solo-hint' }, t('game.soloHint'));
+      holder.append(this.views.hint);
     }
   }
 
@@ -185,6 +187,7 @@ export class App {
     const toTagger = this.views.player.active;
     this.views.player.setActive(!toTagger);
     this.views.tagger.setActive(toTagger);
+    if (this.views.hint) this.views.hint.hidden = toTagger;
     this.conn.send({ t: MSG.VIEW, tagger: toTagger });
   }
 

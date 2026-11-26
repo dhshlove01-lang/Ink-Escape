@@ -3,8 +3,9 @@ import { minPlayerDist } from '../../shared/augmentMath.js';
 import { CELL, TILE } from '../../shared/map/GameMap.js';
 import { PSTATE, EV } from '../../shared/protocol.js';
 import { buildCutout } from '../render/PaperCutout.js';
-import { drawAnimalFace } from '../render/AnimalModels.js';
+import { drawAnimalFace, ANIMAL_LOOK } from '../render/AnimalModels.js';
 import { planProps, hash2, rand } from '../render/DungeonKit.js';
+import { validSpawnSpot } from './spawnSpot.js';
 
 // 술래 왼쪽 화면: 맵 탑뷰 실시간 관전 + 소환 위치 고르기.
 // 몬스터는 작은 미니 그림(정면)으로 보인다.
@@ -13,14 +14,15 @@ import { planProps, hash2, rand } from '../render/DungeonKit.js';
 const PX = 16; // 칸 하나 = 16px (배경 캔버스 해상도)
 
 export class TopDownMap extends Emitter {
-  constructor({ session, palette, balance }) {
+  constructor({ session, palette, balance, mini = false }) {
     super();
     this.session = session;
     this.map = session.map;
     this.palette = palette;
     this.b = balance;
+    this.mini = mini;
     this.canvas = document.createElement('canvas');
-    this.canvas.className = 'topdown';
+    this.canvas.className = mini ? 'topdown minimap-canvas' : 'topdown';
     this.ctx = this.canvas.getContext('2d');
     this.target = null;
     this.hover = null;
@@ -28,14 +30,16 @@ export class TopDownMap extends Emitter {
     this.props = planProps(this.map);
     this.bg = this.renderBackground();
 
-    this.canvas.addEventListener('pointerdown', (e) => {
-      const w = this.toWorld(e);
-      if (!w) return;
-      this.target = w;
-      this.emit('pick', w);
-    });
-    this.canvas.addEventListener('pointermove', (e) => (this.hover = this.toWorld(e)));
-    this.canvas.addEventListener('pointerleave', () => (this.hover = null));
+    if (!mini) {
+      this.canvas.addEventListener('pointerdown', (e) => {
+        const w = this.toWorld(e);
+        if (!w) return;
+        this.target = w;
+        this.emit('pick', w);
+      });
+      this.canvas.addEventListener('pointermove', (e) => (this.hover = this.toWorld(e)));
+      this.canvas.addEventListener('pointerleave', () => (this.hover = null));
+    }
     this._off = [session.on(EV.MDIE, (e) => this.minis.delete(e.id))];
   }
 
@@ -230,7 +234,7 @@ export class TopDownMap extends Emitter {
       this.canvas.height = Math.max(1, Math.round(r.height * dpr));
     }
     const W = this.canvas.width, H = this.canvas.height;
-    const scale = Math.min(W / this.map.worldW, H / this.map.worldH) * 0.96;
+    const scale = Math.min(W / this.map.worldW, H / this.map.worldH) * (this.mini ? 0.99 : 0.96);
     this.view = { scale, ox: (W - this.map.worldW * scale) / 2, oy: (H - this.map.worldH * scale) / 2, dpr };
   }
 
@@ -245,14 +249,10 @@ export class TopDownMap extends Emitter {
   }
 
   validSpot(p) {
-    if (!p || !this.map.isFloor(p.x, p.z)) return false;
-    for (const pl of this.session.players()) {
-      if (pl.st === PSTATE.ALIVE && !(pl.bits & 16) && Math.hypot(pl.x - p.x, pl.z - p.z) < minPlayerDist(this.b, this.session.taggerAugs)) return false;
-    }
-    return true;
+    return validSpawnSpot({ session: this.session, balance: this.b, map: this.map, p });
   }
 
-  mini(id) {
+  monsterMini(id) {
     let m = this.minis.get(id);
     if (!m) {
       const meta = this.session.monsterMeta.get(id);
@@ -490,7 +490,7 @@ export class TopDownMap extends Emitter {
     const u = 1 / scale; // 화면 1px 을 월드 단위로
 
     // 횃불 빛 (지도 위에 따뜻한 얼룩)
-    this.drawTorchGlow(g, time, 1);
+    this.drawTorchGlow(g, time, this.mini ? 0.55 : 1);
 
     // 탈출 문 3곳 (구조는 늘 보이고, 공개·열림만 상태로)
     if (this.doorRects) {
@@ -504,18 +504,20 @@ export class TopDownMap extends Emitter {
     // 소품
     this.drawProps(g, u);
 
-    // 플레이어 주변 소환 금지 구역
+    // 플레이어 주변 소환 금지 구역 (미니맵에서는 생략 — 작아서 다 덮는다)
     const players = S.players();
-    g.fillStyle = 'rgba(220,40,60,0.1)';
-    g.strokeStyle = 'rgba(220,40,60,0.4)';
-    g.lineWidth = u * 1.5 * dpr;
-    for (const p of players) {
-      if (p.st !== PSTATE.ALIVE || p.bits & 16) continue;
-      const pp = S.playerPos(p.id) || p;
-      g.beginPath();
-      g.arc(pp.x, pp.z, minPlayerDist(this.b, S.taggerAugs), 0, Math.PI * 2); // 그림자 소환이면 작아짐
-      g.fill();
-      g.stroke();
+    if (!this.mini) {
+      g.fillStyle = 'rgba(220,40,60,0.1)';
+      g.strokeStyle = 'rgba(220,40,60,0.4)';
+      g.lineWidth = u * 1.5 * dpr;
+      for (const p of players) {
+        if (p.st !== PSTATE.ALIVE || p.bits & 16) continue;
+        const pp = S.playerPos(p.id) || p;
+        g.beginPath();
+        g.arc(pp.x, pp.z, minPlayerDist(this.b, S.taggerAugs), 0, Math.PI * 2); // 그림자 소환이면 작아짐
+        g.fill();
+        g.stroke();
+      }
     }
 
     // 끈적 잉크 웅덩이 (술래 증강)
@@ -560,37 +562,60 @@ export class TopDownMap extends Emitter {
       g.beginPath();
       g.arc(z.x, z.z, z.r + (z.kind === 'normal' ? 0.4 : 1.5), 0, Math.PI * 2);
       g.fill();
+      if (this.mini) continue;
       g.fillStyle = '#fff';
       g.font = `bold ${14 * u * dpr}px sans-serif`;
       g.textAlign = 'center';
       g.fillText(left.toFixed(1), z.x, z.z + 5 * u * dpr);
     }
 
-    // 몬스터 미니 그림
-    for (const id of S.monsterMeta.keys()) {
-      const p = S.monsterPos(id);
-      const mi = this.mini(id);
-      if (!p || !mi) continue;
-      const w = Math.max(3.6, mi.st.width * 1.8);
-      const k = w / mi.cut.canvas.width;
-      const h = mi.cut.canvas.height * k;
-      // 바닥 그림자
-      g.fillStyle = 'rgba(0,0,0,0.45)';
-      g.beginPath();
-      g.ellipse(p.x, p.z + h * 0.2, w * 0.42, w * 0.13, 0, 0, Math.PI * 2);
-      g.fill();
-      g.drawImage(mi.cut.canvas, p.x - w / 2, p.z - h * 0.85, w, h);
-      g.fillStyle = '#1a1414';
-      g.fillRect(p.x - w / 2, p.z + h * 0.18, w, 0.5);
+    // 몬스터: 2D 지도는 미니 그림, 미니맵은 작은 빨간 점
+    if (this.mini) {
       g.fillStyle = '#e0303f';
-      g.fillRect(p.x - w / 2, p.z + h * 0.18, (w * p.hp) / p.maxHp, 0.5);
+      for (const id of S.monsterMeta.keys()) {
+        const p = S.monsterPos(id);
+        if (!p) continue;
+        g.beginPath();
+        g.arc(p.x, p.z, 1.5, 0, Math.PI * 2);
+        g.fill();
+      }
+    } else {
+      for (const id of S.monsterMeta.keys()) {
+        const p = S.monsterPos(id);
+        const mi = this.monsterMini(id);
+        if (!p || !mi) continue;
+        const w = Math.max(3.6, mi.st.width * 1.8);
+        const k = w / mi.cut.canvas.width;
+        const h = mi.cut.canvas.height * k;
+        // 바닥 그림자
+        g.fillStyle = 'rgba(0,0,0,0.45)';
+        g.beginPath();
+        g.ellipse(p.x, p.z + h * 0.2, w * 0.42, w * 0.13, 0, 0, Math.PI * 2);
+        g.fill();
+        g.drawImage(mi.cut.canvas, p.x - w / 2, p.z - h * 0.85, w, h);
+        g.fillStyle = '#1a1414';
+        g.fillRect(p.x - w / 2, p.z + h * 0.18, w, 0.5);
+        g.fillStyle = '#e0303f';
+        g.fillRect(p.x - w / 2, p.z + h * 0.18, (w * p.hp) / p.maxHp, 0.5);
+      }
     }
 
-    // 플레이어 (동물 얼굴 + 발밑 색 링)
+    // 플레이어 (동물 얼굴 + 발밑 색 링) — 미니맵은 큰 색 점
     for (const p of players) {
       if (p.st === PSTATE.ESCAPED || p.st === PSTATE.OUT) continue;
       const pp = S.playerPos(p.id) || p;
       const dead = p.st === PSTATE.DEAD;
+      if (this.mini) {
+        const col = ANIMAL_LOOK[S.animalOf(p.id)]?.label || '#e39a4b';
+        g.fillStyle = dead ? 'rgba(120,120,120,0.9)' : col;
+        g.beginPath();
+        g.arc(pp.x, pp.z, 2.3, 0, Math.PI * 2);
+        g.fill();
+        g.strokeStyle = dead ? 'rgba(80,80,80,0.9)' : '#fff';
+        g.lineWidth = 0.9;
+        g.stroke();
+        continue;
+      }
       g.fillStyle = dead ? 'rgba(60,60,60,0.55)' : 'rgba(0,0,0,0.45)';
       g.beginPath();
       g.ellipse(pp.x, pp.z + 0.5, 1.7, 0.7, 0, 0, Math.PI * 2);
@@ -632,8 +657,8 @@ export class TopDownMap extends Emitter {
       }
     }
 
-    // 고른 위치 / 마우스 위치
-    for (const [p, solid] of [[this.hover, false], [this.target, true]]) {
+    // 고른 위치 / 마우스 위치 (미니맵은 소환 위치를 다루지 않는다)
+    for (const [p, solid] of this.mini ? [] : [[this.hover, false], [this.target, true]]) {
       if (!p) continue;
       const ok = this.validSpot(p);
       g.strokeStyle = ok ? 'rgba(120,255,160,0.95)' : 'rgba(255,80,80,0.95)';
@@ -651,7 +676,7 @@ export class TopDownMap extends Emitter {
     g.setTransform(1, 0, 0, 1, 0, 0);
     const vg = g.createRadialGradient(W / 2, H / 2, Math.min(W, H) * 0.32, W / 2, H / 2, Math.max(W, H) * 0.72);
     vg.addColorStop(0, 'rgba(0,0,0,0)');
-    vg.addColorStop(1, 'rgba(0,0,0,0.72)');
+    vg.addColorStop(1, `rgba(0,0,0,${this.mini ? 0.42 : 0.72})`);
     g.fillStyle = vg;
     g.fillRect(0, 0, W, H);
   }

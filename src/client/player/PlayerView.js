@@ -204,6 +204,7 @@ export class PlayerView {
   }
 
   onShot({ origin, muzzle, point, monsterId, monsterIds = monsterId ? [monsterId] : [], follow }) {
+    this.effects.muzzle(muzzle, 0.75);
     this.effects.tracer(muzzle, point, undefined, follow);
     if (!monsterId) {
       const s = surfaceAt(this.session.map, point, new THREE.Vector3().subVectors(point, origin));
