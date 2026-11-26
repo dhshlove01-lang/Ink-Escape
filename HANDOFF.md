@@ -110,6 +110,13 @@ URL=https://dhshlove01-lang.github.io/Ink-Escape/ NODE_PATH=$(npm root -g) node 
 
 ## 작업 기록
 
+### 2026-11-26 · 시작 화면 정리 (팝업 2개)
+- **무엇을**: 위쪽 동물 얼굴 줄·"닉네임" 흰 글씨 제거 → 전체 배치를 위로. 닉네임 칸은 방 만들기와 같은 주아 글씨·가운데 정렬. 방 코드 칸+참가 버튼 → 빨간 긴 **참가하기** 버튼 하나, 누르면 가운데 팝업(방 코드 칸: 큰 글씨·가운데, 취소/참가). 아래로 펴지던 조작법 → 잘 보이는 **🎮 조작법** 버튼 + 가운데 팝업(플레이어/술래/혼자 테스트 칸, 문장을 ' · ' 로 나눠 줄 목록).
+- **왜**: 사용자 요청 (닉네임 두 번 표시, 조작법이 잘 안 보임).
+- **어디**: `src/client/ui/screens.js` (`modalBox` 공용 팝업 — 배경 클릭·Esc 로 닫힘, `TitleView.build`), `style.css` (`.title-input`·`.code-input`·`.modal-*`·`.howto-btn`·`.howto-sec`, 빈 `.title-status` 는 숨김), `strings.js` (`title.joinRoom`·`title.joinTitle`·`common.cancel`·`common.ok`, ko·en).
+- **검증**: 헤드리스 크로뮴 ko/en 스크린샷(시작 화면·조작법 팝업·코드 팝업), pageerror 0, `npm test` 12/12, smoke 통과.
+
+
 ### 2026-11-26 · 속성을 색과 분리(C안) · 플레이어 따라가기 카메라 · 천장 뚫림 방지
 - **C안**: 속성은 술래가 고름 — 술래 화면에 `속성: — 기본 · 🛡 방어 · 🔥 화염 · ❄ 빙결 · ⚡ 번개 · ☠ 독` (숫자키 0~5). 색(컬러 피커)은 꾸미기만. `StatCalculator.attributesFrom(opt.attr)`, 소환 메시지에 `attr`, 방장 `SpawnSystem` 이 검사. 기본(속성 없음)은 효과 없음·종이색 오라. (획의 `c` 는 이제 칠한 칸 표시용일 뿐)
 - **따라가기 카메라**: 술래 화면 아래 플레이어 카드가 버튼 → 누르면 그 플레이어 머리 위(벽 위 6m)·뒤 5m 에서 따라가며 내려다봄, 보는 카드는 노란 테두리. (`CornerCam.followSpot`, `TaggerView.setView`)

@@ -38,6 +38,19 @@ export function langPicker() {
   return box;
 }
 
+// 가운데 팝업 (배경 클릭·Esc 로 닫힘). hidden 으로 열고 닫는다.
+function modalBox({ title, body, actions, onClose, wide = false }) {
+  const back = el('div', { class: 'modal-back', hidden: true, onclick: (e) => e.target === back && onClose() },
+    el('div', { class: 'modal-card' + (wide ? ' wide' : ''), role: 'dialog', 'aria-modal': 'true', 'aria-label': title },
+      el('h2', { class: 'modal-title' }, title),
+      ...body,
+      actions,
+    ),
+  );
+  back.addEventListener('keydown', (e) => e.key === 'Escape' && onClose());
+  return back;
+}
+
 export class TitleView {
   constructor(parent, { onCreate, onJoin, onSolo }) {
     this.cb = { onCreate, onJoin, onSolo };
@@ -52,8 +65,8 @@ export class TitleView {
 
   build() {
     const { onCreate, onJoin, onSolo } = this.cb;
-    const name = el('input', { id: 'name', maxlength: 12, placeholder: t('title.nickname'), value: this.nameVal });
-    const code = el('input', { id: 'code', maxlength: 5, placeholder: t('title.roomCode'), value: this.codeVal, style: { textTransform: 'uppercase' } });
+    const name = el('input', { id: 'name', class: 'title-input', maxlength: 12, placeholder: t('title.nickname'), 'aria-label': t('title.nickname'), value: this.nameVal });
+    const code = el('input', { id: 'code', class: 'title-input code-input', maxlength: 5, placeholder: t('title.roomCode'), 'aria-label': t('title.roomCode'), value: this.codeVal, autocomplete: 'off', spellcheck: 'false' });
     name.addEventListener('input', () => (this.nameVal = name.value));
     code.addEventListener('input', () => (this.codeVal = code.value));
     this.status = el('div', { class: 'title-status' }, this.statusText);
@@ -73,9 +86,59 @@ export class TitleView {
         busy(false);
       }
     };
-    const join = () => run(() => onJoin(code.value.trim().toUpperCase(), getName()));
-    code.addEventListener('keydown', (e) => e.key === 'Enter' && join());
-    const faces = el('div', { class: 'title-faces' }, ...ANIMALS.map((a) => faceCanvas(a, 64)));
+    // 참가하기 → 가운데 팝업에서 방 코드 입력
+    this.joinStatus = el('div', { class: 'title-status' });
+    const closeJoin = () => {
+      modal.hidden = true;
+      this.joinStatus.textContent = '';
+    };
+    const join = async () => {
+      const btns = modal.querySelectorAll('button');
+      btns.forEach((b) => (b.disabled = true));
+      this.joinStatus.textContent = t('common.connecting');
+      try {
+        await onJoin(code.value.trim().toUpperCase(), getName());
+      } catch (e) {
+        this.joinStatus.textContent = tr(e.message || String(e));
+        btns.forEach((b) => (b.disabled = false));
+      }
+    };
+    code.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') join();
+    });
+    const modal = modalBox({
+      title: t('title.joinTitle'),
+      onClose: closeJoin,
+      body: [code, this.joinStatus],
+      actions: el('div', { class: 'modal-actions' },
+        el('button', { class: 'btn ghost', onclick: closeJoin }, t('common.cancel')),
+        el('button', { class: 'btn primary', onclick: join }, t('title.join')),
+      ),
+    });
+    const openJoin = () => {
+      modal.hidden = false;
+      code.focus();
+      code.select();
+    };
+    // 조작법 → 가운데 팝업 (역할별 칸, ' · ' 로 나눈 줄)
+    const closeHelp = () => (help.hidden = true);
+    const howtoBlock = (key) => {
+      const text = t(key);
+      const cut = text.indexOf(':');
+      const head = cut > 0 ? text.slice(0, cut) : '';
+      const rest = cut > 0 ? text.slice(cut + 1) : text;
+      return el('section', { class: 'howto-sec' },
+        head && el('h3', {}, head.trim()),
+        el('ul', {}, ...rest.split('·').map((x) => el('li', {}, x.trim()))),
+      );
+    };
+    const help = modalBox({
+      title: t('title.howto'),
+      wide: true,
+      onClose: closeHelp,
+      body: [howtoBlock('title.howtoPlayer'), howtoBlock('title.howtoTagger'), howtoBlock('title.howtoSolo')],
+      actions: el('button', { class: 'btn primary', onclick: closeHelp }, t('common.ok')),
+    });
     this.picker?._off?.();
     this.picker = langPicker();
     this.root.replaceChildren(
@@ -83,25 +146,22 @@ export class TitleView {
         'div',
         { class: 'title-card' },
         el('div', { class: 'title-top' }, this.picker),
-        faces,
         url('ui.logo') ? el('h1', { class: 'logo' }, el('img', { src: url('ui.logo'), alt: 'INK ESCAPE' })) : el('h1', {}, 'INK ESCAPE'),
         el('p', { class: 'title-sub' }, t('title.sub')),
-        el('label', { class: 'field' }, el('span', {}, t('title.nickname')), name),
         el('div', { class: 'title-actions' },
+          name,
           el('button', { class: 'btn primary', onclick: () => run(() => onCreate(getName())) }, t('title.create')),
-          el('div', { class: 'join' }, code, el('button', { class: 'btn', onclick: join }, t('title.join'))),
+          el('button', { class: 'btn primary', onclick: openJoin }, t('title.joinRoom')),
           el('button', { class: 'btn ghost', onclick: () => run(() => onSolo(getName())) }, t('title.solo')),
         ),
         this.status,
-        el('details', { class: 'howto' },
-          el('summary', {}, t('title.howto')),
-          el('ul', {},
-            el('li', {}, t('title.howtoPlayer')),
-            el('li', {}, t('title.howtoTagger')),
-            el('li', {}, t('title.howtoSolo')),
-          ),
-        ),
+        el('button', { class: 'howto-btn', onclick: () => {
+          help.hidden = false;
+          help.querySelector('.btn')?.focus();
+        } }, '🎮 ', t('title.howto')),
       ),
+      modal,
+      help,
     );
   }
 
