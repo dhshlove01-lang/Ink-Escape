@@ -92,7 +92,13 @@ URL=https://dhshlove01-lang.github.io/Ink-Escape/ NODE_PATH=$(npm root -g) node 
 
 ## 지금 진행 중
 
-(없음 — 다음 작업을 시작하면 여기에 할 일과 체크 목록을 적고 바로 커밋·푸시)
+2026-11-26 시바 3D 코드 모델 (img2threejs 스킬, Claude 작업 중) — 사용자 요청: 원본 2D(assets/source/shiba.png)로 캐릭터 하나 시험 제작
+- 작업 폴더 `art/models/shiba/` (reference.png, work/: 스펙 `object-sculpt-spec.json`, 스펙 생성기 `build_spec.py`, 상태 `.img2threejs/state.json`), 재생성 `art/models/shiba/rebuild.sh <pass-id>` (미리보기는 scratch 의 three 0.160 + esbuild 필요 — 스크립트 안 경로 참고)
+- [x] 이미지 분석·적합성·랜드마크·평가·세부 목록·재질 근거·스펙·엄격 검사 통과
+- [ ] 빌드 패스: blockout 진행 중 (렌더 `work/renders/blockout-sheet.png`). 남은 점: 반다나 너무 밝고 넓음, 벨트가 떠 보임, 주황 연함
+- [ ] 이후 structural → feature-placement → material → lighting → interaction → optimization, 각 패스 리뷰 기록
+- [ ] 게임 적용: `src/client/render/models/shiba.js`(순수 JS) + `config/models.js` 한 줄(procedural), ModelLibrary 지원, 기존 GLB 와 비교 사진
+- 주의: 생성기는 transform.rotation 을 라디안으로 쓴다(build_spec.py 에서 변환). 끝점(attachment) 부품은 회전 0. 토러스는 반지름 0.45 기준 scale.
 
 ## 다음 할 일 (우선순위)
 

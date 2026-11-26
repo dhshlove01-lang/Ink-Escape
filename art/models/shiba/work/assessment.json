@@ -1,0 +1,528 @@
+{
+ "targetName": "Chibi Shiba Mascot",
+ "sourceImage": "/home/user/ink-escape/art/models/shiba/reference.png",
+ "preSpecAssessment": {
+  "objectClass": {
+   "primaryType": "stylized chibi mascot character (anthropomorphic shiba inu)",
+   "primaryDomain": "character",
+   "formLanguage": [
+    "organic",
+    "rounded",
+    "bilateral-symmetric"
+   ],
+   "structureKind": [
+    "head-on-torso blend",
+    "short limbs",
+    "worn accessories"
+   ],
+   "motionPotential": [
+    "idle bob",
+    "wave arm",
+    "head tilt",
+    "walk cycle"
+   ],
+   "materialFamilies": [
+    "fur (matte)",
+    "cloth",
+    "leather",
+    "brass metal",
+    "glossy eye"
+   ],
+   "notes": "Observed from one front view on neutral grey background. Stylized flat-color regions; no fur strands needed."
+  },
+  "complexity": {
+   "tier": "complex",
+   "scores": {
+    "silhouetteComplexity": 2,
+    "componentCount": 3,
+    "hierarchyDepth": 3,
+    "repetitionDensity": 2,
+    "materialLayerCount": 3,
+    "localDetailDensity": 3,
+    "occlusionRisk": 2,
+    "actionReadinessNeed": 3
+   },
+   "estimatedCounts": {
+    "macroComponents": 7,
+    "mesoComponents": 14,
+    "microFeatureGroups": 6,
+    "materialLayers": 9,
+    "repetitionSystems": 2
+   },
+   "reasoning": [
+    "Chibi character: few macro volumes but many identity-defining small features (face, ears, accessories).",
+    "Bilateral pairs (ears, eyes, brows, arms, legs, feet, pouches) = mirrored repetition systems.",
+    "Game use needs action-ready hierarchy (arms/head/tail pivots) for idle animations."
+   ]
+  },
+  "specDepthDecision": {
+   "requiredDepth": "complex",
+   "minimumComponentLevels": [
+    "macro",
+    "meso",
+    "micro"
+   ],
+   "needsRepetitionSystems": true,
+   "needsMaterialLocalOverrides": true,
+   "needsMultipleReviewViews": true,
+   "needsActionReadyHierarchy": true,
+   "rationale": "Choose simple/moderate/complex/ultra-complex from observed structure, not from a hardcoded domain."
+  },
+  "unknownsToResolveBeforeImplementation": [
+   "Back of head/body and tail not visible: tail inferred as shiba curled tail (speculative, low confidence).",
+   "Body depth inferred (head depth 0.85×width, torso 0.8×width).",
+   "Bandana back drape and belt back inferred as continuous wraps."
+  ],
+  "detailInventory": {
+   "scanMethod": "component-zones",
+   "targetMinDetails": 10,
+   "note": "Enumerate every identity-defining small detail before authoring the spec. Each detail must map to a component.localFeatures entry or material.localOverrides entry, never prose only. Use forge/stage1_intake/build_detail_inventory.py to scan zones.",
+   "details": [
+    {
+     "id": "face-mask",
+     "component": "head",
+     "description": "Cream lower face (urajiro) covering muzzle and cheek lobes up to just under eyes; hard colour boundary",
+     "mapsTo": "vertex-region",
+     "evidenceRef": "reference.png front view",
+     "confidence": 0.85
+    },
+    {
+     "id": "brow-dots",
+     "component": "head",
+     "description": "Two cream oval eyebrow dots above the eyes",
+     "mapsTo": "localFeature",
+     "evidenceRef": "reference.png front view",
+     "confidence": 0.85
+    },
+    {
+     "id": "eyes",
+     "component": "head",
+     "description": "Large near-black glossy eyes, wide-set, each with 2 white catchlights upper-right",
+     "mapsTo": "localFeature",
+     "evidenceRef": "reference.png front view",
+     "confidence": 0.85
+    },
+    {
+     "id": "nose",
+     "component": "head",
+     "description": "Small dark brown rounded-triangle nose at muzzle front",
+     "mapsTo": "localFeature",
+     "evidenceRef": "reference.png front view",
+     "confidence": 0.85
+    },
+    {
+     "id": "mouth",
+     "component": "head",
+     "description": "Open smile, dark interior with pink tongue",
+     "mapsTo": "localFeature",
+     "evidenceRef": "reference.png front view",
+     "confidence": 0.85
+    },
+    {
+     "id": "ear-inner",
+     "component": "ear",
+     "description": "Cream inner triangle insert on each ear",
+     "mapsTo": "localFeature",
+     "evidenceRef": "reference.png front view",
+     "confidence": 0.85
+    },
+    {
+     "id": "bandana-triangle",
+     "component": "bandana",
+     "description": "Orange cloth triangle hanging over chest, point down",
+     "mapsTo": "component",
+     "evidenceRef": "reference.png front view",
+     "confidence": 0.85
+    },
+    {
+     "id": "bandana-knot",
+     "component": "bandana",
+     "description": "Knot with two short tails on the character's left shoulder",
+     "mapsTo": "localFeature",
+     "evidenceRef": "reference.png front view",
+     "confidence": 0.85
+    },
+    {
+     "id": "belly-patch",
+     "component": "torso",
+     "description": "Cream belly oval from chest to crotch",
+     "mapsTo": "vertex-region",
+     "evidenceRef": "reference.png front view",
+     "confidence": 0.85
+    },
+    {
+     "id": "belt-buckle",
+     "component": "belt",
+     "description": "Brass rectangular buckle with prong at belt front",
+     "mapsTo": "localFeature",
+     "evidenceRef": "reference.png front view",
+     "confidence": 0.85
+    },
+    {
+     "id": "pouches",
+     "component": "belt",
+     "description": "Two brown leather pouches with flaps and brass snap studs on each hip",
+     "mapsTo": "component",
+     "evidenceRef": "reference.png front view",
+     "confidence": 0.85
+    },
+    {
+     "id": "paw-tips",
+     "component": "arm",
+     "description": "Cream paw tips on arm ends",
+     "mapsTo": "vertex-region",
+     "evidenceRef": "reference.png front view",
+     "confidence": 0.85
+    },
+    {
+     "id": "feet",
+     "component": "leg",
+     "description": "Cream oval feet",
+     "mapsTo": "component",
+     "evidenceRef": "reference.png front view",
+     "confidence": 0.85
+    }
+   ]
+  },
+  "anatomy": {
+   "styleHeads": 2.6,
+   "proportions": {
+    "headUnit": 0.308,
+    "torso": 1.25,
+    "legs": 0.22,
+    "shoulderWidth": 1.15,
+    "hipWidth": 1.1,
+    "evidenceRef": "reference.png px: ears tip y69, crown y95, chin y300, head x152-436 (w284 @y234), torso x~135-455 (@y430), belt y440-500, feet y565-600, total 69-600=531px → 2.6 HU incl. ears"
+   },
+   "pose": {
+    "type": "symmetric neutral stand, arms abducted ~35° down-out, slight elbow bend, legs straight under torso",
+    "jointAngles": {
+     "neck": [
+      0,
+      0,
+      0
+     ],
+     "leftShoulder": [
+      0,
+      0,
+      -55
+     ],
+     "rightShoulder": [
+      0,
+      0,
+      55
+     ],
+     "leftElbow": [
+      0,
+      0,
+      -10
+     ],
+     "rightElbow": [
+      0,
+      0,
+      10
+     ],
+     "leftWrist": [
+      0,
+      0,
+      0
+     ],
+     "rightWrist": [
+      0,
+      0,
+      0
+     ],
+     "leftHip": [
+      0,
+      0,
+      0
+     ],
+     "rightHip": [
+      0,
+      0,
+      0
+     ],
+     "leftKnee": [
+      0,
+      0,
+      0
+     ],
+     "rightKnee": [
+      0,
+      0,
+      0
+     ],
+     "leftAnkle": [
+      0,
+      0,
+      0
+     ],
+     "rightAnkle": [
+      0,
+      0,
+      0
+     ]
+    }
+   },
+   "faceLandmarks": {
+    "hairline": 0.0,
+    "eyeLine": 0.48,
+    "eyeSpacing": 0.2,
+    "noseBase": 0.62,
+    "mouthLine": 0.78,
+    "earTop": -0.13,
+    "earBottom": 0.1,
+    "browDots": 0.28,
+    "eyeRadius": 0.07,
+    "normalizedTo": "head bbox x152-436 y95-300",
+    "evidenceRef": "eye centres (245,193),(343,193) r≈20px; brow dots (258,152),(333,152); nose (295,218); mouth (295,255) w≈70px; tongue (295,262)"
+   },
+   "features": [
+    "urajiro cream face mask + cheek lobes",
+    "cream brow dots",
+    "large glossy black eyes w/ catchlights",
+    "triangle ears cream inner",
+    "orange bandana knot at character-left shoulder",
+    "brown belt brass buckle two pouches",
+    "cream belly, paw tips, feet"
+   ],
+   "confidence": 0.8,
+   "applies": true
+  },
+  "sourceImage": "/home/user/ink-escape/art/models/shiba/reference.png",
+  "pipelineRouting": {
+   "version": 1,
+   "track": "character-v1.5",
+   "source": "explicit",
+   "status": "resolved",
+   "classification": {
+    "kind": "character",
+    "confidence": 1.0,
+    "evidenceRefs": [
+     "pipeline-routing:explicit:character-v1.5"
+    ],
+    "provider": "pipeline-routing-cli",
+    "version": "1"
+   },
+   "conflicts": []
+  }
+ },
+ "qualityContract": {
+  "qualityBar": "complex",
+  "definitionOfDone": [
+   "The rendered model matches the reference silhouette, primary proportions, visible component hierarchy, material response, and most recognizable local features for the selected fidelity tier."
+  ],
+  "minimumSpecDepth": {
+   "macroComponents": 3,
+   "mesoComponents": 8,
+   "microFeatureGroups": 5,
+   "materialLayers": 3,
+   "repetitionSystems": 1,
+   "reviewViewpoints": 4
+  },
+  "featureGroups": [
+   {
+    "id": "overall-silhouette",
+    "name": "Overall silhouette and proportions",
+    "required": true,
+    "qualityCriteria": [
+     "Bounding shape, dominant curves, negative spaces, and scale relationships are explicitly described."
+    ],
+    "evidenceRefs": [
+     "full-object"
+    ],
+    "failureModes": [
+     "model reads as a generic placeholder instead of the reference object",
+     "major proportions are guessed without evidence"
+    ]
+   },
+   {
+    "id": "primary-structure",
+    "name": "Primary structure and hierarchy",
+    "required": true,
+    "qualityCriteria": [
+     "Major parts, joints, seams, contact points, and parent-child relationships are named before code generation."
+    ],
+    "evidenceRefs": [
+     "full-object"
+    ],
+    "failureModes": [
+     "large visible parts are merged into one mesh",
+     "component hierarchy is too shallow for the observed complexity"
+    ]
+   },
+   {
+    "id": "attachment-joint-correctness",
+    "name": "Attachment and joint correctness",
+    "required": true,
+    "qualityCriteria": [
+     "Every visible child appendage, branch, limb, handle, connector, tube, cable, horn, wing, leg, or hinged part has an attachment contract with parent socket, localStart/localEnd, contact type, embed/overlap, and gap tolerance."
+    ],
+    "evidenceRefs": [
+     "full-object"
+    ],
+    "failureModes": [
+     "child part root floats away from the parent",
+     "branch/limb/tube is centered in space instead of pivoting from its root",
+     "parent-child transform mixes world and local coordinates"
+    ]
+   },
+   {
+    "id": "surface-material-response",
+    "name": "Surface material response",
+    "required": true,
+    "qualityCriteria": [
+     "Albedo zones, roughness, normal/bump/displacement intent, cavity dirt, edge wear, and local overrides are specified where visible.",
+     "Important materials define independent albedo, roughness, height/normal, and AO responses instead of reusing one texture for unrelated PBR channels.",
+     "Surface response is decomposed into macro, meso, and micro frequency bands with scale and amplitude tied to object scale."
+    ],
+    "evidenceRefs": [
+     "full-object"
+    ],
+    "failureModes": [
+     "surface looks like flat plastic",
+     "local material variation is missing or not tied to image evidence"
+    ]
+   },
+   {
+    "id": "reference-lookdev",
+    "name": "Reference color, material, and lighting response",
+    "required": true,
+    "qualityCriteria": [
+     "Material-pass names the reference-derived albedo palette, roughness variation, tactile normal/bump/displacement response, and local masks.",
+     "When a source image is available, run reference PBR extraction and require confidence >= 0.7 before treating maps as implementation-ready.",
+     "Lighting-pass names key/fill/rim or environment light, exposure, tone mapping, background, and contact shadow behavior.",
+     "Neutral, grazing-angle, and reference-matched renders prove that surface relief survives relighting and is not painted into albedo."
+    ],
+    "evidenceRefs": [
+     "full-object"
+    ],
+    "failureModes": [
+     "model has acceptable shape but reads as flat shaded or plastic",
+     "colors are a generic average instead of reference-observed local color zones",
+     "lighting is evenly ambient and cannot reproduce the source value range"
+    ]
+   }
+  ],
+  "visualDeltaChecks": [
+   "silhouette and negative-space delta",
+   "component hierarchy depth delta",
+   "repetition density and distribution delta",
+   "material albedo/roughness/normal response delta",
+   "local feature placement and scale delta"
+  ],
+  "antiShallowSpecRules": [
+   "Do not proceed to code if qualityContract.qualityBar is unassessed.",
+   "Do not proceed to code if the spec only contains a root component for a moderate or complex object.",
+   "Do not proceed to code if required featureGroups are not represented by componentTree, materials, or repetitionSystems.",
+   "Do not proceed to code if visible local features are described only in prose and not attached to components/materials/evidenceRefs.",
+   "Do not proceed past structural-pass if attached child parts lack attachment.parentSocket, localStart, localEnd, embedDepth/overlap, and gapTolerance.",
+   "Do not pass material look-dev when albedo is reused as roughness, height, normal, or AO.",
+   "Do not pass material look-dev without macro, meso, and micro surface frequency bands for close-up materials.",
+   "Do not pass reference-fidelity material look-dev from a source image without usable referencePbr maps or an explicit documented limitation.",
+   "Do not patch a spec with extracted PBR maps when extraction confidence is below the target threshold unless the user explicitly accepts lower fidelity.",
+   "Do not place adjacent separate-geometry parts below 0.02 world-unit seam overlap (source: grimoire/build/geometry_patterns.md).",
+   "Do not satisfy raised or recessed relief, fasteners, or grip structure with a map alone when the feature affects form; use geometry or displacement (source: grimoire/build/geometry_patterns.md)."
+  ]
+ },
+ "authoringInstruction": "Fill observed object class, complexity reasoning, featureGroups, visualDeltaChecks, and unknowns before generating or implementing ObjectSculptSpec.",
+ "pipelineRouting": {
+  "version": 1,
+  "track": "character-v1.5",
+  "source": "explicit",
+  "status": "resolved",
+  "classification": {
+   "kind": "character",
+   "confidence": 1.0,
+   "evidenceRefs": [
+    "pipeline-routing:explicit:character-v1.5"
+   ],
+   "provider": "pipeline-routing-cli",
+   "version": "1"
+  },
+  "conflicts": []
+ },
+ "localSpecSearch": {
+  "collection": "core_3d",
+  "query": "Chibi Shiba Mascot stylized fur character bandana cloth leather belt buckle pouch chibi eyes catchlight",
+  "index": {
+   "status": "hit",
+   "reason": "current",
+   "fingerprint": "62f2831e1d52eeb6dbb94a87c44fa25b1f4926626a7b1f8c2bcadc63e04e9471"
+  },
+  "matches": [
+   {
+    "record_id": "core.shader-mapping-tubegeometry-straps-cables-belts",
+    "file_path": "docs/raw/img2threejs-skill-dataset.json",
+    "heading": null,
+    "key_path": "categories.rendering_shader_mapping[10]",
+    "score": 3.699753200989,
+    "snippets": [
+     "... đường cong 3D. Recognition cues: Flexible, curve-following linear component — sling strap, pressure-switch cable, ammo belt draping into a receiver Dấu hiệu nhận diện: Bộ phận tuyến tính mềm dẻo chạy theo đường cong — dây đeo súng, cáp ..."
+    ],
+    "source_refs": [
+     {
+      "path": "docs/raw/img2threejs-skill-dataset.json",
+      "heading": null,
+      "key_path": "categories.rendering_shader_mapping[10]"
+     }
+    ],
+    "evidence_refs": [
+     {
+      "kind": "source",
+      "ref": "docs/raw/img2threejs-skill-dataset.json",
+      "note": "img2threejs NotebookLM research distillation"
+     }
+    ]
+   },
+   {
+    "record_id": "core.pbr-subsurface-scattering-sss",
+    "file_path": "docs/raw/img2threejs-skill-dataset.json",
+    "heading": null,
+    "key_path": "categories.material_pbr[5]",
+    "score": 2.888753984226,
+    "snippets": [
+     "... sections of the material glow softly when backlit rather than showing a hard black silhouette; Relevant mainly to glove leather/polymer trims and agent-model skin, not metal weapon parts Dấu hiệu nhận diện: Các cạnh/phần mỏng của vật liệu ..."
+    ],
+    "source_refs": [
+     {
+      "path": "docs/raw/img2threejs-skill-dataset.json",
+      "heading": null,
+      "key_path": "categories.material_pbr[5]"
+     }
+    ],
+    "evidence_refs": [
+     {
+      "kind": "source",
+      "ref": "docs/raw/img2threejs-skill-dataset.json",
+      "note": "img2threejs NotebookLM research distillation"
+     }
+    ]
+   },
+   {
+    "record_id": "core.pbr-hand-painted-vs-pbr-texture",
+    "file_path": "docs/raw/img2threejs-skill-dataset.json",
+    "heading": null,
+    "key_path": "categories.material_pbr[12]",
+    "score": 2.632304791455,
+    "snippets": [
+     "Distinguishes textures with lighting baked directly into color (static, stylized) from textures that respond dynamically to scene lighting via separate PBR channels. Phân biệt kết cấu có ánh sáng được nướng trực tiếp vào màu (tĩnh, cách điệu) ..."
+    ],
+    "source_refs": [
+     {
+      "path": "docs/raw/img2threejs-skill-dataset.json",
+      "heading": null,
+      "key_path": "categories.material_pbr[12]"
+     }
+    ],
+    "evidence_refs": [
+     {
+      "kind": "source",
+      "ref": "docs/raw/img2threejs-skill-dataset.json",
+      "note": "img2threejs NotebookLM research distillation"
+     }
+    ]
+   }
+  ]
+ }
+}

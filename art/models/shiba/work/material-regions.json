@@ -1,0 +1,155 @@
+{
+ "referenceId": "shiba-front",
+ "regions": [
+  {
+   "componentId": "head",
+   "regionId": "forehead-fur",
+   "sourceImage": "/home/user/ink-escape/art/models/shiba/reference.png",
+   "bbox": {
+    "x": 238,
+    "y": 108,
+    "width": 110,
+    "height": 28
+   },
+   "family": "fur",
+   "subtype": "stylized",
+   "finish": "fibre-matte",
+   "materialSpecId": "fur-orange"
+  },
+  {
+   "componentId": "belly",
+   "regionId": "belly-fur",
+   "sourceImage": "/home/user/ink-escape/art/models/shiba/reference.png",
+   "bbox": {
+    "x": 240,
+    "y": 360,
+    "width": 110,
+    "height": 60
+   },
+   "family": "fur",
+   "subtype": "stylized",
+   "finish": "fibre-matte",
+   "materialSpecId": "fur-cream"
+  },
+  {
+   "componentId": "ear-inner-l",
+   "regionId": "ear-inner",
+   "sourceImage": "/home/user/ink-escape/art/models/shiba/reference.png",
+   "bbox": {
+    "x": 200,
+    "y": 92,
+    "width": 24,
+    "height": 22
+   },
+   "family": "fur",
+   "subtype": "stylized",
+   "finish": "fibre-matte",
+   "materialSpecId": "ear-inner"
+  },
+  {
+   "componentId": "eye-l",
+   "regionId": "eye",
+   "sourceImage": "/home/user/ink-escape/art/models/shiba/reference.png",
+   "bbox": {
+    "x": 234,
+    "y": 184,
+    "width": 22,
+    "height": 20
+   },
+   "family": "plastic",
+   "subtype": "generic-polymer",
+   "finish": "glossy",
+   "materialSpecId": "eye"
+  },
+  {
+   "componentId": "nose",
+   "regionId": "nose",
+   "sourceImage": "/home/user/ink-escape/art/models/shiba/reference.png",
+   "bbox": {
+    "x": 284,
+    "y": 209,
+    "width": 22,
+    "height": 14
+   },
+   "family": "plastic",
+   "subtype": "generic-polymer",
+   "finish": "matte",
+   "materialSpecId": "nose"
+  },
+  {
+   "componentId": "tongue",
+   "regionId": "tongue",
+   "sourceImage": "/home/user/ink-escape/art/models/shiba/reference.png",
+   "bbox": {
+    "x": 284,
+    "y": 257,
+    "width": 22,
+    "height": 10
+   },
+   "family": "rubber",
+   "subtype": "generic-elastomer",
+   "finish": "matte",
+   "materialSpecId": "tongue"
+  },
+  {
+   "componentId": "bandana-front",
+   "regionId": "bandana",
+   "sourceImage": "/home/user/ink-escape/art/models/shiba/reference.png",
+   "bbox": {
+    "x": 250,
+    "y": 318,
+    "width": 90,
+    "height": 40
+   },
+   "family": "fabric",
+   "subtype": "woven",
+   "finish": "matte",
+   "materialSpecId": "bandana"
+  },
+  {
+   "componentId": "belt",
+   "regionId": "belt-strap",
+   "sourceImage": "/home/user/ink-escape/art/models/shiba/reference.png",
+   "bbox": {
+    "x": 195,
+    "y": 460,
+    "width": 65,
+    "height": 14
+   },
+   "family": "leather",
+   "subtype": "natural-or-synthetic",
+   "finish": "matte-worn",
+   "materialSpecId": "leather"
+  },
+  {
+   "componentId": "pouch-flap-r",
+   "regionId": "pouch-flap",
+   "sourceImage": "/home/user/ink-escape/art/models/shiba/reference.png",
+   "bbox": {
+    "x": 138,
+    "y": 438,
+    "width": 40,
+    "height": 16
+   },
+   "family": "leather",
+   "subtype": "natural-or-synthetic",
+   "finish": "matte-worn",
+   "materialSpecId": "leather-dark"
+  },
+  {
+   "componentId": "buckle",
+   "regionId": "buckle-brass",
+   "sourceImage": "/home/user/ink-escape/art/models/shiba/reference.png",
+   "bbox": {
+    "x": 272,
+    "y": 461,
+    "width": 46,
+    "height": 32
+   },
+   "family": "metal",
+   "subtype": "brass-bronze",
+   "finish": "polished-or-aged",
+   "materialSpecId": "brass"
+  }
+ ]
+}

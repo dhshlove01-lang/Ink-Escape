@@ -1,0 +1,6 @@
+{
+  "verdict": "character-conditional -> stylized",
+  "stylization": "chibi (~1.9 heads) game mascot, low-poly-friendly, real-time browser game prop",
+  "reasons": ["one obvious target", "clear frontal silhouette on neutral background", "major materials visible", "organic fur form accepted as stylized shells (no strands)"],
+  "limits": ["single front view: back, tail, side depth inferred", "fur microstructure not reproduced (flat/faceted shading + vertex color)"]
+}

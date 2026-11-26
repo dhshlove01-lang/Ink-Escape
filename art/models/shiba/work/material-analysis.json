@@ -1,0 +1,4453 @@
+{
+  "schemaVersion": 1,
+  "kind": "img2threejs.material-analysis",
+  "referenceId": "shiba-front",
+  "manifest": "/home/user/ink-escape/art/models/shiba/work/material-regions.json",
+  "registry": "/home/user/ink-escape/.claude/skills/img2threejs/docs/materials/material-reference.json",
+  "targetThreshold": 0.7,
+  "notObservedMaterials": [],
+  "unresolvedNotObservedMaterials": [],
+  "regions": [
+    {
+      "componentId": "head",
+      "regionId": "forehead-fur",
+      "materialSpecId": "fur-orange",
+      "hypothesis": {
+        "componentId": "head",
+        "regionId": "forehead-fur",
+        "materialId": null,
+        "family": "fur",
+        "subtype": "stylized",
+        "finish": "fibre-matte",
+        "aliases": [],
+        "confidence": 0.751,
+        "source": "vision"
+      },
+      "assignment": {
+        "materialId": "fur.stylized",
+        "status": "proceed",
+        "source": "vision",
+        "confidence": 0.751,
+        "method": "family-subtype-finish",
+        "alternatives": [],
+        "evidence": {
+          "crop": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/00-forehead-fur.png",
+            "bbox": {
+              "x": 238,
+              "y": 108,
+              "width": 110,
+              "height": 28
+            },
+            "sourceWidth": 590,
+            "sourceHeight": 666,
+            "loaderWarnings": [],
+            "coverage": 0.0078
+          },
+          "pbr": {
+            "ok": true,
+            "verdict": "pass",
+            "confidence": 0.751,
+            "estimatedFidelity": 0.751,
+            "targetThreshold": 0.7,
+            "materialId": "fur-orange",
+            "sourceImage": "/home/user/ink-escape/art/models/shiba/work/material-evidence/00-forehead-fur.png",
+            "outDir": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-00-forehead-fur",
+            "palette": [
+              "#EE9C3C",
+              "#F0A142",
+              "#EC9836",
+              "#E99230",
+              "#F3A84B"
+            ],
+            "maps": {
+              "albedo": {
+                "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-00-forehead-fur/fur-orange_albedo.png",
+                "url": "fur-orange_albedo.png",
+                "channel": "albedo",
+                "source": "reference-pixel-extraction"
+              },
+              "roughness": {
+                "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-00-forehead-fur/fur-orange_roughness.png",
+                "url": "fur-orange_roughness.png",
+                "channel": "roughness",
+                "source": "reference-pixel-extraction"
+              },
+              "height": {
+                "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-00-forehead-fur/fur-orange_height.png",
+                "url": "fur-orange_height.png",
+                "channel": "height",
+                "source": "reference-pixel-extraction"
+              },
+              "normal": {
+                "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-00-forehead-fur/fur-orange_normal.png",
+                "url": "fur-orange_normal.png",
+                "channel": "normal",
+                "source": "reference-pixel-extraction"
+              },
+              "ao": {
+                "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-00-forehead-fur/fur-orange_ao.png",
+                "url": "fur-orange_ao.png",
+                "channel": "ao",
+                "source": "reference-pixel-extraction"
+              }
+            },
+            "diagnostics": {
+              "sourceWidth": 110,
+              "sourceHeight": 28,
+              "mapSize": 512,
+              "cropBBoxPixels": {
+                "x": 0,
+                "y": 0,
+                "width": 110,
+                "height": 28
+              },
+              "mask": {
+                "backgroundColor": "#F0A444",
+                "backgroundNoise": 17.692,
+                "transparentPixelFraction": 0.0,
+                "foregroundCoverage": 1.0
+              },
+              "mapStats": {
+                "valueRange": 0.08,
+                "heightP90Gradient": 0.11615,
+                "roughnessBase": 0.797,
+                "roughnessVariation": 0.177,
+                "normalStrength": 0.292,
+                "blurRadius": 10
+              },
+              "palette": [
+                "#EE9C3C",
+                "#F0A142",
+                "#EC9836",
+                "#E99230",
+                "#F3A84B"
+              ]
+            },
+            "warnings": [
+              "image is not clearly isolated from background; using most pixels as material evidence",
+              "object/background separation is weak",
+              "single-image inverse rendering cannot prove true physical PBR; confidence is capped",
+              "low value range weakens height/roughness inference"
+            ],
+            "limitation": "single-image PBR extraction is an estimate; 70%+ extraction confidence still needs render screenshot review"
+          },
+          "texture": {
+            "finishClass": "painted-metal",
+            "recipe": {
+              "metalness": 0.0,
+              "roughness": 0.5,
+              "clearcoat": 1.0,
+              "clearcoatRoughness": 0.05,
+              "transmission": 0.0,
+              "ior": 1.5,
+              "envMapIntensity": 1.0,
+              "anisotropy": 0.0,
+              "procedural": "flat-clearcoat"
+            },
+            "palette": [
+              "#F0A649",
+              "#EE9E40",
+              "#EA9532",
+              "#ED9A39",
+              "#F0A13F"
+            ],
+            "paletteHueRisk": [],
+            "gradientAxis": "horizontal",
+            "stats": {
+              "meanLum": 170.3,
+              "meanSaturation": 0.746,
+              "gradientStrength": 0.067,
+              "mottle": 0.012,
+              "streakRatio": 2.63,
+              "hueSpread": 0.0,
+              "specularFraction": 0.0
+            }
+          }
+        },
+        "profileId": "fur.stylized",
+        "family": "fur",
+        "subtype": "stylized",
+        "finish": "fibre-matte",
+        "renderPrior": {
+          "metalness": 0.0,
+          "roughness": 0.78,
+          "sheen": 0.45,
+          "sheenRoughness": 0.75
+        },
+        "requiredMaps": [
+          "map",
+          "roughnessMap",
+          "normalMap"
+        ],
+        "optionalMaps": [
+          "sheenColorMap",
+          "sheenRoughnessMap",
+          "aoMap"
+        ],
+        "validationViews": [
+          "neutral-studio",
+          "grazing",
+          "reference-beauty"
+        ],
+        "sourceRefs": [
+          "three.mesh-physical",
+          "pbrt.hair",
+          "khronos.sheen"
+        ],
+        "visualCues": [
+          "soft grazing response",
+          "directional fibres",
+          "broken outer silhouette"
+        ]
+      },
+      "observations": [
+        "chromatic base-colour response",
+        "directional surface frequency",
+        "single-image PBR inference requires controlled render validation"
+      ],
+      "crop": {
+        "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/00-forehead-fur.png",
+        "bbox": {
+          "x": 238,
+          "y": 108,
+          "width": 110,
+          "height": 28
+        },
+        "sourceWidth": 590,
+        "sourceHeight": 666,
+        "loaderWarnings": [],
+        "coverage": 0.0078
+      },
+      "textureAnalysis": {
+        "finishClass": "painted-metal",
+        "recipe": {
+          "metalness": 0.0,
+          "roughness": 0.5,
+          "clearcoat": 1.0,
+          "clearcoatRoughness": 0.05,
+          "transmission": 0.0,
+          "ior": 1.5,
+          "envMapIntensity": 1.0,
+          "anisotropy": 0.0,
+          "procedural": "flat-clearcoat"
+        },
+        "palette": [
+          "#F0A649",
+          "#EE9E40",
+          "#EA9532",
+          "#ED9A39",
+          "#F0A13F"
+        ],
+        "paletteHueRisk": [],
+        "gradientAxis": "horizontal",
+        "stats": {
+          "meanLum": 170.3,
+          "meanSaturation": 0.746,
+          "gradientStrength": 0.067,
+          "mottle": 0.012,
+          "streakRatio": 2.63,
+          "hueSpread": 0.0,
+          "specularFraction": 0.0
+        }
+      },
+      "pbrReport": {
+        "ok": true,
+        "verdict": "pass",
+        "confidence": 0.751,
+        "estimatedFidelity": 0.751,
+        "targetThreshold": 0.7,
+        "materialId": "fur-orange",
+        "sourceImage": "/home/user/ink-escape/art/models/shiba/work/material-evidence/00-forehead-fur.png",
+        "outDir": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-00-forehead-fur",
+        "palette": [
+          "#EE9C3C",
+          "#F0A142",
+          "#EC9836",
+          "#E99230",
+          "#F3A84B"
+        ],
+        "maps": {
+          "albedo": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-00-forehead-fur/fur-orange_albedo.png",
+            "url": "fur-orange_albedo.png",
+            "channel": "albedo",
+            "source": "reference-pixel-extraction"
+          },
+          "roughness": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-00-forehead-fur/fur-orange_roughness.png",
+            "url": "fur-orange_roughness.png",
+            "channel": "roughness",
+            "source": "reference-pixel-extraction"
+          },
+          "height": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-00-forehead-fur/fur-orange_height.png",
+            "url": "fur-orange_height.png",
+            "channel": "height",
+            "source": "reference-pixel-extraction"
+          },
+          "normal": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-00-forehead-fur/fur-orange_normal.png",
+            "url": "fur-orange_normal.png",
+            "channel": "normal",
+            "source": "reference-pixel-extraction"
+          },
+          "ao": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-00-forehead-fur/fur-orange_ao.png",
+            "url": "fur-orange_ao.png",
+            "channel": "ao",
+            "source": "reference-pixel-extraction"
+          }
+        },
+        "diagnostics": {
+          "sourceWidth": 110,
+          "sourceHeight": 28,
+          "mapSize": 512,
+          "cropBBoxPixels": {
+            "x": 0,
+            "y": 0,
+            "width": 110,
+            "height": 28
+          },
+          "mask": {
+            "backgroundColor": "#F0A444",
+            "backgroundNoise": 17.692,
+            "transparentPixelFraction": 0.0,
+            "foregroundCoverage": 1.0
+          },
+          "mapStats": {
+            "valueRange": 0.08,
+            "heightP90Gradient": 0.11615,
+            "roughnessBase": 0.797,
+            "roughnessVariation": 0.177,
+            "normalStrength": 0.292,
+            "blurRadius": 10
+          },
+          "palette": [
+            "#EE9C3C",
+            "#F0A142",
+            "#EC9836",
+            "#E99230",
+            "#F3A84B"
+          ]
+        },
+        "warnings": [
+          "image is not clearly isolated from background; using most pixels as material evidence",
+          "object/background separation is weak",
+          "single-image inverse rendering cannot prove true physical PBR; confidence is capped",
+          "low value range weakens height/roughness inference"
+        ],
+        "limitation": "single-image PBR extraction is an estimate; 70%+ extraction confidence still needs render screenshot review"
+      },
+      "referencePbr": {
+        "version": "1.0",
+        "sourceImage": "/home/user/ink-escape/art/models/shiba/work/material-evidence/00-forehead-fur.png",
+        "extractor": "stage1_intake/extract_pbr_evidence.py",
+        "method": "single-image pixel evidence with de-lighting estimate; not photogrammetry",
+        "usable": true,
+        "verdict": "pass",
+        "confidence": 0.751,
+        "estimatedFidelity": 0.751,
+        "targetThreshold": 0.7,
+        "hardLimit": "A single image cannot uniquely recover true albedo/roughness/normal/AO; maps are reference-derived estimates.",
+        "maps": {
+          "albedo": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-00-forehead-fur/fur-orange_albedo.png",
+            "url": "fur-orange_albedo.png",
+            "channel": "albedo",
+            "source": "reference-pixel-extraction"
+          },
+          "roughness": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-00-forehead-fur/fur-orange_roughness.png",
+            "url": "fur-orange_roughness.png",
+            "channel": "roughness",
+            "source": "reference-pixel-extraction"
+          },
+          "height": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-00-forehead-fur/fur-orange_height.png",
+            "url": "fur-orange_height.png",
+            "channel": "height",
+            "source": "reference-pixel-extraction"
+          },
+          "normal": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-00-forehead-fur/fur-orange_normal.png",
+            "url": "fur-orange_normal.png",
+            "channel": "normal",
+            "source": "reference-pixel-extraction"
+          },
+          "ao": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-00-forehead-fur/fur-orange_ao.png",
+            "url": "fur-orange_ao.png",
+            "channel": "ao",
+            "source": "reference-pixel-extraction"
+          }
+        },
+        "diagnostics": {
+          "sourceWidth": 110,
+          "sourceHeight": 28,
+          "mapSize": 512,
+          "cropBBoxPixels": {
+            "x": 0,
+            "y": 0,
+            "width": 110,
+            "height": 28
+          },
+          "mask": {
+            "backgroundColor": "#F0A444",
+            "backgroundNoise": 17.692,
+            "transparentPixelFraction": 0.0,
+            "foregroundCoverage": 1.0
+          },
+          "mapStats": {
+            "valueRange": 0.08,
+            "heightP90Gradient": 0.11615,
+            "roughnessBase": 0.797,
+            "roughnessVariation": 0.177,
+            "normalStrength": 0.292,
+            "blurRadius": 10
+          },
+          "palette": [
+            "#EE9C3C",
+            "#F0A142",
+            "#EC9836",
+            "#E99230",
+            "#F3A84B"
+          ]
+        },
+        "warnings": [
+          "image is not clearly isolated from background; using most pixels as material evidence",
+          "object/background separation is weak",
+          "single-image inverse rendering cannot prove true physical PBR; confidence is capped",
+          "low value range weakens height/roughness inference"
+        ]
+      },
+      "maps": {
+        "albedo": {
+          "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-00-forehead-fur/fur-orange_albedo.png",
+          "url": "fur-orange_albedo.png",
+          "channel": "albedo",
+          "source": "reference-pixel-extraction"
+        },
+        "roughness": {
+          "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-00-forehead-fur/fur-orange_roughness.png",
+          "url": "fur-orange_roughness.png",
+          "channel": "roughness",
+          "source": "reference-pixel-extraction"
+        },
+        "height": {
+          "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-00-forehead-fur/fur-orange_height.png",
+          "url": "fur-orange_height.png",
+          "channel": "height",
+          "source": "reference-pixel-extraction"
+        },
+        "normal": {
+          "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-00-forehead-fur/fur-orange_normal.png",
+          "url": "fur-orange_normal.png",
+          "channel": "normal",
+          "source": "reference-pixel-extraction"
+        },
+        "ao": {
+          "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-00-forehead-fur/fur-orange_ao.png",
+          "url": "fur-orange_ao.png",
+          "channel": "ao",
+          "source": "reference-pixel-extraction"
+        }
+      }
+    },
+    {
+      "componentId": "belly",
+      "regionId": "belly-fur",
+      "materialSpecId": "fur-cream",
+      "hypothesis": {
+        "componentId": "belly",
+        "regionId": "belly-fur",
+        "materialId": null,
+        "family": "fur",
+        "subtype": "stylized",
+        "finish": "fibre-matte",
+        "aliases": [],
+        "confidence": 0.821,
+        "source": "vision"
+      },
+      "assignment": {
+        "materialId": "fur.stylized",
+        "status": "proceed",
+        "source": "vision",
+        "confidence": 0.821,
+        "method": "family-subtype-finish",
+        "alternatives": [],
+        "evidence": {
+          "crop": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/01-belly-fur.png",
+            "bbox": {
+              "x": 240,
+              "y": 360,
+              "width": 110,
+              "height": 60
+            },
+            "sourceWidth": 590,
+            "sourceHeight": 666,
+            "loaderWarnings": [],
+            "coverage": 0.0168
+          },
+          "pbr": {
+            "ok": true,
+            "verdict": "pass",
+            "confidence": 0.821,
+            "estimatedFidelity": 0.821,
+            "targetThreshold": 0.7,
+            "materialId": "fur-cream",
+            "sourceImage": "/home/user/ink-escape/art/models/shiba/work/material-evidence/01-belly-fur.png",
+            "outDir": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-01-belly-fur",
+            "palette": [
+              "#DF6A24",
+              "#EBD9C1",
+              "#E4D1B7",
+              "#A57F5B",
+              "#C9AF90"
+            ],
+            "maps": {
+              "albedo": {
+                "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-01-belly-fur/fur-cream_albedo.png",
+                "url": "fur-cream_albedo.png",
+                "channel": "albedo",
+                "source": "reference-pixel-extraction"
+              },
+              "roughness": {
+                "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-01-belly-fur/fur-cream_roughness.png",
+                "url": "fur-cream_roughness.png",
+                "channel": "roughness",
+                "source": "reference-pixel-extraction"
+              },
+              "height": {
+                "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-01-belly-fur/fur-cream_height.png",
+                "url": "fur-cream_height.png",
+                "channel": "height",
+                "source": "reference-pixel-extraction"
+              },
+              "normal": {
+                "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-01-belly-fur/fur-cream_normal.png",
+                "url": "fur-cream_normal.png",
+                "channel": "normal",
+                "source": "reference-pixel-extraction"
+              },
+              "ao": {
+                "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-01-belly-fur/fur-cream_ao.png",
+                "url": "fur-cream_ao.png",
+                "channel": "ao",
+                "source": "reference-pixel-extraction"
+              }
+            },
+            "diagnostics": {
+              "sourceWidth": 110,
+              "sourceHeight": 60,
+              "mapSize": 512,
+              "cropBBoxPixels": {
+                "x": 0,
+                "y": 0,
+                "width": 110,
+                "height": 60
+              },
+              "mask": {
+                "backgroundColor": "#E4CCB1",
+                "backgroundNoise": 176.426,
+                "transparentPixelFraction": 0.0,
+                "foregroundCoverage": 0.9942
+              },
+              "mapStats": {
+                "valueRange": 0.4468,
+                "heightP90Gradient": 0.02829,
+                "roughnessBase": 0.708,
+                "roughnessVariation": 0.053,
+                "normalStrength": 0.189,
+                "blurRadius": 10
+              },
+              "palette": [
+                "#DF6A24",
+                "#EBD9C1",
+                "#E4D1B7",
+                "#A57F5B",
+                "#C9AF90"
+              ]
+            },
+            "warnings": [
+              "image is not clearly isolated from background; using most pixels as material evidence",
+              "object/background separation is weak",
+              "single-image inverse rendering cannot prove true physical PBR; confidence is capped"
+            ],
+            "limitation": "single-image PBR extraction is an estimate; 70%+ extraction confidence still needs render screenshot review"
+          },
+          "texture": {
+            "finishClass": "painted-metal",
+            "recipe": {
+              "metalness": 0.0,
+              "roughness": 0.5,
+              "clearcoat": 1.0,
+              "clearcoatRoughness": 0.05,
+              "transmission": 0.0,
+              "ior": 1.5,
+              "envMapIntensity": 1.0,
+              "anisotropy": 0.0,
+              "procedural": "flat-clearcoat"
+            },
+            "palette": [
+              "#E7732B",
+              "#DB7739",
+              "#D8A47C",
+              "#E7D5BC",
+              "#E5D2B8"
+            ],
+            "paletteHueRisk": [],
+            "gradientAxis": "vertical",
+            "stats": {
+              "meanLum": 177.7,
+              "meanSaturation": 0.465,
+              "gradientStrength": 0.321,
+              "mottle": 0.018,
+              "streakRatio": 1.11,
+              "hueSpread": 0.002,
+              "specularFraction": 0.0
+            }
+          }
+        },
+        "profileId": "fur.stylized",
+        "family": "fur",
+        "subtype": "stylized",
+        "finish": "fibre-matte",
+        "renderPrior": {
+          "metalness": 0.0,
+          "roughness": 0.78,
+          "sheen": 0.45,
+          "sheenRoughness": 0.75
+        },
+        "requiredMaps": [
+          "map",
+          "roughnessMap",
+          "normalMap"
+        ],
+        "optionalMaps": [
+          "sheenColorMap",
+          "sheenRoughnessMap",
+          "aoMap"
+        ],
+        "validationViews": [
+          "neutral-studio",
+          "grazing",
+          "reference-beauty"
+        ],
+        "sourceRefs": [
+          "three.mesh-physical",
+          "pbrt.hair",
+          "khronos.sheen"
+        ],
+        "visualCues": [
+          "soft grazing response",
+          "directional fibres",
+          "broken outer silhouette"
+        ]
+      },
+      "observations": [
+        "chromatic base-colour response",
+        "strong image-space gradient; verify it is material pattern, not lighting",
+        "single-image PBR inference requires controlled render validation"
+      ],
+      "crop": {
+        "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/01-belly-fur.png",
+        "bbox": {
+          "x": 240,
+          "y": 360,
+          "width": 110,
+          "height": 60
+        },
+        "sourceWidth": 590,
+        "sourceHeight": 666,
+        "loaderWarnings": [],
+        "coverage": 0.0168
+      },
+      "textureAnalysis": {
+        "finishClass": "painted-metal",
+        "recipe": {
+          "metalness": 0.0,
+          "roughness": 0.5,
+          "clearcoat": 1.0,
+          "clearcoatRoughness": 0.05,
+          "transmission": 0.0,
+          "ior": 1.5,
+          "envMapIntensity": 1.0,
+          "anisotropy": 0.0,
+          "procedural": "flat-clearcoat"
+        },
+        "palette": [
+          "#E7732B",
+          "#DB7739",
+          "#D8A47C",
+          "#E7D5BC",
+          "#E5D2B8"
+        ],
+        "paletteHueRisk": [],
+        "gradientAxis": "vertical",
+        "stats": {
+          "meanLum": 177.7,
+          "meanSaturation": 0.465,
+          "gradientStrength": 0.321,
+          "mottle": 0.018,
+          "streakRatio": 1.11,
+          "hueSpread": 0.002,
+          "specularFraction": 0.0
+        }
+      },
+      "pbrReport": {
+        "ok": true,
+        "verdict": "pass",
+        "confidence": 0.821,
+        "estimatedFidelity": 0.821,
+        "targetThreshold": 0.7,
+        "materialId": "fur-cream",
+        "sourceImage": "/home/user/ink-escape/art/models/shiba/work/material-evidence/01-belly-fur.png",
+        "outDir": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-01-belly-fur",
+        "palette": [
+          "#DF6A24",
+          "#EBD9C1",
+          "#E4D1B7",
+          "#A57F5B",
+          "#C9AF90"
+        ],
+        "maps": {
+          "albedo": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-01-belly-fur/fur-cream_albedo.png",
+            "url": "fur-cream_albedo.png",
+            "channel": "albedo",
+            "source": "reference-pixel-extraction"
+          },
+          "roughness": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-01-belly-fur/fur-cream_roughness.png",
+            "url": "fur-cream_roughness.png",
+            "channel": "roughness",
+            "source": "reference-pixel-extraction"
+          },
+          "height": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-01-belly-fur/fur-cream_height.png",
+            "url": "fur-cream_height.png",
+            "channel": "height",
+            "source": "reference-pixel-extraction"
+          },
+          "normal": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-01-belly-fur/fur-cream_normal.png",
+            "url": "fur-cream_normal.png",
+            "channel": "normal",
+            "source": "reference-pixel-extraction"
+          },
+          "ao": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-01-belly-fur/fur-cream_ao.png",
+            "url": "fur-cream_ao.png",
+            "channel": "ao",
+            "source": "reference-pixel-extraction"
+          }
+        },
+        "diagnostics": {
+          "sourceWidth": 110,
+          "sourceHeight": 60,
+          "mapSize": 512,
+          "cropBBoxPixels": {
+            "x": 0,
+            "y": 0,
+            "width": 110,
+            "height": 60
+          },
+          "mask": {
+            "backgroundColor": "#E4CCB1",
+            "backgroundNoise": 176.426,
+            "transparentPixelFraction": 0.0,
+            "foregroundCoverage": 0.9942
+          },
+          "mapStats": {
+            "valueRange": 0.4468,
+            "heightP90Gradient": 0.02829,
+            "roughnessBase": 0.708,
+            "roughnessVariation": 0.053,
+            "normalStrength": 0.189,
+            "blurRadius": 10
+          },
+          "palette": [
+            "#DF6A24",
+            "#EBD9C1",
+            "#E4D1B7",
+            "#A57F5B",
+            "#C9AF90"
+          ]
+        },
+        "warnings": [
+          "image is not clearly isolated from background; using most pixels as material evidence",
+          "object/background separation is weak",
+          "single-image inverse rendering cannot prove true physical PBR; confidence is capped"
+        ],
+        "limitation": "single-image PBR extraction is an estimate; 70%+ extraction confidence still needs render screenshot review"
+      },
+      "referencePbr": {
+        "version": "1.0",
+        "sourceImage": "/home/user/ink-escape/art/models/shiba/work/material-evidence/01-belly-fur.png",
+        "extractor": "stage1_intake/extract_pbr_evidence.py",
+        "method": "single-image pixel evidence with de-lighting estimate; not photogrammetry",
+        "usable": true,
+        "verdict": "pass",
+        "confidence": 0.821,
+        "estimatedFidelity": 0.821,
+        "targetThreshold": 0.7,
+        "hardLimit": "A single image cannot uniquely recover true albedo/roughness/normal/AO; maps are reference-derived estimates.",
+        "maps": {
+          "albedo": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-01-belly-fur/fur-cream_albedo.png",
+            "url": "fur-cream_albedo.png",
+            "channel": "albedo",
+            "source": "reference-pixel-extraction"
+          },
+          "roughness": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-01-belly-fur/fur-cream_roughness.png",
+            "url": "fur-cream_roughness.png",
+            "channel": "roughness",
+            "source": "reference-pixel-extraction"
+          },
+          "height": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-01-belly-fur/fur-cream_height.png",
+            "url": "fur-cream_height.png",
+            "channel": "height",
+            "source": "reference-pixel-extraction"
+          },
+          "normal": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-01-belly-fur/fur-cream_normal.png",
+            "url": "fur-cream_normal.png",
+            "channel": "normal",
+            "source": "reference-pixel-extraction"
+          },
+          "ao": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-01-belly-fur/fur-cream_ao.png",
+            "url": "fur-cream_ao.png",
+            "channel": "ao",
+            "source": "reference-pixel-extraction"
+          }
+        },
+        "diagnostics": {
+          "sourceWidth": 110,
+          "sourceHeight": 60,
+          "mapSize": 512,
+          "cropBBoxPixels": {
+            "x": 0,
+            "y": 0,
+            "width": 110,
+            "height": 60
+          },
+          "mask": {
+            "backgroundColor": "#E4CCB1",
+            "backgroundNoise": 176.426,
+            "transparentPixelFraction": 0.0,
+            "foregroundCoverage": 0.9942
+          },
+          "mapStats": {
+            "valueRange": 0.4468,
+            "heightP90Gradient": 0.02829,
+            "roughnessBase": 0.708,
+            "roughnessVariation": 0.053,
+            "normalStrength": 0.189,
+            "blurRadius": 10
+          },
+          "palette": [
+            "#DF6A24",
+            "#EBD9C1",
+            "#E4D1B7",
+            "#A57F5B",
+            "#C9AF90"
+          ]
+        },
+        "warnings": [
+          "image is not clearly isolated from background; using most pixels as material evidence",
+          "object/background separation is weak",
+          "single-image inverse rendering cannot prove true physical PBR; confidence is capped"
+        ]
+      },
+      "maps": {
+        "albedo": {
+          "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-01-belly-fur/fur-cream_albedo.png",
+          "url": "fur-cream_albedo.png",
+          "channel": "albedo",
+          "source": "reference-pixel-extraction"
+        },
+        "roughness": {
+          "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-01-belly-fur/fur-cream_roughness.png",
+          "url": "fur-cream_roughness.png",
+          "channel": "roughness",
+          "source": "reference-pixel-extraction"
+        },
+        "height": {
+          "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-01-belly-fur/fur-cream_height.png",
+          "url": "fur-cream_height.png",
+          "channel": "height",
+          "source": "reference-pixel-extraction"
+        },
+        "normal": {
+          "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-01-belly-fur/fur-cream_normal.png",
+          "url": "fur-cream_normal.png",
+          "channel": "normal",
+          "source": "reference-pixel-extraction"
+        },
+        "ao": {
+          "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-01-belly-fur/fur-cream_ao.png",
+          "url": "fur-cream_ao.png",
+          "channel": "ao",
+          "source": "reference-pixel-extraction"
+        }
+      }
+    },
+    {
+      "componentId": "ear-inner-l",
+      "regionId": "ear-inner",
+      "materialSpecId": "ear-inner",
+      "hypothesis": {
+        "componentId": "ear-inner-l",
+        "regionId": "ear-inner",
+        "materialId": null,
+        "family": "fur",
+        "subtype": "stylized",
+        "finish": "fibre-matte",
+        "aliases": [],
+        "confidence": 0.772,
+        "source": "vision"
+      },
+      "assignment": {
+        "materialId": "fur.stylized",
+        "status": "proceed",
+        "source": "vision",
+        "confidence": 0.772,
+        "method": "family-subtype-finish",
+        "alternatives": [],
+        "evidence": {
+          "crop": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/02-ear-inner.png",
+            "bbox": {
+              "x": 200,
+              "y": 92,
+              "width": 24,
+              "height": 22
+            },
+            "sourceWidth": 590,
+            "sourceHeight": 666,
+            "loaderWarnings": [],
+            "coverage": 0.0013
+          },
+          "pbr": {
+            "ok": true,
+            "verdict": "pass",
+            "confidence": 0.772,
+            "estimatedFidelity": 0.772,
+            "targetThreshold": 0.7,
+            "materialId": "ear-inner",
+            "sourceImage": "/home/user/ink-escape/art/models/shiba/work/material-evidence/02-ear-inner.png",
+            "outDir": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-02-ear-inner",
+            "palette": [
+              "#BB8D63",
+              "#C49A71",
+              "#B07E54",
+              "#D1AA83",
+              "#A46C41"
+            ],
+            "maps": {
+              "albedo": {
+                "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-02-ear-inner/ear-inner_albedo.png",
+                "url": "ear-inner_albedo.png",
+                "channel": "albedo",
+                "source": "reference-pixel-extraction"
+              },
+              "roughness": {
+                "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-02-ear-inner/ear-inner_roughness.png",
+                "url": "ear-inner_roughness.png",
+                "channel": "roughness",
+                "source": "reference-pixel-extraction"
+              },
+              "height": {
+                "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-02-ear-inner/ear-inner_height.png",
+                "url": "ear-inner_height.png",
+                "channel": "height",
+                "source": "reference-pixel-extraction"
+              },
+              "normal": {
+                "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-02-ear-inner/ear-inner_normal.png",
+                "url": "ear-inner_normal.png",
+                "channel": "normal",
+                "source": "reference-pixel-extraction"
+              },
+              "ao": {
+                "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-02-ear-inner/ear-inner_ao.png",
+                "url": "ear-inner_ao.png",
+                "channel": "ao",
+                "source": "reference-pixel-extraction"
+              }
+            },
+            "diagnostics": {
+              "sourceWidth": 24,
+              "sourceHeight": 22,
+              "mapSize": 512,
+              "cropBBoxPixels": {
+                "x": 0,
+                "y": 0,
+                "width": 24,
+                "height": 22
+              },
+              "mask": {
+                "backgroundColor": "#CA9368",
+                "backgroundNoise": 50.784,
+                "transparentPixelFraction": 0.0,
+                "foregroundCoverage": 1.0
+              },
+              "mapStats": {
+                "valueRange": 0.2525,
+                "heightP90Gradient": 0.03648,
+                "roughnessBase": 0.71,
+                "roughnessVariation": 0.063,
+                "normalStrength": 0.199,
+                "blurRadius": 10
+              },
+              "palette": [
+                "#BB8D63",
+                "#C49A71",
+                "#B07E54",
+                "#D1AA83",
+                "#A46C41"
+              ]
+            },
+            "warnings": [
+              "image is not clearly isolated from background; using most pixels as material evidence",
+              "object/background separation is weak",
+              "single-image inverse rendering cannot prove true physical PBR; confidence is capped"
+            ],
+            "limitation": "single-image PBR extraction is an estimate; 70%+ extraction confidence still needs render screenshot review"
+          },
+          "texture": {
+            "finishClass": "painted-metal",
+            "recipe": {
+              "metalness": 0.0,
+              "roughness": 0.5,
+              "clearcoat": 1.0,
+              "clearcoatRoughness": 0.05,
+              "transmission": 0.0,
+              "ior": 1.5,
+              "envMapIntensity": 1.0,
+              "anisotropy": 0.0,
+              "procedural": "flat-clearcoat"
+            },
+            "palette": [
+              "#D4AC82",
+              "#C69B72",
+              "#B28158",
+              "#B08159",
+              "#C08E5B"
+            ],
+            "paletteHueRisk": [],
+            "gradientAxis": "horizontal",
+            "stats": {
+              "meanLum": 151.3,
+              "meanSaturation": 0.469,
+              "gradientStrength": 0.176,
+              "mottle": 0.007,
+              "streakRatio": 0.94,
+              "hueSpread": 0.001,
+              "specularFraction": 0.0
+            }
+          }
+        },
+        "profileId": "fur.stylized",
+        "family": "fur",
+        "subtype": "stylized",
+        "finish": "fibre-matte",
+        "renderPrior": {
+          "metalness": 0.0,
+          "roughness": 0.78,
+          "sheen": 0.45,
+          "sheenRoughness": 0.75
+        },
+        "requiredMaps": [
+          "map",
+          "roughnessMap",
+          "normalMap"
+        ],
+        "optionalMaps": [
+          "sheenColorMap",
+          "sheenRoughnessMap",
+          "aoMap"
+        ],
+        "validationViews": [
+          "neutral-studio",
+          "grazing",
+          "reference-beauty"
+        ],
+        "sourceRefs": [
+          "three.mesh-physical",
+          "pbrt.hair",
+          "khronos.sheen"
+        ],
+        "visualCues": [
+          "soft grazing response",
+          "directional fibres",
+          "broken outer silhouette"
+        ]
+      },
+      "observations": [
+        "chromatic base-colour response",
+        "single-image PBR inference requires controlled render validation"
+      ],
+      "crop": {
+        "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/02-ear-inner.png",
+        "bbox": {
+          "x": 200,
+          "y": 92,
+          "width": 24,
+          "height": 22
+        },
+        "sourceWidth": 590,
+        "sourceHeight": 666,
+        "loaderWarnings": [],
+        "coverage": 0.0013
+      },
+      "textureAnalysis": {
+        "finishClass": "painted-metal",
+        "recipe": {
+          "metalness": 0.0,
+          "roughness": 0.5,
+          "clearcoat": 1.0,
+          "clearcoatRoughness": 0.05,
+          "transmission": 0.0,
+          "ior": 1.5,
+          "envMapIntensity": 1.0,
+          "anisotropy": 0.0,
+          "procedural": "flat-clearcoat"
+        },
+        "palette": [
+          "#D4AC82",
+          "#C69B72",
+          "#B28158",
+          "#B08159",
+          "#C08E5B"
+        ],
+        "paletteHueRisk": [],
+        "gradientAxis": "horizontal",
+        "stats": {
+          "meanLum": 151.3,
+          "meanSaturation": 0.469,
+          "gradientStrength": 0.176,
+          "mottle": 0.007,
+          "streakRatio": 0.94,
+          "hueSpread": 0.001,
+          "specularFraction": 0.0
+        }
+      },
+      "pbrReport": {
+        "ok": true,
+        "verdict": "pass",
+        "confidence": 0.772,
+        "estimatedFidelity": 0.772,
+        "targetThreshold": 0.7,
+        "materialId": "ear-inner",
+        "sourceImage": "/home/user/ink-escape/art/models/shiba/work/material-evidence/02-ear-inner.png",
+        "outDir": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-02-ear-inner",
+        "palette": [
+          "#BB8D63",
+          "#C49A71",
+          "#B07E54",
+          "#D1AA83",
+          "#A46C41"
+        ],
+        "maps": {
+          "albedo": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-02-ear-inner/ear-inner_albedo.png",
+            "url": "ear-inner_albedo.png",
+            "channel": "albedo",
+            "source": "reference-pixel-extraction"
+          },
+          "roughness": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-02-ear-inner/ear-inner_roughness.png",
+            "url": "ear-inner_roughness.png",
+            "channel": "roughness",
+            "source": "reference-pixel-extraction"
+          },
+          "height": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-02-ear-inner/ear-inner_height.png",
+            "url": "ear-inner_height.png",
+            "channel": "height",
+            "source": "reference-pixel-extraction"
+          },
+          "normal": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-02-ear-inner/ear-inner_normal.png",
+            "url": "ear-inner_normal.png",
+            "channel": "normal",
+            "source": "reference-pixel-extraction"
+          },
+          "ao": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-02-ear-inner/ear-inner_ao.png",
+            "url": "ear-inner_ao.png",
+            "channel": "ao",
+            "source": "reference-pixel-extraction"
+          }
+        },
+        "diagnostics": {
+          "sourceWidth": 24,
+          "sourceHeight": 22,
+          "mapSize": 512,
+          "cropBBoxPixels": {
+            "x": 0,
+            "y": 0,
+            "width": 24,
+            "height": 22
+          },
+          "mask": {
+            "backgroundColor": "#CA9368",
+            "backgroundNoise": 50.784,
+            "transparentPixelFraction": 0.0,
+            "foregroundCoverage": 1.0
+          },
+          "mapStats": {
+            "valueRange": 0.2525,
+            "heightP90Gradient": 0.03648,
+            "roughnessBase": 0.71,
+            "roughnessVariation": 0.063,
+            "normalStrength": 0.199,
+            "blurRadius": 10
+          },
+          "palette": [
+            "#BB8D63",
+            "#C49A71",
+            "#B07E54",
+            "#D1AA83",
+            "#A46C41"
+          ]
+        },
+        "warnings": [
+          "image is not clearly isolated from background; using most pixels as material evidence",
+          "object/background separation is weak",
+          "single-image inverse rendering cannot prove true physical PBR; confidence is capped"
+        ],
+        "limitation": "single-image PBR extraction is an estimate; 70%+ extraction confidence still needs render screenshot review"
+      },
+      "referencePbr": {
+        "version": "1.0",
+        "sourceImage": "/home/user/ink-escape/art/models/shiba/work/material-evidence/02-ear-inner.png",
+        "extractor": "stage1_intake/extract_pbr_evidence.py",
+        "method": "single-image pixel evidence with de-lighting estimate; not photogrammetry",
+        "usable": true,
+        "verdict": "pass",
+        "confidence": 0.772,
+        "estimatedFidelity": 0.772,
+        "targetThreshold": 0.7,
+        "hardLimit": "A single image cannot uniquely recover true albedo/roughness/normal/AO; maps are reference-derived estimates.",
+        "maps": {
+          "albedo": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-02-ear-inner/ear-inner_albedo.png",
+            "url": "ear-inner_albedo.png",
+            "channel": "albedo",
+            "source": "reference-pixel-extraction"
+          },
+          "roughness": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-02-ear-inner/ear-inner_roughness.png",
+            "url": "ear-inner_roughness.png",
+            "channel": "roughness",
+            "source": "reference-pixel-extraction"
+          },
+          "height": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-02-ear-inner/ear-inner_height.png",
+            "url": "ear-inner_height.png",
+            "channel": "height",
+            "source": "reference-pixel-extraction"
+          },
+          "normal": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-02-ear-inner/ear-inner_normal.png",
+            "url": "ear-inner_normal.png",
+            "channel": "normal",
+            "source": "reference-pixel-extraction"
+          },
+          "ao": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-02-ear-inner/ear-inner_ao.png",
+            "url": "ear-inner_ao.png",
+            "channel": "ao",
+            "source": "reference-pixel-extraction"
+          }
+        },
+        "diagnostics": {
+          "sourceWidth": 24,
+          "sourceHeight": 22,
+          "mapSize": 512,
+          "cropBBoxPixels": {
+            "x": 0,
+            "y": 0,
+            "width": 24,
+            "height": 22
+          },
+          "mask": {
+            "backgroundColor": "#CA9368",
+            "backgroundNoise": 50.784,
+            "transparentPixelFraction": 0.0,
+            "foregroundCoverage": 1.0
+          },
+          "mapStats": {
+            "valueRange": 0.2525,
+            "heightP90Gradient": 0.03648,
+            "roughnessBase": 0.71,
+            "roughnessVariation": 0.063,
+            "normalStrength": 0.199,
+            "blurRadius": 10
+          },
+          "palette": [
+            "#BB8D63",
+            "#C49A71",
+            "#B07E54",
+            "#D1AA83",
+            "#A46C41"
+          ]
+        },
+        "warnings": [
+          "image is not clearly isolated from background; using most pixels as material evidence",
+          "object/background separation is weak",
+          "single-image inverse rendering cannot prove true physical PBR; confidence is capped"
+        ]
+      },
+      "maps": {
+        "albedo": {
+          "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-02-ear-inner/ear-inner_albedo.png",
+          "url": "ear-inner_albedo.png",
+          "channel": "albedo",
+          "source": "reference-pixel-extraction"
+        },
+        "roughness": {
+          "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-02-ear-inner/ear-inner_roughness.png",
+          "url": "ear-inner_roughness.png",
+          "channel": "roughness",
+          "source": "reference-pixel-extraction"
+        },
+        "height": {
+          "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-02-ear-inner/ear-inner_height.png",
+          "url": "ear-inner_height.png",
+          "channel": "height",
+          "source": "reference-pixel-extraction"
+        },
+        "normal": {
+          "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-02-ear-inner/ear-inner_normal.png",
+          "url": "ear-inner_normal.png",
+          "channel": "normal",
+          "source": "reference-pixel-extraction"
+        },
+        "ao": {
+          "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-02-ear-inner/ear-inner_ao.png",
+          "url": "ear-inner_ao.png",
+          "channel": "ao",
+          "source": "reference-pixel-extraction"
+        }
+      }
+    },
+    {
+      "componentId": "eye-l",
+      "regionId": "eye",
+      "materialSpecId": "eye",
+      "hypothesis": {
+        "componentId": "eye-l",
+        "regionId": "eye",
+        "materialId": null,
+        "family": "plastic",
+        "subtype": "generic-polymer",
+        "finish": "glossy",
+        "aliases": [],
+        "confidence": 0.831,
+        "source": "vision"
+      },
+      "assignment": {
+        "materialId": "plastic.glossy",
+        "status": "proceed",
+        "source": "vision",
+        "confidence": 0.831,
+        "method": "family-subtype-finish",
+        "alternatives": [],
+        "evidence": {
+          "crop": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/03-eye.png",
+            "bbox": {
+              "x": 234,
+              "y": 184,
+              "width": 22,
+              "height": 20
+            },
+            "sourceWidth": 590,
+            "sourceHeight": 666,
+            "loaderWarnings": [],
+            "coverage": 0.0011
+          },
+          "pbr": {
+            "ok": true,
+            "verdict": "pass",
+            "confidence": 0.831,
+            "estimatedFidelity": 0.831,
+            "targetThreshold": 0.7,
+            "materialId": "eye",
+            "sourceImage": "/home/user/ink-escape/art/models/shiba/work/material-evidence/03-eye.png",
+            "outDir": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-03-eye",
+            "palette": [
+              "#050302",
+              "#1B0B04",
+              "#271106",
+              "#0D0A08",
+              "#3D2012"
+            ],
+            "maps": {
+              "albedo": {
+                "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-03-eye/eye_albedo.png",
+                "url": "eye_albedo.png",
+                "channel": "albedo",
+                "source": "reference-pixel-extraction"
+              },
+              "roughness": {
+                "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-03-eye/eye_roughness.png",
+                "url": "eye_roughness.png",
+                "channel": "roughness",
+                "source": "reference-pixel-extraction"
+              },
+              "height": {
+                "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-03-eye/eye_height.png",
+                "url": "eye_height.png",
+                "channel": "height",
+                "source": "reference-pixel-extraction"
+              },
+              "normal": {
+                "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-03-eye/eye_normal.png",
+                "url": "eye_normal.png",
+                "channel": "normal",
+                "source": "reference-pixel-extraction"
+              },
+              "ao": {
+                "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-03-eye/eye_ao.png",
+                "url": "eye_ao.png",
+                "channel": "ao",
+                "source": "reference-pixel-extraction"
+              }
+            },
+            "diagnostics": {
+              "sourceWidth": 22,
+              "sourceHeight": 20,
+              "mapSize": 512,
+              "cropBBoxPixels": {
+                "x": 0,
+                "y": 0,
+                "width": 22,
+                "height": 20
+              },
+              "mask": {
+                "backgroundColor": "#C3BDBA",
+                "backgroundNoise": 301.053,
+                "transparentPixelFraction": 0.0,
+                "foregroundCoverage": 0.4636
+              },
+              "mapStats": {
+                "valueRange": 0.1269,
+                "heightP90Gradient": 0.03469,
+                "roughnessBase": 0.692,
+                "roughnessVariation": 0.067,
+                "normalStrength": 0.197,
+                "blurRadius": 10
+              },
+              "palette": [
+                "#050302",
+                "#1B0B04",
+                "#271106",
+                "#0D0A08",
+                "#3D2012"
+              ]
+            },
+            "warnings": [
+              "single-image inverse rendering cannot prove true physical PBR; confidence is capped",
+              "low value range weakens height/roughness inference"
+            ],
+            "limitation": "single-image PBR extraction is an estimate; 70%+ extraction confidence still needs render screenshot review"
+          },
+          "texture": {
+            "finishClass": "painted-metal",
+            "recipe": {
+              "metalness": 0.0,
+              "roughness": 0.5,
+              "clearcoat": 1.0,
+              "clearcoatRoughness": 0.05,
+              "transmission": 0.0,
+              "ior": 1.5,
+              "envMapIntensity": 1.0,
+              "anisotropy": 0.0,
+              "procedural": "flat-clearcoat"
+            },
+            "palette": [
+              "#9B9793",
+              "#281811",
+              "#0E0A08",
+              "#0A0808",
+              "#545352"
+            ],
+            "paletteHueRisk": [],
+            "gradientAxis": "horizontal",
+            "stats": {
+              "meanLum": 38.8,
+              "meanSaturation": 0.337,
+              "gradientStrength": 0.56,
+              "mottle": 0.016,
+              "streakRatio": 1.52,
+              "hueSpread": 0.028,
+              "specularFraction": 0.012
+            }
+          }
+        },
+        "profileId": "plastic.glossy",
+        "family": "plastic",
+        "subtype": "generic-polymer",
+        "finish": "glossy",
+        "renderPrior": {
+          "metalness": 0.0,
+          "roughness": 0.28,
+          "clearcoat": 0.2,
+          "clearcoatRoughness": 0.18,
+          "ior": 1.5
+        },
+        "requiredMaps": [
+          "map",
+          "roughnessMap"
+        ],
+        "optionalMaps": [
+          "normalMap",
+          "clearcoatMap"
+        ],
+        "validationViews": [
+          "neutral-studio",
+          "grazing",
+          "environment-reflection",
+          "reference-beauty"
+        ],
+        "sourceRefs": [
+          "three.mesh-physical",
+          "three.mesh-standard",
+          "adobe.pbr-guide-1",
+          "google.filament-pbr",
+          "mit.material-recognition"
+        ],
+        "visualCues": [
+          "untinted or light-coloured specular over coloured diffuse body",
+          "smooth molded surface"
+        ]
+      },
+      "observations": [
+        "chromatic base-colour response",
+        "strong image-space gradient; verify it is material pattern, not lighting",
+        "single-image PBR inference requires controlled render validation"
+      ],
+      "crop": {
+        "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/03-eye.png",
+        "bbox": {
+          "x": 234,
+          "y": 184,
+          "width": 22,
+          "height": 20
+        },
+        "sourceWidth": 590,
+        "sourceHeight": 666,
+        "loaderWarnings": [],
+        "coverage": 0.0011
+      },
+      "textureAnalysis": {
+        "finishClass": "painted-metal",
+        "recipe": {
+          "metalness": 0.0,
+          "roughness": 0.5,
+          "clearcoat": 1.0,
+          "clearcoatRoughness": 0.05,
+          "transmission": 0.0,
+          "ior": 1.5,
+          "envMapIntensity": 1.0,
+          "anisotropy": 0.0,
+          "procedural": "flat-clearcoat"
+        },
+        "palette": [
+          "#9B9793",
+          "#281811",
+          "#0E0A08",
+          "#0A0808",
+          "#545352"
+        ],
+        "paletteHueRisk": [],
+        "gradientAxis": "horizontal",
+        "stats": {
+          "meanLum": 38.8,
+          "meanSaturation": 0.337,
+          "gradientStrength": 0.56,
+          "mottle": 0.016,
+          "streakRatio": 1.52,
+          "hueSpread": 0.028,
+          "specularFraction": 0.012
+        }
+      },
+      "pbrReport": {
+        "ok": true,
+        "verdict": "pass",
+        "confidence": 0.831,
+        "estimatedFidelity": 0.831,
+        "targetThreshold": 0.7,
+        "materialId": "eye",
+        "sourceImage": "/home/user/ink-escape/art/models/shiba/work/material-evidence/03-eye.png",
+        "outDir": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-03-eye",
+        "palette": [
+          "#050302",
+          "#1B0B04",
+          "#271106",
+          "#0D0A08",
+          "#3D2012"
+        ],
+        "maps": {
+          "albedo": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-03-eye/eye_albedo.png",
+            "url": "eye_albedo.png",
+            "channel": "albedo",
+            "source": "reference-pixel-extraction"
+          },
+          "roughness": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-03-eye/eye_roughness.png",
+            "url": "eye_roughness.png",
+            "channel": "roughness",
+            "source": "reference-pixel-extraction"
+          },
+          "height": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-03-eye/eye_height.png",
+            "url": "eye_height.png",
+            "channel": "height",
+            "source": "reference-pixel-extraction"
+          },
+          "normal": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-03-eye/eye_normal.png",
+            "url": "eye_normal.png",
+            "channel": "normal",
+            "source": "reference-pixel-extraction"
+          },
+          "ao": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-03-eye/eye_ao.png",
+            "url": "eye_ao.png",
+            "channel": "ao",
+            "source": "reference-pixel-extraction"
+          }
+        },
+        "diagnostics": {
+          "sourceWidth": 22,
+          "sourceHeight": 20,
+          "mapSize": 512,
+          "cropBBoxPixels": {
+            "x": 0,
+            "y": 0,
+            "width": 22,
+            "height": 20
+          },
+          "mask": {
+            "backgroundColor": "#C3BDBA",
+            "backgroundNoise": 301.053,
+            "transparentPixelFraction": 0.0,
+            "foregroundCoverage": 0.4636
+          },
+          "mapStats": {
+            "valueRange": 0.1269,
+            "heightP90Gradient": 0.03469,
+            "roughnessBase": 0.692,
+            "roughnessVariation": 0.067,
+            "normalStrength": 0.197,
+            "blurRadius": 10
+          },
+          "palette": [
+            "#050302",
+            "#1B0B04",
+            "#271106",
+            "#0D0A08",
+            "#3D2012"
+          ]
+        },
+        "warnings": [
+          "single-image inverse rendering cannot prove true physical PBR; confidence is capped",
+          "low value range weakens height/roughness inference"
+        ],
+        "limitation": "single-image PBR extraction is an estimate; 70%+ extraction confidence still needs render screenshot review"
+      },
+      "referencePbr": {
+        "version": "1.0",
+        "sourceImage": "/home/user/ink-escape/art/models/shiba/work/material-evidence/03-eye.png",
+        "extractor": "stage1_intake/extract_pbr_evidence.py",
+        "method": "single-image pixel evidence with de-lighting estimate; not photogrammetry",
+        "usable": true,
+        "verdict": "pass",
+        "confidence": 0.831,
+        "estimatedFidelity": 0.831,
+        "targetThreshold": 0.7,
+        "hardLimit": "A single image cannot uniquely recover true albedo/roughness/normal/AO; maps are reference-derived estimates.",
+        "maps": {
+          "albedo": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-03-eye/eye_albedo.png",
+            "url": "eye_albedo.png",
+            "channel": "albedo",
+            "source": "reference-pixel-extraction"
+          },
+          "roughness": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-03-eye/eye_roughness.png",
+            "url": "eye_roughness.png",
+            "channel": "roughness",
+            "source": "reference-pixel-extraction"
+          },
+          "height": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-03-eye/eye_height.png",
+            "url": "eye_height.png",
+            "channel": "height",
+            "source": "reference-pixel-extraction"
+          },
+          "normal": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-03-eye/eye_normal.png",
+            "url": "eye_normal.png",
+            "channel": "normal",
+            "source": "reference-pixel-extraction"
+          },
+          "ao": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-03-eye/eye_ao.png",
+            "url": "eye_ao.png",
+            "channel": "ao",
+            "source": "reference-pixel-extraction"
+          }
+        },
+        "diagnostics": {
+          "sourceWidth": 22,
+          "sourceHeight": 20,
+          "mapSize": 512,
+          "cropBBoxPixels": {
+            "x": 0,
+            "y": 0,
+            "width": 22,
+            "height": 20
+          },
+          "mask": {
+            "backgroundColor": "#C3BDBA",
+            "backgroundNoise": 301.053,
+            "transparentPixelFraction": 0.0,
+            "foregroundCoverage": 0.4636
+          },
+          "mapStats": {
+            "valueRange": 0.1269,
+            "heightP90Gradient": 0.03469,
+            "roughnessBase": 0.692,
+            "roughnessVariation": 0.067,
+            "normalStrength": 0.197,
+            "blurRadius": 10
+          },
+          "palette": [
+            "#050302",
+            "#1B0B04",
+            "#271106",
+            "#0D0A08",
+            "#3D2012"
+          ]
+        },
+        "warnings": [
+          "single-image inverse rendering cannot prove true physical PBR; confidence is capped",
+          "low value range weakens height/roughness inference"
+        ]
+      },
+      "maps": {
+        "albedo": {
+          "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-03-eye/eye_albedo.png",
+          "url": "eye_albedo.png",
+          "channel": "albedo",
+          "source": "reference-pixel-extraction"
+        },
+        "roughness": {
+          "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-03-eye/eye_roughness.png",
+          "url": "eye_roughness.png",
+          "channel": "roughness",
+          "source": "reference-pixel-extraction"
+        },
+        "height": {
+          "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-03-eye/eye_height.png",
+          "url": "eye_height.png",
+          "channel": "height",
+          "source": "reference-pixel-extraction"
+        },
+        "normal": {
+          "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-03-eye/eye_normal.png",
+          "url": "eye_normal.png",
+          "channel": "normal",
+          "source": "reference-pixel-extraction"
+        },
+        "ao": {
+          "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-03-eye/eye_ao.png",
+          "url": "eye_ao.png",
+          "channel": "ao",
+          "source": "reference-pixel-extraction"
+        }
+      }
+    },
+    {
+      "componentId": "nose",
+      "regionId": "nose",
+      "materialSpecId": "nose",
+      "hypothesis": {
+        "componentId": "nose",
+        "regionId": "nose",
+        "materialId": null,
+        "family": "plastic",
+        "subtype": "generic-polymer",
+        "finish": "matte",
+        "aliases": [],
+        "confidence": 0.805,
+        "source": "vision"
+      },
+      "assignment": {
+        "materialId": "plastic.matte",
+        "status": "proceed",
+        "source": "vision",
+        "confidence": 0.805,
+        "method": "family-subtype-finish",
+        "alternatives": [],
+        "evidence": {
+          "crop": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/04-nose.png",
+            "bbox": {
+              "x": 284,
+              "y": 209,
+              "width": 22,
+              "height": 14
+            },
+            "sourceWidth": 590,
+            "sourceHeight": 666,
+            "loaderWarnings": [],
+            "coverage": 0.0008
+          },
+          "pbr": {
+            "ok": true,
+            "verdict": "pass",
+            "confidence": 0.805,
+            "estimatedFidelity": 0.805,
+            "targetThreshold": 0.7,
+            "materialId": "nose",
+            "sourceImage": "/home/user/ink-escape/art/models/shiba/work/material-evidence/04-nose.png",
+            "outDir": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-04-nose",
+            "palette": [
+              "#382217",
+              "#66493C",
+              "#492F22",
+              "#7E675E",
+              "#0F0603"
+            ],
+            "maps": {
+              "albedo": {
+                "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-04-nose/nose_albedo.png",
+                "url": "nose_albedo.png",
+                "channel": "albedo",
+                "source": "reference-pixel-extraction"
+              },
+              "roughness": {
+                "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-04-nose/nose_roughness.png",
+                "url": "nose_roughness.png",
+                "channel": "roughness",
+                "source": "reference-pixel-extraction"
+              },
+              "height": {
+                "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-04-nose/nose_height.png",
+                "url": "nose_height.png",
+                "channel": "height",
+                "source": "reference-pixel-extraction"
+              },
+              "normal": {
+                "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-04-nose/nose_normal.png",
+                "url": "nose_normal.png",
+                "channel": "normal",
+                "source": "reference-pixel-extraction"
+              },
+              "ao": {
+                "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-04-nose/nose_ao.png",
+                "url": "nose_ao.png",
+                "channel": "ao",
+                "source": "reference-pixel-extraction"
+              }
+            },
+            "diagnostics": {
+              "sourceWidth": 22,
+              "sourceHeight": 14,
+              "mapSize": 512,
+              "cropBBoxPixels": {
+                "x": 0,
+                "y": 0,
+                "width": 22,
+                "height": 14
+              },
+              "mask": {
+                "backgroundColor": "#5B3A2D",
+                "backgroundNoise": 104.159,
+                "transparentPixelFraction": 0.0,
+                "foregroundCoverage": 1.0
+              },
+              "mapStats": {
+                "valueRange": 0.3851,
+                "heightP90Gradient": 0.0225,
+                "roughnessBase": 0.691,
+                "roughnessVariation": 0.05,
+                "normalStrength": 0.183,
+                "blurRadius": 10
+              },
+              "palette": [
+                "#382217",
+                "#66493C",
+                "#492F22",
+                "#7E675E",
+                "#0F0603"
+              ]
+            },
+            "warnings": [
+              "image is not clearly isolated from background; using most pixels as material evidence",
+              "object/background separation is weak",
+              "single-image inverse rendering cannot prove true physical PBR; confidence is capped"
+            ],
+            "limitation": "single-image PBR extraction is an estimate; 70%+ extraction confidence still needs render screenshot review"
+          },
+          "texture": {
+            "finishClass": "painted-metal",
+            "recipe": {
+              "metalness": 0.0,
+              "roughness": 0.5,
+              "clearcoat": 1.0,
+              "clearcoatRoughness": 0.05,
+              "transmission": 0.0,
+              "ior": 1.5,
+              "envMapIntensity": 1.0,
+              "anisotropy": 0.0,
+              "procedural": "flat-clearcoat"
+            },
+            "palette": [
+              "#6C4A3A",
+              "#6F574E",
+              "#493024",
+              "#362116",
+              "#26160E"
+            ],
+            "paletteHueRisk": [],
+            "gradientAxis": "vertical",
+            "stats": {
+              "meanLum": 57.9,
+              "meanSaturation": 0.518,
+              "gradientStrength": 0.263,
+              "mottle": 0.006,
+              "streakRatio": 0.97,
+              "hueSpread": 0.002,
+              "specularFraction": 0.0
+            }
+          }
+        },
+        "profileId": "plastic.matte",
+        "family": "plastic",
+        "subtype": "generic-polymer",
+        "finish": "matte",
+        "renderPrior": {
+          "metalness": 0.0,
+          "roughness": 0.68,
+          "ior": 1.5
+        },
+        "requiredMaps": [
+          "map",
+          "roughnessMap"
+        ],
+        "optionalMaps": [
+          "normalMap",
+          "aoMap"
+        ],
+        "validationViews": [
+          "albedo-unlit",
+          "neutral-studio",
+          "grazing"
+        ],
+        "sourceRefs": [
+          "three.mesh-standard",
+          "adobe.pbr-guide-1",
+          "google.filament-pbr",
+          "mit.material-recognition"
+        ],
+        "visualCues": [
+          "coloured diffuse body",
+          "broad neutral highlight",
+          "mold seams or fine stipple"
+        ]
+      },
+      "observations": [
+        "chromatic base-colour response",
+        "strong image-space gradient; verify it is material pattern, not lighting",
+        "single-image PBR inference requires controlled render validation"
+      ],
+      "crop": {
+        "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/04-nose.png",
+        "bbox": {
+          "x": 284,
+          "y": 209,
+          "width": 22,
+          "height": 14
+        },
+        "sourceWidth": 590,
+        "sourceHeight": 666,
+        "loaderWarnings": [],
+        "coverage": 0.0008
+      },
+      "textureAnalysis": {
+        "finishClass": "painted-metal",
+        "recipe": {
+          "metalness": 0.0,
+          "roughness": 0.5,
+          "clearcoat": 1.0,
+          "clearcoatRoughness": 0.05,
+          "transmission": 0.0,
+          "ior": 1.5,
+          "envMapIntensity": 1.0,
+          "anisotropy": 0.0,
+          "procedural": "flat-clearcoat"
+        },
+        "palette": [
+          "#6C4A3A",
+          "#6F574E",
+          "#493024",
+          "#362116",
+          "#26160E"
+        ],
+        "paletteHueRisk": [],
+        "gradientAxis": "vertical",
+        "stats": {
+          "meanLum": 57.9,
+          "meanSaturation": 0.518,
+          "gradientStrength": 0.263,
+          "mottle": 0.006,
+          "streakRatio": 0.97,
+          "hueSpread": 0.002,
+          "specularFraction": 0.0
+        }
+      },
+      "pbrReport": {
+        "ok": true,
+        "verdict": "pass",
+        "confidence": 0.805,
+        "estimatedFidelity": 0.805,
+        "targetThreshold": 0.7,
+        "materialId": "nose",
+        "sourceImage": "/home/user/ink-escape/art/models/shiba/work/material-evidence/04-nose.png",
+        "outDir": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-04-nose",
+        "palette": [
+          "#382217",
+          "#66493C",
+          "#492F22",
+          "#7E675E",
+          "#0F0603"
+        ],
+        "maps": {
+          "albedo": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-04-nose/nose_albedo.png",
+            "url": "nose_albedo.png",
+            "channel": "albedo",
+            "source": "reference-pixel-extraction"
+          },
+          "roughness": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-04-nose/nose_roughness.png",
+            "url": "nose_roughness.png",
+            "channel": "roughness",
+            "source": "reference-pixel-extraction"
+          },
+          "height": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-04-nose/nose_height.png",
+            "url": "nose_height.png",
+            "channel": "height",
+            "source": "reference-pixel-extraction"
+          },
+          "normal": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-04-nose/nose_normal.png",
+            "url": "nose_normal.png",
+            "channel": "normal",
+            "source": "reference-pixel-extraction"
+          },
+          "ao": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-04-nose/nose_ao.png",
+            "url": "nose_ao.png",
+            "channel": "ao",
+            "source": "reference-pixel-extraction"
+          }
+        },
+        "diagnostics": {
+          "sourceWidth": 22,
+          "sourceHeight": 14,
+          "mapSize": 512,
+          "cropBBoxPixels": {
+            "x": 0,
+            "y": 0,
+            "width": 22,
+            "height": 14
+          },
+          "mask": {
+            "backgroundColor": "#5B3A2D",
+            "backgroundNoise": 104.159,
+            "transparentPixelFraction": 0.0,
+            "foregroundCoverage": 1.0
+          },
+          "mapStats": {
+            "valueRange": 0.3851,
+            "heightP90Gradient": 0.0225,
+            "roughnessBase": 0.691,
+            "roughnessVariation": 0.05,
+            "normalStrength": 0.183,
+            "blurRadius": 10
+          },
+          "palette": [
+            "#382217",
+            "#66493C",
+            "#492F22",
+            "#7E675E",
+            "#0F0603"
+          ]
+        },
+        "warnings": [
+          "image is not clearly isolated from background; using most pixels as material evidence",
+          "object/background separation is weak",
+          "single-image inverse rendering cannot prove true physical PBR; confidence is capped"
+        ],
+        "limitation": "single-image PBR extraction is an estimate; 70%+ extraction confidence still needs render screenshot review"
+      },
+      "referencePbr": {
+        "version": "1.0",
+        "sourceImage": "/home/user/ink-escape/art/models/shiba/work/material-evidence/04-nose.png",
+        "extractor": "stage1_intake/extract_pbr_evidence.py",
+        "method": "single-image pixel evidence with de-lighting estimate; not photogrammetry",
+        "usable": true,
+        "verdict": "pass",
+        "confidence": 0.805,
+        "estimatedFidelity": 0.805,
+        "targetThreshold": 0.7,
+        "hardLimit": "A single image cannot uniquely recover true albedo/roughness/normal/AO; maps are reference-derived estimates.",
+        "maps": {
+          "albedo": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-04-nose/nose_albedo.png",
+            "url": "nose_albedo.png",
+            "channel": "albedo",
+            "source": "reference-pixel-extraction"
+          },
+          "roughness": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-04-nose/nose_roughness.png",
+            "url": "nose_roughness.png",
+            "channel": "roughness",
+            "source": "reference-pixel-extraction"
+          },
+          "height": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-04-nose/nose_height.png",
+            "url": "nose_height.png",
+            "channel": "height",
+            "source": "reference-pixel-extraction"
+          },
+          "normal": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-04-nose/nose_normal.png",
+            "url": "nose_normal.png",
+            "channel": "normal",
+            "source": "reference-pixel-extraction"
+          },
+          "ao": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-04-nose/nose_ao.png",
+            "url": "nose_ao.png",
+            "channel": "ao",
+            "source": "reference-pixel-extraction"
+          }
+        },
+        "diagnostics": {
+          "sourceWidth": 22,
+          "sourceHeight": 14,
+          "mapSize": 512,
+          "cropBBoxPixels": {
+            "x": 0,
+            "y": 0,
+            "width": 22,
+            "height": 14
+          },
+          "mask": {
+            "backgroundColor": "#5B3A2D",
+            "backgroundNoise": 104.159,
+            "transparentPixelFraction": 0.0,
+            "foregroundCoverage": 1.0
+          },
+          "mapStats": {
+            "valueRange": 0.3851,
+            "heightP90Gradient": 0.0225,
+            "roughnessBase": 0.691,
+            "roughnessVariation": 0.05,
+            "normalStrength": 0.183,
+            "blurRadius": 10
+          },
+          "palette": [
+            "#382217",
+            "#66493C",
+            "#492F22",
+            "#7E675E",
+            "#0F0603"
+          ]
+        },
+        "warnings": [
+          "image is not clearly isolated from background; using most pixels as material evidence",
+          "object/background separation is weak",
+          "single-image inverse rendering cannot prove true physical PBR; confidence is capped"
+        ]
+      },
+      "maps": {
+        "albedo": {
+          "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-04-nose/nose_albedo.png",
+          "url": "nose_albedo.png",
+          "channel": "albedo",
+          "source": "reference-pixel-extraction"
+        },
+        "roughness": {
+          "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-04-nose/nose_roughness.png",
+          "url": "nose_roughness.png",
+          "channel": "roughness",
+          "source": "reference-pixel-extraction"
+        },
+        "height": {
+          "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-04-nose/nose_height.png",
+          "url": "nose_height.png",
+          "channel": "height",
+          "source": "reference-pixel-extraction"
+        },
+        "normal": {
+          "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-04-nose/nose_normal.png",
+          "url": "nose_normal.png",
+          "channel": "normal",
+          "source": "reference-pixel-extraction"
+        },
+        "ao": {
+          "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-04-nose/nose_ao.png",
+          "url": "nose_ao.png",
+          "channel": "ao",
+          "source": "reference-pixel-extraction"
+        }
+      }
+    },
+    {
+      "componentId": "tongue",
+      "regionId": "tongue",
+      "materialSpecId": "tongue",
+      "hypothesis": {
+        "componentId": "tongue",
+        "regionId": "tongue",
+        "materialId": null,
+        "family": "rubber",
+        "subtype": "generic-elastomer",
+        "finish": "matte",
+        "aliases": [],
+        "confidence": 0.774,
+        "source": "vision"
+      },
+      "assignment": {
+        "materialId": "rubber.matte",
+        "status": "proceed",
+        "source": "vision",
+        "confidence": 0.774,
+        "method": "family-subtype-finish",
+        "alternatives": [],
+        "evidence": {
+          "crop": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/05-tongue.png",
+            "bbox": {
+              "x": 284,
+              "y": 257,
+              "width": 22,
+              "height": 10
+            },
+            "sourceWidth": 590,
+            "sourceHeight": 666,
+            "loaderWarnings": [],
+            "coverage": 0.0006
+          },
+          "pbr": {
+            "ok": true,
+            "verdict": "pass",
+            "confidence": 0.774,
+            "estimatedFidelity": 0.774,
+            "targetThreshold": 0.7,
+            "materialId": "tongue",
+            "sourceImage": "/home/user/ink-escape/art/models/shiba/work/material-evidence/05-tongue.png",
+            "outDir": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-05-tongue",
+            "palette": [
+              "#C26461",
+              "#7C2D2A",
+              "#953F3B",
+              "#AD504D",
+              "#D47C7A"
+            ],
+            "maps": {
+              "albedo": {
+                "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-05-tongue/tongue_albedo.png",
+                "url": "tongue_albedo.png",
+                "channel": "albedo",
+                "source": "reference-pixel-extraction"
+              },
+              "roughness": {
+                "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-05-tongue/tongue_roughness.png",
+                "url": "tongue_roughness.png",
+                "channel": "roughness",
+                "source": "reference-pixel-extraction"
+              },
+              "height": {
+                "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-05-tongue/tongue_height.png",
+                "url": "tongue_height.png",
+                "channel": "height",
+                "source": "reference-pixel-extraction"
+              },
+              "normal": {
+                "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-05-tongue/tongue_normal.png",
+                "url": "tongue_normal.png",
+                "channel": "normal",
+                "source": "reference-pixel-extraction"
+              },
+              "ao": {
+                "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-05-tongue/tongue_ao.png",
+                "url": "tongue_ao.png",
+                "channel": "ao",
+                "source": "reference-pixel-extraction"
+              }
+            },
+            "diagnostics": {
+              "sourceWidth": 22,
+              "sourceHeight": 10,
+              "mapSize": 512,
+              "cropBBoxPixels": {
+                "x": 0,
+                "y": 0,
+                "width": 22,
+                "height": 10
+              },
+              "mask": {
+                "backgroundColor": "#B75451",
+                "backgroundNoise": 67.919,
+                "transparentPixelFraction": 0.0,
+                "foregroundCoverage": 1.0
+              },
+              "mapStats": {
+                "valueRange": 0.3517,
+                "heightP90Gradient": 0.01647,
+                "roughnessBase": 0.692,
+                "roughnessVariation": 0.05,
+                "normalStrength": 0.176,
+                "blurRadius": 10
+              },
+              "palette": [
+                "#C26461",
+                "#7C2D2A",
+                "#953F3B",
+                "#AD504D",
+                "#D47C7A"
+              ]
+            },
+            "warnings": [
+              "image is not clearly isolated from background; using most pixels as material evidence",
+              "object/background separation is weak",
+              "single-image inverse rendering cannot prove true physical PBR; confidence is capped"
+            ],
+            "limitation": "single-image PBR extraction is an estimate; 70%+ extraction confidence still needs render screenshot review"
+          },
+          "texture": {
+            "finishClass": "painted-metal",
+            "recipe": {
+              "metalness": 0.0,
+              "roughness": 0.5,
+              "clearcoat": 1.0,
+              "clearcoatRoughness": 0.05,
+              "transmission": 0.0,
+              "ior": 1.5,
+              "envMapIntensity": 1.0,
+              "anisotropy": 0.0,
+              "procedural": "flat-clearcoat"
+            },
+            "palette": [
+              "#762926",
+              "#8B3834",
+              "#A64B48",
+              "#C96C69",
+              "#D07673"
+            ],
+            "paletteHueRisk": [],
+            "gradientAxis": "vertical",
+            "stats": {
+              "meanLum": 107.1,
+              "meanSaturation": 0.555,
+              "gradientStrength": 0.316,
+              "mottle": 0.003,
+              "streakRatio": 0.6,
+              "hueSpread": 0.0,
+              "specularFraction": 0.0
+            }
+          }
+        },
+        "profileId": "rubber.matte",
+        "family": "rubber",
+        "subtype": "generic-elastomer",
+        "finish": "matte",
+        "renderPrior": {
+          "metalness": 0.0,
+          "roughness": 0.88,
+          "ior": 1.48
+        },
+        "requiredMaps": [
+          "map",
+          "roughnessMap",
+          "normalMap"
+        ],
+        "optionalMaps": [
+          "aoMap"
+        ],
+        "validationViews": [
+          "albedo-unlit",
+          "neutral-studio",
+          "grazing",
+          "reference-beauty"
+        ],
+        "sourceRefs": [
+          "three.mesh-standard",
+          "adobe.pbr-guide-1",
+          "google.filament-pbr",
+          "mit.material-recognition"
+        ],
+        "visualCues": [
+          "dark diffuse body",
+          "weak broad highlight",
+          "molded or grippy microtexture"
+        ]
+      },
+      "observations": [
+        "chromatic base-colour response",
+        "strong image-space gradient; verify it is material pattern, not lighting",
+        "single-image PBR inference requires controlled render validation"
+      ],
+      "crop": {
+        "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/05-tongue.png",
+        "bbox": {
+          "x": 284,
+          "y": 257,
+          "width": 22,
+          "height": 10
+        },
+        "sourceWidth": 590,
+        "sourceHeight": 666,
+        "loaderWarnings": [],
+        "coverage": 0.0006
+      },
+      "textureAnalysis": {
+        "finishClass": "painted-metal",
+        "recipe": {
+          "metalness": 0.0,
+          "roughness": 0.5,
+          "clearcoat": 1.0,
+          "clearcoatRoughness": 0.05,
+          "transmission": 0.0,
+          "ior": 1.5,
+          "envMapIntensity": 1.0,
+          "anisotropy": 0.0,
+          "procedural": "flat-clearcoat"
+        },
+        "palette": [
+          "#762926",
+          "#8B3834",
+          "#A64B48",
+          "#C96C69",
+          "#D07673"
+        ],
+        "paletteHueRisk": [],
+        "gradientAxis": "vertical",
+        "stats": {
+          "meanLum": 107.1,
+          "meanSaturation": 0.555,
+          "gradientStrength": 0.316,
+          "mottle": 0.003,
+          "streakRatio": 0.6,
+          "hueSpread": 0.0,
+          "specularFraction": 0.0
+        }
+      },
+      "pbrReport": {
+        "ok": true,
+        "verdict": "pass",
+        "confidence": 0.774,
+        "estimatedFidelity": 0.774,
+        "targetThreshold": 0.7,
+        "materialId": "tongue",
+        "sourceImage": "/home/user/ink-escape/art/models/shiba/work/material-evidence/05-tongue.png",
+        "outDir": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-05-tongue",
+        "palette": [
+          "#C26461",
+          "#7C2D2A",
+          "#953F3B",
+          "#AD504D",
+          "#D47C7A"
+        ],
+        "maps": {
+          "albedo": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-05-tongue/tongue_albedo.png",
+            "url": "tongue_albedo.png",
+            "channel": "albedo",
+            "source": "reference-pixel-extraction"
+          },
+          "roughness": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-05-tongue/tongue_roughness.png",
+            "url": "tongue_roughness.png",
+            "channel": "roughness",
+            "source": "reference-pixel-extraction"
+          },
+          "height": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-05-tongue/tongue_height.png",
+            "url": "tongue_height.png",
+            "channel": "height",
+            "source": "reference-pixel-extraction"
+          },
+          "normal": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-05-tongue/tongue_normal.png",
+            "url": "tongue_normal.png",
+            "channel": "normal",
+            "source": "reference-pixel-extraction"
+          },
+          "ao": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-05-tongue/tongue_ao.png",
+            "url": "tongue_ao.png",
+            "channel": "ao",
+            "source": "reference-pixel-extraction"
+          }
+        },
+        "diagnostics": {
+          "sourceWidth": 22,
+          "sourceHeight": 10,
+          "mapSize": 512,
+          "cropBBoxPixels": {
+            "x": 0,
+            "y": 0,
+            "width": 22,
+            "height": 10
+          },
+          "mask": {
+            "backgroundColor": "#B75451",
+            "backgroundNoise": 67.919,
+            "transparentPixelFraction": 0.0,
+            "foregroundCoverage": 1.0
+          },
+          "mapStats": {
+            "valueRange": 0.3517,
+            "heightP90Gradient": 0.01647,
+            "roughnessBase": 0.692,
+            "roughnessVariation": 0.05,
+            "normalStrength": 0.176,
+            "blurRadius": 10
+          },
+          "palette": [
+            "#C26461",
+            "#7C2D2A",
+            "#953F3B",
+            "#AD504D",
+            "#D47C7A"
+          ]
+        },
+        "warnings": [
+          "image is not clearly isolated from background; using most pixels as material evidence",
+          "object/background separation is weak",
+          "single-image inverse rendering cannot prove true physical PBR; confidence is capped"
+        ],
+        "limitation": "single-image PBR extraction is an estimate; 70%+ extraction confidence still needs render screenshot review"
+      },
+      "referencePbr": {
+        "version": "1.0",
+        "sourceImage": "/home/user/ink-escape/art/models/shiba/work/material-evidence/05-tongue.png",
+        "extractor": "stage1_intake/extract_pbr_evidence.py",
+        "method": "single-image pixel evidence with de-lighting estimate; not photogrammetry",
+        "usable": true,
+        "verdict": "pass",
+        "confidence": 0.774,
+        "estimatedFidelity": 0.774,
+        "targetThreshold": 0.7,
+        "hardLimit": "A single image cannot uniquely recover true albedo/roughness/normal/AO; maps are reference-derived estimates.",
+        "maps": {
+          "albedo": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-05-tongue/tongue_albedo.png",
+            "url": "tongue_albedo.png",
+            "channel": "albedo",
+            "source": "reference-pixel-extraction"
+          },
+          "roughness": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-05-tongue/tongue_roughness.png",
+            "url": "tongue_roughness.png",
+            "channel": "roughness",
+            "source": "reference-pixel-extraction"
+          },
+          "height": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-05-tongue/tongue_height.png",
+            "url": "tongue_height.png",
+            "channel": "height",
+            "source": "reference-pixel-extraction"
+          },
+          "normal": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-05-tongue/tongue_normal.png",
+            "url": "tongue_normal.png",
+            "channel": "normal",
+            "source": "reference-pixel-extraction"
+          },
+          "ao": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-05-tongue/tongue_ao.png",
+            "url": "tongue_ao.png",
+            "channel": "ao",
+            "source": "reference-pixel-extraction"
+          }
+        },
+        "diagnostics": {
+          "sourceWidth": 22,
+          "sourceHeight": 10,
+          "mapSize": 512,
+          "cropBBoxPixels": {
+            "x": 0,
+            "y": 0,
+            "width": 22,
+            "height": 10
+          },
+          "mask": {
+            "backgroundColor": "#B75451",
+            "backgroundNoise": 67.919,
+            "transparentPixelFraction": 0.0,
+            "foregroundCoverage": 1.0
+          },
+          "mapStats": {
+            "valueRange": 0.3517,
+            "heightP90Gradient": 0.01647,
+            "roughnessBase": 0.692,
+            "roughnessVariation": 0.05,
+            "normalStrength": 0.176,
+            "blurRadius": 10
+          },
+          "palette": [
+            "#C26461",
+            "#7C2D2A",
+            "#953F3B",
+            "#AD504D",
+            "#D47C7A"
+          ]
+        },
+        "warnings": [
+          "image is not clearly isolated from background; using most pixels as material evidence",
+          "object/background separation is weak",
+          "single-image inverse rendering cannot prove true physical PBR; confidence is capped"
+        ]
+      },
+      "maps": {
+        "albedo": {
+          "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-05-tongue/tongue_albedo.png",
+          "url": "tongue_albedo.png",
+          "channel": "albedo",
+          "source": "reference-pixel-extraction"
+        },
+        "roughness": {
+          "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-05-tongue/tongue_roughness.png",
+          "url": "tongue_roughness.png",
+          "channel": "roughness",
+          "source": "reference-pixel-extraction"
+        },
+        "height": {
+          "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-05-tongue/tongue_height.png",
+          "url": "tongue_height.png",
+          "channel": "height",
+          "source": "reference-pixel-extraction"
+        },
+        "normal": {
+          "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-05-tongue/tongue_normal.png",
+          "url": "tongue_normal.png",
+          "channel": "normal",
+          "source": "reference-pixel-extraction"
+        },
+        "ao": {
+          "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-05-tongue/tongue_ao.png",
+          "url": "tongue_ao.png",
+          "channel": "ao",
+          "source": "reference-pixel-extraction"
+        }
+      }
+    },
+    {
+      "componentId": "bandana-front",
+      "regionId": "bandana",
+      "materialSpecId": "bandana",
+      "hypothesis": {
+        "componentId": "bandana-front",
+        "regionId": "bandana",
+        "materialId": null,
+        "family": "fabric",
+        "subtype": "woven",
+        "finish": "matte",
+        "aliases": [],
+        "confidence": 0.751,
+        "source": "vision"
+      },
+      "assignment": {
+        "materialId": "fabric.woven-matte",
+        "status": "proceed",
+        "source": "vision",
+        "confidence": 0.751,
+        "method": "family-subtype-finish",
+        "alternatives": [],
+        "evidence": {
+          "crop": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/06-bandana.png",
+            "bbox": {
+              "x": 250,
+              "y": 318,
+              "width": 90,
+              "height": 40
+            },
+            "sourceWidth": 590,
+            "sourceHeight": 666,
+            "loaderWarnings": [],
+            "coverage": 0.0092
+          },
+          "pbr": {
+            "ok": true,
+            "verdict": "pass",
+            "confidence": 0.751,
+            "estimatedFidelity": 0.751,
+            "targetThreshold": 0.7,
+            "materialId": "bandana",
+            "sourceImage": "/home/user/ink-escape/art/models/shiba/work/material-evidence/06-bandana.png",
+            "outDir": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-06-bandana",
+            "palette": [
+              "#DB601A",
+              "#E16721",
+              "#E67029",
+              "#D55915",
+              "#EC7932"
+            ],
+            "maps": {
+              "albedo": {
+                "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-06-bandana/bandana_albedo.png",
+                "url": "bandana_albedo.png",
+                "channel": "albedo",
+                "source": "reference-pixel-extraction"
+              },
+              "roughness": {
+                "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-06-bandana/bandana_roughness.png",
+                "url": "bandana_roughness.png",
+                "channel": "roughness",
+                "source": "reference-pixel-extraction"
+              },
+              "height": {
+                "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-06-bandana/bandana_height.png",
+                "url": "bandana_height.png",
+                "channel": "height",
+                "source": "reference-pixel-extraction"
+              },
+              "normal": {
+                "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-06-bandana/bandana_normal.png",
+                "url": "bandana_normal.png",
+                "channel": "normal",
+                "source": "reference-pixel-extraction"
+              },
+              "ao": {
+                "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-06-bandana/bandana_ao.png",
+                "url": "bandana_ao.png",
+                "channel": "ao",
+                "source": "reference-pixel-extraction"
+              }
+            },
+            "diagnostics": {
+              "sourceWidth": 90,
+              "sourceHeight": 40,
+              "mapSize": 512,
+              "cropBBoxPixels": {
+                "x": 0,
+                "y": 0,
+                "width": 90,
+                "height": 40
+              },
+              "mask": {
+                "backgroundColor": "#E87128",
+                "backgroundNoise": 17.72,
+                "transparentPixelFraction": 0.0,
+                "foregroundCoverage": 1.0
+              },
+              "mapStats": {
+                "valueRange": 0.1233,
+                "heightP90Gradient": 0.09679,
+                "roughnessBase": 0.789,
+                "roughnessVariation": 0.164,
+                "normalStrength": 0.27,
+                "blurRadius": 10
+              },
+              "palette": [
+                "#DB601A",
+                "#E16721",
+                "#E67029",
+                "#D55915",
+                "#EC7932"
+              ]
+            },
+            "warnings": [
+              "image is not clearly isolated from background; using most pixels as material evidence",
+              "object/background separation is weak",
+              "single-image inverse rendering cannot prove true physical PBR; confidence is capped",
+              "low value range weakens height/roughness inference"
+            ],
+            "limitation": "single-image PBR extraction is an estimate; 70%+ extraction confidence still needs render screenshot review"
+          },
+          "texture": {
+            "finishClass": "painted-metal",
+            "recipe": {
+              "metalness": 0.0,
+              "roughness": 0.5,
+              "clearcoat": 1.0,
+              "clearcoatRoughness": 0.05,
+              "transmission": 0.0,
+              "ior": 1.5,
+              "envMapIntensity": 1.0,
+              "anisotropy": 0.0,
+              "procedural": "flat-clearcoat"
+            },
+            "palette": [
+              "#DB601C",
+              "#E46D26",
+              "#DB601A",
+              "#DD631E",
+              "#E7732C"
+            ],
+            "paletteHueRisk": [],
+            "gradientAxis": "vertical",
+            "stats": {
+              "meanLum": 131.6,
+              "meanSaturation": 0.853,
+              "gradientStrength": 0.07,
+              "mottle": 0.015,
+              "streakRatio": 1.31,
+              "hueSpread": 0.0,
+              "specularFraction": 0.0
+            }
+          }
+        },
+        "profileId": "fabric.woven-matte",
+        "family": "fabric",
+        "subtype": "woven",
+        "finish": "matte",
+        "renderPrior": {
+          "metalness": 0.0,
+          "roughness": 0.85,
+          "sheen": 0.65,
+          "sheenRoughness": 0.75
+        },
+        "requiredMaps": [
+          "map",
+          "roughnessMap",
+          "normalMap"
+        ],
+        "optionalMaps": [
+          "sheenColorMap",
+          "sheenRoughnessMap",
+          "aoMap"
+        ],
+        "validationViews": [
+          "albedo-unlit",
+          "neutral-studio",
+          "grazing",
+          "reference-beauty"
+        ],
+        "sourceRefs": [
+          "three.mesh-physical",
+          "three.texture",
+          "khronos.sheen",
+          "mit.material-recognition"
+        ],
+        "visualCues": [
+          "diffuse body with grazing-angle sheen",
+          "woven directional microstructure",
+          "soft broad highlights"
+        ]
+      },
+      "observations": [
+        "chromatic base-colour response",
+        "single-image PBR inference requires controlled render validation"
+      ],
+      "crop": {
+        "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/06-bandana.png",
+        "bbox": {
+          "x": 250,
+          "y": 318,
+          "width": 90,
+          "height": 40
+        },
+        "sourceWidth": 590,
+        "sourceHeight": 666,
+        "loaderWarnings": [],
+        "coverage": 0.0092
+      },
+      "textureAnalysis": {
+        "finishClass": "painted-metal",
+        "recipe": {
+          "metalness": 0.0,
+          "roughness": 0.5,
+          "clearcoat": 1.0,
+          "clearcoatRoughness": 0.05,
+          "transmission": 0.0,
+          "ior": 1.5,
+          "envMapIntensity": 1.0,
+          "anisotropy": 0.0,
+          "procedural": "flat-clearcoat"
+        },
+        "palette": [
+          "#DB601C",
+          "#E46D26",
+          "#DB601A",
+          "#DD631E",
+          "#E7732C"
+        ],
+        "paletteHueRisk": [],
+        "gradientAxis": "vertical",
+        "stats": {
+          "meanLum": 131.6,
+          "meanSaturation": 0.853,
+          "gradientStrength": 0.07,
+          "mottle": 0.015,
+          "streakRatio": 1.31,
+          "hueSpread": 0.0,
+          "specularFraction": 0.0
+        }
+      },
+      "pbrReport": {
+        "ok": true,
+        "verdict": "pass",
+        "confidence": 0.751,
+        "estimatedFidelity": 0.751,
+        "targetThreshold": 0.7,
+        "materialId": "bandana",
+        "sourceImage": "/home/user/ink-escape/art/models/shiba/work/material-evidence/06-bandana.png",
+        "outDir": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-06-bandana",
+        "palette": [
+          "#DB601A",
+          "#E16721",
+          "#E67029",
+          "#D55915",
+          "#EC7932"
+        ],
+        "maps": {
+          "albedo": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-06-bandana/bandana_albedo.png",
+            "url": "bandana_albedo.png",
+            "channel": "albedo",
+            "source": "reference-pixel-extraction"
+          },
+          "roughness": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-06-bandana/bandana_roughness.png",
+            "url": "bandana_roughness.png",
+            "channel": "roughness",
+            "source": "reference-pixel-extraction"
+          },
+          "height": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-06-bandana/bandana_height.png",
+            "url": "bandana_height.png",
+            "channel": "height",
+            "source": "reference-pixel-extraction"
+          },
+          "normal": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-06-bandana/bandana_normal.png",
+            "url": "bandana_normal.png",
+            "channel": "normal",
+            "source": "reference-pixel-extraction"
+          },
+          "ao": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-06-bandana/bandana_ao.png",
+            "url": "bandana_ao.png",
+            "channel": "ao",
+            "source": "reference-pixel-extraction"
+          }
+        },
+        "diagnostics": {
+          "sourceWidth": 90,
+          "sourceHeight": 40,
+          "mapSize": 512,
+          "cropBBoxPixels": {
+            "x": 0,
+            "y": 0,
+            "width": 90,
+            "height": 40
+          },
+          "mask": {
+            "backgroundColor": "#E87128",
+            "backgroundNoise": 17.72,
+            "transparentPixelFraction": 0.0,
+            "foregroundCoverage": 1.0
+          },
+          "mapStats": {
+            "valueRange": 0.1233,
+            "heightP90Gradient": 0.09679,
+            "roughnessBase": 0.789,
+            "roughnessVariation": 0.164,
+            "normalStrength": 0.27,
+            "blurRadius": 10
+          },
+          "palette": [
+            "#DB601A",
+            "#E16721",
+            "#E67029",
+            "#D55915",
+            "#EC7932"
+          ]
+        },
+        "warnings": [
+          "image is not clearly isolated from background; using most pixels as material evidence",
+          "object/background separation is weak",
+          "single-image inverse rendering cannot prove true physical PBR; confidence is capped",
+          "low value range weakens height/roughness inference"
+        ],
+        "limitation": "single-image PBR extraction is an estimate; 70%+ extraction confidence still needs render screenshot review"
+      },
+      "referencePbr": {
+        "version": "1.0",
+        "sourceImage": "/home/user/ink-escape/art/models/shiba/work/material-evidence/06-bandana.png",
+        "extractor": "stage1_intake/extract_pbr_evidence.py",
+        "method": "single-image pixel evidence with de-lighting estimate; not photogrammetry",
+        "usable": true,
+        "verdict": "pass",
+        "confidence": 0.751,
+        "estimatedFidelity": 0.751,
+        "targetThreshold": 0.7,
+        "hardLimit": "A single image cannot uniquely recover true albedo/roughness/normal/AO; maps are reference-derived estimates.",
+        "maps": {
+          "albedo": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-06-bandana/bandana_albedo.png",
+            "url": "bandana_albedo.png",
+            "channel": "albedo",
+            "source": "reference-pixel-extraction"
+          },
+          "roughness": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-06-bandana/bandana_roughness.png",
+            "url": "bandana_roughness.png",
+            "channel": "roughness",
+            "source": "reference-pixel-extraction"
+          },
+          "height": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-06-bandana/bandana_height.png",
+            "url": "bandana_height.png",
+            "channel": "height",
+            "source": "reference-pixel-extraction"
+          },
+          "normal": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-06-bandana/bandana_normal.png",
+            "url": "bandana_normal.png",
+            "channel": "normal",
+            "source": "reference-pixel-extraction"
+          },
+          "ao": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-06-bandana/bandana_ao.png",
+            "url": "bandana_ao.png",
+            "channel": "ao",
+            "source": "reference-pixel-extraction"
+          }
+        },
+        "diagnostics": {
+          "sourceWidth": 90,
+          "sourceHeight": 40,
+          "mapSize": 512,
+          "cropBBoxPixels": {
+            "x": 0,
+            "y": 0,
+            "width": 90,
+            "height": 40
+          },
+          "mask": {
+            "backgroundColor": "#E87128",
+            "backgroundNoise": 17.72,
+            "transparentPixelFraction": 0.0,
+            "foregroundCoverage": 1.0
+          },
+          "mapStats": {
+            "valueRange": 0.1233,
+            "heightP90Gradient": 0.09679,
+            "roughnessBase": 0.789,
+            "roughnessVariation": 0.164,
+            "normalStrength": 0.27,
+            "blurRadius": 10
+          },
+          "palette": [
+            "#DB601A",
+            "#E16721",
+            "#E67029",
+            "#D55915",
+            "#EC7932"
+          ]
+        },
+        "warnings": [
+          "image is not clearly isolated from background; using most pixels as material evidence",
+          "object/background separation is weak",
+          "single-image inverse rendering cannot prove true physical PBR; confidence is capped",
+          "low value range weakens height/roughness inference"
+        ]
+      },
+      "maps": {
+        "albedo": {
+          "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-06-bandana/bandana_albedo.png",
+          "url": "bandana_albedo.png",
+          "channel": "albedo",
+          "source": "reference-pixel-extraction"
+        },
+        "roughness": {
+          "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-06-bandana/bandana_roughness.png",
+          "url": "bandana_roughness.png",
+          "channel": "roughness",
+          "source": "reference-pixel-extraction"
+        },
+        "height": {
+          "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-06-bandana/bandana_height.png",
+          "url": "bandana_height.png",
+          "channel": "height",
+          "source": "reference-pixel-extraction"
+        },
+        "normal": {
+          "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-06-bandana/bandana_normal.png",
+          "url": "bandana_normal.png",
+          "channel": "normal",
+          "source": "reference-pixel-extraction"
+        },
+        "ao": {
+          "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-06-bandana/bandana_ao.png",
+          "url": "bandana_ao.png",
+          "channel": "ao",
+          "source": "reference-pixel-extraction"
+        }
+      }
+    },
+    {
+      "componentId": "belt",
+      "regionId": "belt-strap",
+      "materialSpecId": "leather",
+      "hypothesis": {
+        "componentId": "belt",
+        "regionId": "belt-strap",
+        "materialId": null,
+        "family": "leather",
+        "subtype": "natural-or-synthetic",
+        "finish": "matte-worn",
+        "aliases": [],
+        "confidence": 0.809,
+        "source": "vision"
+      },
+      "assignment": {
+        "materialId": "leather.matte",
+        "status": "proceed",
+        "source": "vision",
+        "confidence": 0.809,
+        "method": "family-subtype-finish",
+        "alternatives": [],
+        "evidence": {
+          "crop": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/07-belt-strap.png",
+            "bbox": {
+              "x": 195,
+              "y": 460,
+              "width": 65,
+              "height": 14
+            },
+            "sourceWidth": 590,
+            "sourceHeight": 666,
+            "loaderWarnings": [],
+            "coverage": 0.0023
+          },
+          "pbr": {
+            "ok": true,
+            "verdict": "pass",
+            "confidence": 0.809,
+            "estimatedFidelity": 0.809,
+            "targetThreshold": 0.7,
+            "materialId": "leather",
+            "sourceImage": "/home/user/ink-escape/art/models/shiba/work/material-evidence/07-belt-strap.png",
+            "outDir": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-07-belt-strap",
+            "palette": [
+              "#5E3A28",
+              "#553423",
+              "#886046",
+              "#6B4530",
+              "#B29A7E"
+            ],
+            "maps": {
+              "albedo": {
+                "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-07-belt-strap/leather_albedo.png",
+                "url": "leather_albedo.png",
+                "channel": "albedo",
+                "source": "reference-pixel-extraction"
+              },
+              "roughness": {
+                "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-07-belt-strap/leather_roughness.png",
+                "url": "leather_roughness.png",
+                "channel": "roughness",
+                "source": "reference-pixel-extraction"
+              },
+              "height": {
+                "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-07-belt-strap/leather_height.png",
+                "url": "leather_height.png",
+                "channel": "height",
+                "source": "reference-pixel-extraction"
+              },
+              "normal": {
+                "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-07-belt-strap/leather_normal.png",
+                "url": "leather_normal.png",
+                "channel": "normal",
+                "source": "reference-pixel-extraction"
+              },
+              "ao": {
+                "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-07-belt-strap/leather_ao.png",
+                "url": "leather_ao.png",
+                "channel": "ao",
+                "source": "reference-pixel-extraction"
+              }
+            },
+            "diagnostics": {
+              "sourceWidth": 65,
+              "sourceHeight": 14,
+              "mapSize": 512,
+              "cropBBoxPixels": {
+                "x": 0,
+                "y": 0,
+                "width": 65,
+                "height": 14
+              },
+              "mask": {
+                "backgroundColor": "#5E3A27",
+                "backgroundNoise": 17.72,
+                "transparentPixelFraction": 0.0,
+                "foregroundCoverage": 1.0
+              },
+              "mapStats": {
+                "valueRange": 0.3975,
+                "heightP90Gradient": 0.02796,
+                "roughnessBase": 0.695,
+                "roughnessVariation": 0.051,
+                "normalStrength": 0.189,
+                "blurRadius": 10
+              },
+              "palette": [
+                "#5E3A28",
+                "#553423",
+                "#886046",
+                "#6B4530",
+                "#B29A7E"
+              ]
+            },
+            "warnings": [
+              "image is not clearly isolated from background; using most pixels as material evidence",
+              "object/background separation is weak",
+              "single-image inverse rendering cannot prove true physical PBR; confidence is capped"
+            ],
+            "limitation": "single-image PBR extraction is an estimate; 70%+ extraction confidence still needs render screenshot review"
+          },
+          "texture": {
+            "finishClass": "painted-metal",
+            "recipe": {
+              "metalness": 0.0,
+              "roughness": 0.5,
+              "clearcoat": 1.0,
+              "clearcoatRoughness": 0.05,
+              "transmission": 0.0,
+              "ior": 1.5,
+              "envMapIntensity": 1.0,
+              "anisotropy": 0.0,
+              "procedural": "flat-clearcoat"
+            },
+            "palette": [
+              "#987A61",
+              "#75523B",
+              "#5D3A27",
+              "#5C3926",
+              "#5C3926"
+            ],
+            "paletteHueRisk": [],
+            "gradientAxis": "vertical",
+            "stats": {
+              "meanLum": 80.9,
+              "meanSaturation": 0.536,
+              "gradientStrength": 0.248,
+              "mottle": 0.012,
+              "streakRatio": 1.96,
+              "hueSpread": 0.001,
+              "specularFraction": 0.0
+            }
+          }
+        },
+        "profileId": "leather.matte",
+        "family": "leather",
+        "subtype": "natural-or-synthetic",
+        "finish": "matte-worn",
+        "renderPrior": {
+          "metalness": 0.0,
+          "roughness": 0.62,
+          "clearcoat": 0.08,
+          "clearcoatRoughness": 0.45
+        },
+        "requiredMaps": [
+          "map",
+          "roughnessMap",
+          "normalMap"
+        ],
+        "optionalMaps": [
+          "aoMap",
+          "clearcoatMap"
+        ],
+        "validationViews": [
+          "albedo-unlit",
+          "neutral-studio",
+          "grazing",
+          "reference-beauty"
+        ],
+        "sourceRefs": [
+          "three.mesh-physical",
+          "three.mesh-standard",
+          "adobe.pbr-guide-2",
+          "mit.material-recognition"
+        ],
+        "visualCues": [
+          "irregular grain",
+          "worn edges become smoother",
+          "creases darken without becoming metallic"
+        ]
+      },
+      "observations": [
+        "chromatic base-colour response",
+        "directional surface frequency",
+        "strong image-space gradient; verify it is material pattern, not lighting",
+        "single-image PBR inference requires controlled render validation"
+      ],
+      "crop": {
+        "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/07-belt-strap.png",
+        "bbox": {
+          "x": 195,
+          "y": 460,
+          "width": 65,
+          "height": 14
+        },
+        "sourceWidth": 590,
+        "sourceHeight": 666,
+        "loaderWarnings": [],
+        "coverage": 0.0023
+      },
+      "textureAnalysis": {
+        "finishClass": "painted-metal",
+        "recipe": {
+          "metalness": 0.0,
+          "roughness": 0.5,
+          "clearcoat": 1.0,
+          "clearcoatRoughness": 0.05,
+          "transmission": 0.0,
+          "ior": 1.5,
+          "envMapIntensity": 1.0,
+          "anisotropy": 0.0,
+          "procedural": "flat-clearcoat"
+        },
+        "palette": [
+          "#987A61",
+          "#75523B",
+          "#5D3A27",
+          "#5C3926",
+          "#5C3926"
+        ],
+        "paletteHueRisk": [],
+        "gradientAxis": "vertical",
+        "stats": {
+          "meanLum": 80.9,
+          "meanSaturation": 0.536,
+          "gradientStrength": 0.248,
+          "mottle": 0.012,
+          "streakRatio": 1.96,
+          "hueSpread": 0.001,
+          "specularFraction": 0.0
+        }
+      },
+      "pbrReport": {
+        "ok": true,
+        "verdict": "pass",
+        "confidence": 0.809,
+        "estimatedFidelity": 0.809,
+        "targetThreshold": 0.7,
+        "materialId": "leather",
+        "sourceImage": "/home/user/ink-escape/art/models/shiba/work/material-evidence/07-belt-strap.png",
+        "outDir": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-07-belt-strap",
+        "palette": [
+          "#5E3A28",
+          "#553423",
+          "#886046",
+          "#6B4530",
+          "#B29A7E"
+        ],
+        "maps": {
+          "albedo": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-07-belt-strap/leather_albedo.png",
+            "url": "leather_albedo.png",
+            "channel": "albedo",
+            "source": "reference-pixel-extraction"
+          },
+          "roughness": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-07-belt-strap/leather_roughness.png",
+            "url": "leather_roughness.png",
+            "channel": "roughness",
+            "source": "reference-pixel-extraction"
+          },
+          "height": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-07-belt-strap/leather_height.png",
+            "url": "leather_height.png",
+            "channel": "height",
+            "source": "reference-pixel-extraction"
+          },
+          "normal": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-07-belt-strap/leather_normal.png",
+            "url": "leather_normal.png",
+            "channel": "normal",
+            "source": "reference-pixel-extraction"
+          },
+          "ao": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-07-belt-strap/leather_ao.png",
+            "url": "leather_ao.png",
+            "channel": "ao",
+            "source": "reference-pixel-extraction"
+          }
+        },
+        "diagnostics": {
+          "sourceWidth": 65,
+          "sourceHeight": 14,
+          "mapSize": 512,
+          "cropBBoxPixels": {
+            "x": 0,
+            "y": 0,
+            "width": 65,
+            "height": 14
+          },
+          "mask": {
+            "backgroundColor": "#5E3A27",
+            "backgroundNoise": 17.72,
+            "transparentPixelFraction": 0.0,
+            "foregroundCoverage": 1.0
+          },
+          "mapStats": {
+            "valueRange": 0.3975,
+            "heightP90Gradient": 0.02796,
+            "roughnessBase": 0.695,
+            "roughnessVariation": 0.051,
+            "normalStrength": 0.189,
+            "blurRadius": 10
+          },
+          "palette": [
+            "#5E3A28",
+            "#553423",
+            "#886046",
+            "#6B4530",
+            "#B29A7E"
+          ]
+        },
+        "warnings": [
+          "image is not clearly isolated from background; using most pixels as material evidence",
+          "object/background separation is weak",
+          "single-image inverse rendering cannot prove true physical PBR; confidence is capped"
+        ],
+        "limitation": "single-image PBR extraction is an estimate; 70%+ extraction confidence still needs render screenshot review"
+      },
+      "referencePbr": {
+        "version": "1.0",
+        "sourceImage": "/home/user/ink-escape/art/models/shiba/work/material-evidence/07-belt-strap.png",
+        "extractor": "stage1_intake/extract_pbr_evidence.py",
+        "method": "single-image pixel evidence with de-lighting estimate; not photogrammetry",
+        "usable": true,
+        "verdict": "pass",
+        "confidence": 0.809,
+        "estimatedFidelity": 0.809,
+        "targetThreshold": 0.7,
+        "hardLimit": "A single image cannot uniquely recover true albedo/roughness/normal/AO; maps are reference-derived estimates.",
+        "maps": {
+          "albedo": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-07-belt-strap/leather_albedo.png",
+            "url": "leather_albedo.png",
+            "channel": "albedo",
+            "source": "reference-pixel-extraction"
+          },
+          "roughness": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-07-belt-strap/leather_roughness.png",
+            "url": "leather_roughness.png",
+            "channel": "roughness",
+            "source": "reference-pixel-extraction"
+          },
+          "height": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-07-belt-strap/leather_height.png",
+            "url": "leather_height.png",
+            "channel": "height",
+            "source": "reference-pixel-extraction"
+          },
+          "normal": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-07-belt-strap/leather_normal.png",
+            "url": "leather_normal.png",
+            "channel": "normal",
+            "source": "reference-pixel-extraction"
+          },
+          "ao": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-07-belt-strap/leather_ao.png",
+            "url": "leather_ao.png",
+            "channel": "ao",
+            "source": "reference-pixel-extraction"
+          }
+        },
+        "diagnostics": {
+          "sourceWidth": 65,
+          "sourceHeight": 14,
+          "mapSize": 512,
+          "cropBBoxPixels": {
+            "x": 0,
+            "y": 0,
+            "width": 65,
+            "height": 14
+          },
+          "mask": {
+            "backgroundColor": "#5E3A27",
+            "backgroundNoise": 17.72,
+            "transparentPixelFraction": 0.0,
+            "foregroundCoverage": 1.0
+          },
+          "mapStats": {
+            "valueRange": 0.3975,
+            "heightP90Gradient": 0.02796,
+            "roughnessBase": 0.695,
+            "roughnessVariation": 0.051,
+            "normalStrength": 0.189,
+            "blurRadius": 10
+          },
+          "palette": [
+            "#5E3A28",
+            "#553423",
+            "#886046",
+            "#6B4530",
+            "#B29A7E"
+          ]
+        },
+        "warnings": [
+          "image is not clearly isolated from background; using most pixels as material evidence",
+          "object/background separation is weak",
+          "single-image inverse rendering cannot prove true physical PBR; confidence is capped"
+        ]
+      },
+      "maps": {
+        "albedo": {
+          "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-07-belt-strap/leather_albedo.png",
+          "url": "leather_albedo.png",
+          "channel": "albedo",
+          "source": "reference-pixel-extraction"
+        },
+        "roughness": {
+          "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-07-belt-strap/leather_roughness.png",
+          "url": "leather_roughness.png",
+          "channel": "roughness",
+          "source": "reference-pixel-extraction"
+        },
+        "height": {
+          "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-07-belt-strap/leather_height.png",
+          "url": "leather_height.png",
+          "channel": "height",
+          "source": "reference-pixel-extraction"
+        },
+        "normal": {
+          "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-07-belt-strap/leather_normal.png",
+          "url": "leather_normal.png",
+          "channel": "normal",
+          "source": "reference-pixel-extraction"
+        },
+        "ao": {
+          "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-07-belt-strap/leather_ao.png",
+          "url": "leather_ao.png",
+          "channel": "ao",
+          "source": "reference-pixel-extraction"
+        }
+      }
+    },
+    {
+      "componentId": "pouch-flap-r",
+      "regionId": "pouch-flap",
+      "materialSpecId": "leather-dark",
+      "hypothesis": {
+        "componentId": "pouch-flap-r",
+        "regionId": "pouch-flap",
+        "materialId": null,
+        "family": "leather",
+        "subtype": "natural-or-synthetic",
+        "finish": "matte-worn",
+        "aliases": [],
+        "confidence": 0.754,
+        "source": "vision"
+      },
+      "assignment": {
+        "materialId": "leather.matte",
+        "status": "proceed",
+        "source": "vision",
+        "confidence": 0.754,
+        "method": "family-subtype-finish",
+        "alternatives": [],
+        "evidence": {
+          "crop": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/08-pouch-flap.png",
+            "bbox": {
+              "x": 138,
+              "y": 438,
+              "width": 40,
+              "height": 16
+            },
+            "sourceWidth": 590,
+            "sourceHeight": 666,
+            "loaderWarnings": [],
+            "coverage": 0.0016
+          },
+          "pbr": {
+            "ok": true,
+            "verdict": "pass",
+            "confidence": 0.754,
+            "estimatedFidelity": 0.754,
+            "targetThreshold": 0.7,
+            "materialId": "leather-dark",
+            "sourceImage": "/home/user/ink-escape/art/models/shiba/work/material-evidence/08-pouch-flap.png",
+            "outDir": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-08-pouch-flap",
+            "palette": [
+              "#5A3E30",
+              "#694736",
+              "#8D664E",
+              "#7A5542",
+              "#160C07"
+            ],
+            "maps": {
+              "albedo": {
+                "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-08-pouch-flap/leather-dark_albedo.png",
+                "url": "leather-dark_albedo.png",
+                "channel": "albedo",
+                "source": "reference-pixel-extraction"
+              },
+              "roughness": {
+                "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-08-pouch-flap/leather-dark_roughness.png",
+                "url": "leather-dark_roughness.png",
+                "channel": "roughness",
+                "source": "reference-pixel-extraction"
+              },
+              "height": {
+                "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-08-pouch-flap/leather-dark_height.png",
+                "url": "leather-dark_height.png",
+                "channel": "height",
+                "source": "reference-pixel-extraction"
+              },
+              "normal": {
+                "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-08-pouch-flap/leather-dark_normal.png",
+                "url": "leather-dark_normal.png",
+                "channel": "normal",
+                "source": "reference-pixel-extraction"
+              },
+              "ao": {
+                "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-08-pouch-flap/leather-dark_ao.png",
+                "url": "leather-dark_ao.png",
+                "channel": "ao",
+                "source": "reference-pixel-extraction"
+              }
+            },
+            "diagnostics": {
+              "sourceWidth": 40,
+              "sourceHeight": 16,
+              "mapSize": 512,
+              "cropBBoxPixels": {
+                "x": 0,
+                "y": 0,
+                "width": 40,
+                "height": 16
+              },
+              "mask": {
+                "backgroundColor": "#644335",
+                "backgroundNoise": 16.613,
+                "transparentPixelFraction": 0.0,
+                "foregroundCoverage": 1.0
+              },
+              "mapStats": {
+                "valueRange": 0.1778,
+                "heightP90Gradient": 0.05067,
+                "roughnessBase": 0.701,
+                "roughnessVariation": 0.078,
+                "normalStrength": 0.216,
+                "blurRadius": 10
+              },
+              "palette": [
+                "#5A3E30",
+                "#694736",
+                "#8D664E",
+                "#7A5542",
+                "#160C07"
+              ]
+            },
+            "warnings": [
+              "image is not clearly isolated from background; using most pixels as material evidence",
+              "object/background separation is weak",
+              "single-image inverse rendering cannot prove true physical PBR; confidence is capped",
+              "low value range weakens height/roughness inference"
+            ],
+            "limitation": "single-image PBR extraction is an estimate; 70%+ extraction confidence still needs render screenshot review"
+          },
+          "texture": {
+            "finishClass": "painted-metal",
+            "recipe": {
+              "metalness": 0.0,
+              "roughness": 0.5,
+              "clearcoat": 1.0,
+              "clearcoatRoughness": 0.05,
+              "transmission": 0.0,
+              "ior": 1.5,
+              "envMapIntensity": 1.0,
+              "anisotropy": 0.0,
+              "procedural": "flat-clearcoat"
+            },
+            "palette": [
+              "#88634D",
+              "#7B5542",
+              "#5E4133",
+              "#614333",
+              "#5A3D2E"
+            ],
+            "paletteHueRisk": [],
+            "gradientAxis": "vertical",
+            "stats": {
+              "meanLum": 80.4,
+              "meanSaturation": 0.471,
+              "gradientStrength": 0.173,
+              "mottle": 0.009,
+              "streakRatio": 1.79,
+              "hueSpread": 0.002,
+              "specularFraction": 0.0
+            }
+          }
+        },
+        "profileId": "leather.matte",
+        "family": "leather",
+        "subtype": "natural-or-synthetic",
+        "finish": "matte-worn",
+        "renderPrior": {
+          "metalness": 0.0,
+          "roughness": 0.62,
+          "clearcoat": 0.08,
+          "clearcoatRoughness": 0.45
+        },
+        "requiredMaps": [
+          "map",
+          "roughnessMap",
+          "normalMap"
+        ],
+        "optionalMaps": [
+          "aoMap",
+          "clearcoatMap"
+        ],
+        "validationViews": [
+          "albedo-unlit",
+          "neutral-studio",
+          "grazing",
+          "reference-beauty"
+        ],
+        "sourceRefs": [
+          "three.mesh-physical",
+          "three.mesh-standard",
+          "adobe.pbr-guide-2",
+          "mit.material-recognition"
+        ],
+        "visualCues": [
+          "irregular grain",
+          "worn edges become smoother",
+          "creases darken without becoming metallic"
+        ]
+      },
+      "observations": [
+        "chromatic base-colour response",
+        "single-image PBR inference requires controlled render validation"
+      ],
+      "crop": {
+        "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/08-pouch-flap.png",
+        "bbox": {
+          "x": 138,
+          "y": 438,
+          "width": 40,
+          "height": 16
+        },
+        "sourceWidth": 590,
+        "sourceHeight": 666,
+        "loaderWarnings": [],
+        "coverage": 0.0016
+      },
+      "textureAnalysis": {
+        "finishClass": "painted-metal",
+        "recipe": {
+          "metalness": 0.0,
+          "roughness": 0.5,
+          "clearcoat": 1.0,
+          "clearcoatRoughness": 0.05,
+          "transmission": 0.0,
+          "ior": 1.5,
+          "envMapIntensity": 1.0,
+          "anisotropy": 0.0,
+          "procedural": "flat-clearcoat"
+        },
+        "palette": [
+          "#88634D",
+          "#7B5542",
+          "#5E4133",
+          "#614333",
+          "#5A3D2E"
+        ],
+        "paletteHueRisk": [],
+        "gradientAxis": "vertical",
+        "stats": {
+          "meanLum": 80.4,
+          "meanSaturation": 0.471,
+          "gradientStrength": 0.173,
+          "mottle": 0.009,
+          "streakRatio": 1.79,
+          "hueSpread": 0.002,
+          "specularFraction": 0.0
+        }
+      },
+      "pbrReport": {
+        "ok": true,
+        "verdict": "pass",
+        "confidence": 0.754,
+        "estimatedFidelity": 0.754,
+        "targetThreshold": 0.7,
+        "materialId": "leather-dark",
+        "sourceImage": "/home/user/ink-escape/art/models/shiba/work/material-evidence/08-pouch-flap.png",
+        "outDir": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-08-pouch-flap",
+        "palette": [
+          "#5A3E30",
+          "#694736",
+          "#8D664E",
+          "#7A5542",
+          "#160C07"
+        ],
+        "maps": {
+          "albedo": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-08-pouch-flap/leather-dark_albedo.png",
+            "url": "leather-dark_albedo.png",
+            "channel": "albedo",
+            "source": "reference-pixel-extraction"
+          },
+          "roughness": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-08-pouch-flap/leather-dark_roughness.png",
+            "url": "leather-dark_roughness.png",
+            "channel": "roughness",
+            "source": "reference-pixel-extraction"
+          },
+          "height": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-08-pouch-flap/leather-dark_height.png",
+            "url": "leather-dark_height.png",
+            "channel": "height",
+            "source": "reference-pixel-extraction"
+          },
+          "normal": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-08-pouch-flap/leather-dark_normal.png",
+            "url": "leather-dark_normal.png",
+            "channel": "normal",
+            "source": "reference-pixel-extraction"
+          },
+          "ao": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-08-pouch-flap/leather-dark_ao.png",
+            "url": "leather-dark_ao.png",
+            "channel": "ao",
+            "source": "reference-pixel-extraction"
+          }
+        },
+        "diagnostics": {
+          "sourceWidth": 40,
+          "sourceHeight": 16,
+          "mapSize": 512,
+          "cropBBoxPixels": {
+            "x": 0,
+            "y": 0,
+            "width": 40,
+            "height": 16
+          },
+          "mask": {
+            "backgroundColor": "#644335",
+            "backgroundNoise": 16.613,
+            "transparentPixelFraction": 0.0,
+            "foregroundCoverage": 1.0
+          },
+          "mapStats": {
+            "valueRange": 0.1778,
+            "heightP90Gradient": 0.05067,
+            "roughnessBase": 0.701,
+            "roughnessVariation": 0.078,
+            "normalStrength": 0.216,
+            "blurRadius": 10
+          },
+          "palette": [
+            "#5A3E30",
+            "#694736",
+            "#8D664E",
+            "#7A5542",
+            "#160C07"
+          ]
+        },
+        "warnings": [
+          "image is not clearly isolated from background; using most pixels as material evidence",
+          "object/background separation is weak",
+          "single-image inverse rendering cannot prove true physical PBR; confidence is capped",
+          "low value range weakens height/roughness inference"
+        ],
+        "limitation": "single-image PBR extraction is an estimate; 70%+ extraction confidence still needs render screenshot review"
+      },
+      "referencePbr": {
+        "version": "1.0",
+        "sourceImage": "/home/user/ink-escape/art/models/shiba/work/material-evidence/08-pouch-flap.png",
+        "extractor": "stage1_intake/extract_pbr_evidence.py",
+        "method": "single-image pixel evidence with de-lighting estimate; not photogrammetry",
+        "usable": true,
+        "verdict": "pass",
+        "confidence": 0.754,
+        "estimatedFidelity": 0.754,
+        "targetThreshold": 0.7,
+        "hardLimit": "A single image cannot uniquely recover true albedo/roughness/normal/AO; maps are reference-derived estimates.",
+        "maps": {
+          "albedo": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-08-pouch-flap/leather-dark_albedo.png",
+            "url": "leather-dark_albedo.png",
+            "channel": "albedo",
+            "source": "reference-pixel-extraction"
+          },
+          "roughness": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-08-pouch-flap/leather-dark_roughness.png",
+            "url": "leather-dark_roughness.png",
+            "channel": "roughness",
+            "source": "reference-pixel-extraction"
+          },
+          "height": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-08-pouch-flap/leather-dark_height.png",
+            "url": "leather-dark_height.png",
+            "channel": "height",
+            "source": "reference-pixel-extraction"
+          },
+          "normal": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-08-pouch-flap/leather-dark_normal.png",
+            "url": "leather-dark_normal.png",
+            "channel": "normal",
+            "source": "reference-pixel-extraction"
+          },
+          "ao": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-08-pouch-flap/leather-dark_ao.png",
+            "url": "leather-dark_ao.png",
+            "channel": "ao",
+            "source": "reference-pixel-extraction"
+          }
+        },
+        "diagnostics": {
+          "sourceWidth": 40,
+          "sourceHeight": 16,
+          "mapSize": 512,
+          "cropBBoxPixels": {
+            "x": 0,
+            "y": 0,
+            "width": 40,
+            "height": 16
+          },
+          "mask": {
+            "backgroundColor": "#644335",
+            "backgroundNoise": 16.613,
+            "transparentPixelFraction": 0.0,
+            "foregroundCoverage": 1.0
+          },
+          "mapStats": {
+            "valueRange": 0.1778,
+            "heightP90Gradient": 0.05067,
+            "roughnessBase": 0.701,
+            "roughnessVariation": 0.078,
+            "normalStrength": 0.216,
+            "blurRadius": 10
+          },
+          "palette": [
+            "#5A3E30",
+            "#694736",
+            "#8D664E",
+            "#7A5542",
+            "#160C07"
+          ]
+        },
+        "warnings": [
+          "image is not clearly isolated from background; using most pixels as material evidence",
+          "object/background separation is weak",
+          "single-image inverse rendering cannot prove true physical PBR; confidence is capped",
+          "low value range weakens height/roughness inference"
+        ]
+      },
+      "maps": {
+        "albedo": {
+          "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-08-pouch-flap/leather-dark_albedo.png",
+          "url": "leather-dark_albedo.png",
+          "channel": "albedo",
+          "source": "reference-pixel-extraction"
+        },
+        "roughness": {
+          "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-08-pouch-flap/leather-dark_roughness.png",
+          "url": "leather-dark_roughness.png",
+          "channel": "roughness",
+          "source": "reference-pixel-extraction"
+        },
+        "height": {
+          "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-08-pouch-flap/leather-dark_height.png",
+          "url": "leather-dark_height.png",
+          "channel": "height",
+          "source": "reference-pixel-extraction"
+        },
+        "normal": {
+          "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-08-pouch-flap/leather-dark_normal.png",
+          "url": "leather-dark_normal.png",
+          "channel": "normal",
+          "source": "reference-pixel-extraction"
+        },
+        "ao": {
+          "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-08-pouch-flap/leather-dark_ao.png",
+          "url": "leather-dark_ao.png",
+          "channel": "ao",
+          "source": "reference-pixel-extraction"
+        }
+      }
+    },
+    {
+      "componentId": "buckle",
+      "regionId": "buckle-brass",
+      "materialSpecId": "brass",
+      "hypothesis": {
+        "componentId": "buckle",
+        "regionId": "buckle-brass",
+        "materialId": null,
+        "family": "metal",
+        "subtype": "brass-bronze",
+        "finish": "polished-or-aged",
+        "aliases": [],
+        "confidence": 0.81,
+        "source": "vision"
+      },
+      "assignment": {
+        "materialId": "metal.brass",
+        "status": "proceed",
+        "source": "vision",
+        "confidence": 0.81,
+        "method": "family-subtype-finish",
+        "alternatives": [],
+        "evidence": {
+          "crop": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/09-buckle-brass.png",
+            "bbox": {
+              "x": 272,
+              "y": 461,
+              "width": 46,
+              "height": 32
+            },
+            "sourceWidth": 590,
+            "sourceHeight": 666,
+            "loaderWarnings": [],
+            "coverage": 0.0037
+          },
+          "pbr": {
+            "ok": true,
+            "verdict": "pass",
+            "confidence": 0.81,
+            "estimatedFidelity": 0.81,
+            "targetThreshold": 0.7,
+            "materialId": "brass",
+            "sourceImage": "/home/user/ink-escape/art/models/shiba/work/material-evidence/09-buckle-brass.png",
+            "outDir": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-09-buckle-brass",
+            "palette": [
+              "#633F29",
+              "#7F5931",
+              "#583621",
+              "#B78F60",
+              "#381D0E"
+            ],
+            "maps": {
+              "albedo": {
+                "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-09-buckle-brass/brass_albedo.png",
+                "url": "brass_albedo.png",
+                "channel": "albedo",
+                "source": "reference-pixel-extraction"
+              },
+              "roughness": {
+                "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-09-buckle-brass/brass_roughness.png",
+                "url": "brass_roughness.png",
+                "channel": "roughness",
+                "source": "reference-pixel-extraction"
+              },
+              "height": {
+                "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-09-buckle-brass/brass_height.png",
+                "url": "brass_height.png",
+                "channel": "height",
+                "source": "reference-pixel-extraction"
+              },
+              "normal": {
+                "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-09-buckle-brass/brass_normal.png",
+                "url": "brass_normal.png",
+                "channel": "normal",
+                "source": "reference-pixel-extraction"
+              },
+              "ao": {
+                "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-09-buckle-brass/brass_ao.png",
+                "url": "brass_ao.png",
+                "channel": "ao",
+                "source": "reference-pixel-extraction"
+              }
+            },
+            "diagnostics": {
+              "sourceWidth": 46,
+              "sourceHeight": 32,
+              "mapSize": 512,
+              "cropBBoxPixels": {
+                "x": 0,
+                "y": 0,
+                "width": 46,
+                "height": 32
+              },
+              "mask": {
+                "backgroundColor": "#96683E",
+                "backgroundNoise": 85.182,
+                "transparentPixelFraction": 0.0,
+                "foregroundCoverage": 1.0
+              },
+              "mapStats": {
+                "valueRange": 0.4023,
+                "heightP90Gradient": 0.06189,
+                "roughnessBase": 0.707,
+                "roughnessVariation": 0.109,
+                "normalStrength": 0.229,
+                "blurRadius": 10
+              },
+              "palette": [
+                "#633F29",
+                "#7F5931",
+                "#583621",
+                "#B78F60",
+                "#381D0E"
+              ]
+            },
+            "warnings": [
+              "image is not clearly isolated from background; using most pixels as material evidence",
+              "object/background separation is weak",
+              "single-image inverse rendering cannot prove true physical PBR; confidence is capped"
+            ],
+            "limitation": "single-image PBR extraction is an estimate; 70%+ extraction confidence still needs render screenshot review"
+          },
+          "texture": {
+            "finishClass": "painted-metal",
+            "recipe": {
+              "metalness": 0.0,
+              "roughness": 0.5,
+              "clearcoat": 1.0,
+              "clearcoatRoughness": 0.05,
+              "transmission": 0.0,
+              "ior": 1.5,
+              "envMapIntensity": 1.0,
+              "anisotropy": 0.0,
+              "procedural": "flat-clearcoat"
+            },
+            "palette": [
+              "#AC865C",
+              "#5E3E27",
+              "#5F3C25",
+              "#613D25",
+              "#573820"
+            ],
+            "paletteHueRisk": [],
+            "gradientAxis": "vertical",
+            "stats": {
+              "meanLum": 80.4,
+              "meanSaturation": 0.607,
+              "gradientStrength": 0.411,
+              "mottle": 0.017,
+              "streakRatio": 0.88,
+              "hueSpread": 0.004,
+              "specularFraction": 0.0
+            }
+          }
+        },
+        "profileId": "metal.brass",
+        "family": "metal",
+        "subtype": "brass-bronze",
+        "finish": "polished-or-aged",
+        "renderPrior": {
+          "metalness": 1.0,
+          "roughness": 0.3
+        },
+        "requiredMaps": [
+          "map",
+          "roughnessMap"
+        ],
+        "optionalMaps": [
+          "normalMap",
+          "aoMap",
+          "metalnessMap"
+        ],
+        "validationViews": [
+          "albedo-unlit",
+          "environment-reflection",
+          "grazing",
+          "reference-beauty"
+        ],
+        "sourceRefs": [
+          "three.mesh-standard",
+          "gltf.2",
+          "khronos.gltf-pbr",
+          "adobe.pbr-guide-2",
+          "google.filament-pbr"
+        ],
+        "visualCues": [
+          "warm yellow-to-brown conductor reflection",
+          "aged recesses darken and roughen"
+        ]
+      },
+      "observations": [
+        "chromatic base-colour response",
+        "strong image-space gradient; verify it is material pattern, not lighting",
+        "single-image PBR inference requires controlled render validation"
+      ],
+      "crop": {
+        "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/09-buckle-brass.png",
+        "bbox": {
+          "x": 272,
+          "y": 461,
+          "width": 46,
+          "height": 32
+        },
+        "sourceWidth": 590,
+        "sourceHeight": 666,
+        "loaderWarnings": [],
+        "coverage": 0.0037
+      },
+      "textureAnalysis": {
+        "finishClass": "painted-metal",
+        "recipe": {
+          "metalness": 0.0,
+          "roughness": 0.5,
+          "clearcoat": 1.0,
+          "clearcoatRoughness": 0.05,
+          "transmission": 0.0,
+          "ior": 1.5,
+          "envMapIntensity": 1.0,
+          "anisotropy": 0.0,
+          "procedural": "flat-clearcoat"
+        },
+        "palette": [
+          "#AC865C",
+          "#5E3E27",
+          "#5F3C25",
+          "#613D25",
+          "#573820"
+        ],
+        "paletteHueRisk": [],
+        "gradientAxis": "vertical",
+        "stats": {
+          "meanLum": 80.4,
+          "meanSaturation": 0.607,
+          "gradientStrength": 0.411,
+          "mottle": 0.017,
+          "streakRatio": 0.88,
+          "hueSpread": 0.004,
+          "specularFraction": 0.0
+        }
+      },
+      "pbrReport": {
+        "ok": true,
+        "verdict": "pass",
+        "confidence": 0.81,
+        "estimatedFidelity": 0.81,
+        "targetThreshold": 0.7,
+        "materialId": "brass",
+        "sourceImage": "/home/user/ink-escape/art/models/shiba/work/material-evidence/09-buckle-brass.png",
+        "outDir": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-09-buckle-brass",
+        "palette": [
+          "#633F29",
+          "#7F5931",
+          "#583621",
+          "#B78F60",
+          "#381D0E"
+        ],
+        "maps": {
+          "albedo": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-09-buckle-brass/brass_albedo.png",
+            "url": "brass_albedo.png",
+            "channel": "albedo",
+            "source": "reference-pixel-extraction"
+          },
+          "roughness": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-09-buckle-brass/brass_roughness.png",
+            "url": "brass_roughness.png",
+            "channel": "roughness",
+            "source": "reference-pixel-extraction"
+          },
+          "height": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-09-buckle-brass/brass_height.png",
+            "url": "brass_height.png",
+            "channel": "height",
+            "source": "reference-pixel-extraction"
+          },
+          "normal": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-09-buckle-brass/brass_normal.png",
+            "url": "brass_normal.png",
+            "channel": "normal",
+            "source": "reference-pixel-extraction"
+          },
+          "ao": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-09-buckle-brass/brass_ao.png",
+            "url": "brass_ao.png",
+            "channel": "ao",
+            "source": "reference-pixel-extraction"
+          }
+        },
+        "diagnostics": {
+          "sourceWidth": 46,
+          "sourceHeight": 32,
+          "mapSize": 512,
+          "cropBBoxPixels": {
+            "x": 0,
+            "y": 0,
+            "width": 46,
+            "height": 32
+          },
+          "mask": {
+            "backgroundColor": "#96683E",
+            "backgroundNoise": 85.182,
+            "transparentPixelFraction": 0.0,
+            "foregroundCoverage": 1.0
+          },
+          "mapStats": {
+            "valueRange": 0.4023,
+            "heightP90Gradient": 0.06189,
+            "roughnessBase": 0.707,
+            "roughnessVariation": 0.109,
+            "normalStrength": 0.229,
+            "blurRadius": 10
+          },
+          "palette": [
+            "#633F29",
+            "#7F5931",
+            "#583621",
+            "#B78F60",
+            "#381D0E"
+          ]
+        },
+        "warnings": [
+          "image is not clearly isolated from background; using most pixels as material evidence",
+          "object/background separation is weak",
+          "single-image inverse rendering cannot prove true physical PBR; confidence is capped"
+        ],
+        "limitation": "single-image PBR extraction is an estimate; 70%+ extraction confidence still needs render screenshot review"
+      },
+      "referencePbr": {
+        "version": "1.0",
+        "sourceImage": "/home/user/ink-escape/art/models/shiba/work/material-evidence/09-buckle-brass.png",
+        "extractor": "stage1_intake/extract_pbr_evidence.py",
+        "method": "single-image pixel evidence with de-lighting estimate; not photogrammetry",
+        "usable": true,
+        "verdict": "pass",
+        "confidence": 0.81,
+        "estimatedFidelity": 0.81,
+        "targetThreshold": 0.7,
+        "hardLimit": "A single image cannot uniquely recover true albedo/roughness/normal/AO; maps are reference-derived estimates.",
+        "maps": {
+          "albedo": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-09-buckle-brass/brass_albedo.png",
+            "url": "brass_albedo.png",
+            "channel": "albedo",
+            "source": "reference-pixel-extraction"
+          },
+          "roughness": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-09-buckle-brass/brass_roughness.png",
+            "url": "brass_roughness.png",
+            "channel": "roughness",
+            "source": "reference-pixel-extraction"
+          },
+          "height": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-09-buckle-brass/brass_height.png",
+            "url": "brass_height.png",
+            "channel": "height",
+            "source": "reference-pixel-extraction"
+          },
+          "normal": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-09-buckle-brass/brass_normal.png",
+            "url": "brass_normal.png",
+            "channel": "normal",
+            "source": "reference-pixel-extraction"
+          },
+          "ao": {
+            "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-09-buckle-brass/brass_ao.png",
+            "url": "brass_ao.png",
+            "channel": "ao",
+            "source": "reference-pixel-extraction"
+          }
+        },
+        "diagnostics": {
+          "sourceWidth": 46,
+          "sourceHeight": 32,
+          "mapSize": 512,
+          "cropBBoxPixels": {
+            "x": 0,
+            "y": 0,
+            "width": 46,
+            "height": 32
+          },
+          "mask": {
+            "backgroundColor": "#96683E",
+            "backgroundNoise": 85.182,
+            "transparentPixelFraction": 0.0,
+            "foregroundCoverage": 1.0
+          },
+          "mapStats": {
+            "valueRange": 0.4023,
+            "heightP90Gradient": 0.06189,
+            "roughnessBase": 0.707,
+            "roughnessVariation": 0.109,
+            "normalStrength": 0.229,
+            "blurRadius": 10
+          },
+          "palette": [
+            "#633F29",
+            "#7F5931",
+            "#583621",
+            "#B78F60",
+            "#381D0E"
+          ]
+        },
+        "warnings": [
+          "image is not clearly isolated from background; using most pixels as material evidence",
+          "object/background separation is weak",
+          "single-image inverse rendering cannot prove true physical PBR; confidence is capped"
+        ]
+      },
+      "maps": {
+        "albedo": {
+          "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-09-buckle-brass/brass_albedo.png",
+          "url": "brass_albedo.png",
+          "channel": "albedo",
+          "source": "reference-pixel-extraction"
+        },
+        "roughness": {
+          "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-09-buckle-brass/brass_roughness.png",
+          "url": "brass_roughness.png",
+          "channel": "roughness",
+          "source": "reference-pixel-extraction"
+        },
+        "height": {
+          "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-09-buckle-brass/brass_height.png",
+          "url": "brass_height.png",
+          "channel": "height",
+          "source": "reference-pixel-extraction"
+        },
+        "normal": {
+          "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-09-buckle-brass/brass_normal.png",
+          "url": "brass_normal.png",
+          "channel": "normal",
+          "source": "reference-pixel-extraction"
+        },
+        "ao": {
+          "path": "/home/user/ink-escape/art/models/shiba/work/material-evidence/pbr-09-buckle-brass/brass_ao.png",
+          "url": "brass_ao.png",
+          "channel": "ao",
+          "source": "reference-pixel-extraction"
+        }
+      }
+    }
+  ],
+  "status": "proceed",
+  "limitations": [
+    "PBR extraction is reference-derived inference, not inverse rendering.",
+    "A crop must be checked against the component visible footprint before accepting material scores."
+  ],
+  "artifact": "/home/user/ink-escape/art/models/shiba/work/material-analysis.json"
+}

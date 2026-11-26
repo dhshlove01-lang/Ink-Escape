@@ -1,0 +1,14 @@
+{
+  "admitted": true,
+  "reasons": [],
+  "provenance": {
+    "viewpoint": "front",
+    "sourcePath": "/home/user/ink-escape/art/models/shiba/reference.png",
+    "width": 590,
+    "height": 666,
+    "foregroundCoverage": 0.3636,
+    "largestComponentFraction": 1.0,
+    "pHash": 17341878557179816618,
+    "duplicateOfHash": null
+  }
+}

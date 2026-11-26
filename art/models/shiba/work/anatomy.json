@@ -1,0 +1,120 @@
+{
+ "sourceImage": "/home/user/ink-escape/art/models/shiba/reference.png",
+ "overlayImage": "/home/user/ink-escape/art/models/shiba/work/landmarks.png",
+ "overlayLegend": {
+  "C": "center symmetry axis",
+  "1..N": "head-unit horizontal ticks (blue, dashed)",
+  "H": "hairline guide (default fraction of the first head-unit band)",
+  "E": "eye line guide",
+  "N": "nose base guide",
+  "M": "mouth line guide",
+  "S": "shoulder line guide (default fraction, adjust to observed pose)",
+  "P": "hip line guide (default fraction, adjust to observed pose)",
+  "grayDashed": "rule-of-thirds compositional grid"
+ },
+ "anatomy": {
+  "styleHeads": 2.6,
+  "proportions": {
+   "headUnit": 0.308,
+   "torso": 1.25,
+   "legs": 0.22,
+   "shoulderWidth": 1.15,
+   "hipWidth": 1.1,
+   "evidenceRef": "reference.png px: ears tip y69, crown y95, chin y300, head x152-436 (w284 @y234), torso x~135-455 (@y430), belt y440-500, feet y565-600, total 69-600=531px → 2.6 HU incl. ears"
+  },
+  "pose": {
+   "type": "symmetric neutral stand, arms abducted ~35° down-out, slight elbow bend, legs straight under torso",
+   "jointAngles": {
+    "neck": [
+     0,
+     0,
+     0
+    ],
+    "leftShoulder": [
+     0,
+     0,
+     -55
+    ],
+    "rightShoulder": [
+     0,
+     0,
+     55
+    ],
+    "leftElbow": [
+     0,
+     0,
+     -10
+    ],
+    "rightElbow": [
+     0,
+     0,
+     10
+    ],
+    "leftWrist": [
+     0,
+     0,
+     0
+    ],
+    "rightWrist": [
+     0,
+     0,
+     0
+    ],
+    "leftHip": [
+     0,
+     0,
+     0
+    ],
+    "rightHip": [
+     0,
+     0,
+     0
+    ],
+    "leftKnee": [
+     0,
+     0,
+     0
+    ],
+    "rightKnee": [
+     0,
+     0,
+     0
+    ],
+    "leftAnkle": [
+     0,
+     0,
+     0
+    ],
+    "rightAnkle": [
+     0,
+     0,
+     0
+    ]
+   }
+  },
+  "faceLandmarks": {
+   "hairline": 0.0,
+   "eyeLine": 0.48,
+   "eyeSpacing": 0.2,
+   "noseBase": 0.62,
+   "mouthLine": 0.78,
+   "earTop": -0.13,
+   "earBottom": 0.1,
+   "browDots": 0.28,
+   "eyeRadius": 0.07,
+   "normalizedTo": "head bbox x152-436 y95-300",
+   "evidenceRef": "eye centres (245,193),(343,193) r≈20px; brow dots (258,152),(333,152); nose (295,218); mouth (295,255) w≈70px; tongue (295,262)"
+  },
+  "features": [
+   "urajiro cream face mask + cheek lobes",
+   "cream brow dots",
+   "large glossy black eyes w/ catchlights",
+   "triangle ears cream inner",
+   "orange bandana knot at character-left shoulder",
+   "brown belt brass buckle two pouches",
+   "cream belly, paw tips, feet"
+  ],
+  "confidence": 0.8
+ },
+ "authoringInstruction": "Open overlayImage and read the reference against its head-unit ticks, thirds grid, face-line guides, shoulder/hip lines, and center axis. Replace every null/placeholder value in anatomy with normalized coordinates or joint angles actually observed; the drawn guide lines are generic starting positions, not measurements."
+}
