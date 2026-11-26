@@ -406,3 +406,10 @@ h1.logo img { display: block; width: min(340px, 78%); height: auto; margin: 0 au
 .art-pencil .pencil i { background: var(--img-pencil) left center / 100% 100% no-repeat; }
 .art-crosshair .crosshair { width: 36px; height: 36px; background: var(--img-crosshair) center / contain no-repeat; }
 .art-crosshair .crosshair i { display: none; }
+
+/* 언어 고르기 (한국어 | English) */
+.title-top { display: flex; justify-content: flex-end; margin: -8px -8px 2px 0; }
+.lang-picker { display: inline-flex; border: 1.5px solid var(--line); border-radius: 999px; overflow: hidden; flex: none; }
+.lang-btn { background: transparent; border: 0; padding: 5px 12px; font-family: var(--font-body); font-size: 13px; color: var(--muted); }
+.lang-btn.on { background: var(--chalk); color: var(--ink); font-weight: 600; }
+.lang-btn:hover:not(.on) { color: var(--chalk); }

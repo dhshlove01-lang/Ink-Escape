@@ -1,6 +1,7 @@
 import { EV, MSG, PSTATE } from '../../shared/protocol.js';
 import { sanitizeStrokes } from '../../shared/judge/Judge.js';
 import { createMonster } from '../entities.js';
+import { msg as say } from '../../shared/i18n/strings.js';
 
 // 술래의 소환 요청 검사 → 3초 대기(빨간 장판) → 몬스터 등장.
 
@@ -13,15 +14,15 @@ export class SpawnSystem {
   request(m, clientId, msg) {
     const reply = (ok, reason) => m.sendTo(clientId, { t: MSG.SPAWN_RESULT, ok, reason });
     const t = m.tagger;
-    if (clientId !== t.id) return reply(false, '술래만 소환할 수 있어요');
+    if (clientId !== t.id) return reply(false, say('spawn.taggerOnly'));
     const strokes = sanitizeStrokes(msg.strokes, this.paletteLength);
-    if (!strokes) return reply(false, '그림 데이터가 이상해요');
+    if (!strokes) return reply(false, say('spawn.badData'));
     const x = Number(msg.x), z = Number(msg.z);
-    if (!Number.isFinite(x) || !Number.isFinite(z) || !m.map.isFloor(x, z)) return reply(false, '바닥이 아닌 곳이에요');
+    if (!Number.isFinite(x) || !Number.isFinite(z) || !m.map.isFloor(x, z)) return reply(false, say('spawn.notFloor'));
     const minD = m.b.spawn.minPlayerDist;
     for (const p of m.players.values()) {
       if (p.state === PSTATE.ALIVE && !p.afk && Math.hypot(p.x - x, p.z - z) < minD) {
-        return reply(false, `플레이어와 ${minD}m 이상 떨어져야 해요`);
+        return reply(false, say('spawn.tooClose', { m: minD }));
       }
     }
 
@@ -39,7 +40,7 @@ export class SpawnSystem {
       const key = hashStrokes(strokes);
       const last = t.recallUsed.get(key) ?? -1e9;
       const cd = m.b.spawn.frenzyRecallCd;
-      if (m.time - last < cd) return reply(false, `같은 그림은 ${cd}초 뒤에`);
+      if (m.time - last < cd) return reply(false, say('spawn.sameCooldown', { n: cd }));
       t.recallUsed.set(key, m.time);
     }
 

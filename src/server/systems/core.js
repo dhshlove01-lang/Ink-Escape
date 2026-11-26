@@ -1,4 +1,5 @@
 import { EV, PSTATE } from '../../shared/protocol.js';
+import { msg } from '../../shared/i18n/strings.js';
 
 // 시계(타임라인), 잉크 회복, 상태이상, 탈출, 승패 — 작은 시스템들.
 // 시스템 인터페이스: update(match, dt)
@@ -56,7 +57,7 @@ export class EscapeSystem {
         p.state = PSTATE.ESCAPED;
         p.escapedAt = m.time;
         m.emit(EV.PESCAPE, { id: p.id });
-        m.finish('players', `${p.name} 탈출 성공!`);
+        m.finish('players', msg('reason.escaped', { name: p.name }));
         return;
       }
     }
@@ -69,6 +70,6 @@ export class VictorySystem {
     const list = [...m.players.values()];
     const alive = list.some((p) => p.state === PSTATE.ALIVE);
     const respawning = list.some((p) => p.state === PSTATE.DEAD && p.respawnAt > 0);
-    if (!alive && !respawning) m.finish('tagger', '플레이어 전멸');
+    if (!alive && !respawning) m.finish('tagger', msg('reason.wiped'));
   }
 }

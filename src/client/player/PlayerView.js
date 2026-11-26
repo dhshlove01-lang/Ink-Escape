@@ -5,6 +5,7 @@ import { WorldRenderer } from '../render/WorldRenderer.js';
 import { FpsController } from './FpsController.js';
 import { Weapon } from './Weapon.js';
 import { Hud } from './Hud.js';
+import { t } from '../i18n.js';
 
 // 플레이어 1인칭 화면. 하위 부품을 조립하고 입력·네트워크를 잇는다.
 
@@ -46,7 +47,7 @@ export class PlayerView {
     });
     this.hud = new Hud(this.root, session, attributes);
     this.banner = new Banner(this.root);
-    this.lockHint = el('div', { class: 'lock-hint' }, el('b', {}, '클릭해서 조작 시작'), el('span', {}, 'WASD 이동 · Shift 달리기 · Space 점프 · 클릭 사격 · R 재장전 · G 지우개 수류탄 · E 길게: 부활', session.solo ? ' · Tab 술래 화면' : ''));
+    this.lockHint = el('div', { class: 'lock-hint' }, el('b', {}, t('player.clickToStart')), el('span', {}, t('player.controls'), session.solo ? t('player.controlsSolo') : ''));
     this.root.append(this.lockHint);
 
     this.spectateIdx = 0;
@@ -91,33 +92,33 @@ export class PlayerView {
     this._off = [
       s.on(EV.MDIE, (e) => e.by === s.me && this.hud.hit(true)),
       s.on(EV.BOSS, (e) => {
-        this.banner.show(`⚠ ${e.kind === 'giant' ? '초대형 괴물' : '보스'} 등장! ${e.icons}`, { kind: 'boss', ms: 3000 });
+        this.banner.show(t(e.kind === 'giant' ? 'player.giantAppear' : 'player.bossAppear', { icons: e.icons }), { kind: 'boss', ms: 3000 });
         this.sfx.play('siren');
         this.hud.redAlert(2200);
       }),
-      s.on(EV.ONE_MIN, () => this.banner.show('1분 남음!', { kind: 'warn' })),
+      s.on(EV.ONE_MIN, () => this.banner.show(t('player.oneMin'), { kind: 'warn' })),
       s.on(EV.DOOR_REVEAL, (e) => {
-        this.banner.show(`탈출 문 위치: ${s.map.doors[e.door].name} (빛기둥)`, { kind: 'info', ms: 3500 });
+        this.banner.show(t('player.doorReveal', { door: t(s.map.doors[e.door].name) }), { kind: 'info', ms: 3500 });
       }),
       s.on(EV.DOOR_OPEN, () => {
         this.sfx.play('door');
-        this.banner.show('문이 열렸다! 탈출하세요 · 술래 폭주!', { kind: 'boss', ms: 3500 });
+        this.banner.show(t('player.doorOpen'), { kind: 'boss', ms: 3500 });
       }),
       s.on(EV.PDEATH, (e) => {
         if (e.id === s.me) this.sfx.play('death');
-        else this.banner.show(`${name(e.id)} 쓰러짐`, { kind: 'warn', ms: 1800 });
+        else this.banner.show(t('player.downed', { name: name(e.id) }), { kind: 'warn', ms: 1800 });
       }),
       s.on(EV.PREVIVE, (e) => {
         this.sfx.play('revive');
-        this.banner.show(e.id === s.me ? `${name(e.by)}님이 살려줬어요!` : `${name(e.by)} → ${name(e.id)} 부활`, { kind: 'good', ms: 2000 });
+        this.banner.show(e.id === s.me ? t('player.revivedMe', { name: name(e.by) }) : t('player.revivedOther', { by: name(e.by), name: name(e.id) }), { kind: 'good', ms: 2000 });
       }),
       s.on(EV.PRESPAWN, (e) => {
         if (e.id !== s.me) return;
         this.ctrl.setPosition(e.x, e.z);
         this.sfx.play('revive');
-        this.banner.show('다시 시작! (남은 목숨 1)', { kind: 'good' });
+        this.banner.show(t('player.respawn'), { kind: 'good' });
       }),
-      s.on(EV.PESCAPE, (e) => this.banner.show(`${name(e.id)} 탈출!`, { kind: 'good' })),
+      s.on(EV.PESCAPE, (e) => this.banner.show(t('player.escaped', { name: name(e.id) }), { kind: 'good' })),
       s.on(EV.PDAMAGE, (e) => e.id === s.me && this.sfx.play('hurt')),
     ];
   }
@@ -153,10 +154,10 @@ export class PlayerView {
     if (dir.y < -1e-6) best = Math.min(best, -origin.y / dir.y);
     const a = dir.x * dir.x + dir.z * dir.z;
     if (a > 1e-8) {
-      for (const t of this.monsters.targets()) {
-        const ox = origin.x - t.x, oz = origin.z - t.z;
+      for (const tg of this.monsters.targets()) {
+        const ox = origin.x - tg.x, oz = origin.z - tg.z;
         const b = 2 * (ox * dir.x + oz * dir.z);
-        const c = ox * ox + oz * oz - t.r * t.r;
+        const c = ox * ox + oz * oz - tg.r * tg.r;
         const disc = b * b - 4 * a * c;
         if (disc < 0) continue;
         const sq = Math.sqrt(disc);
@@ -164,9 +165,9 @@ export class PlayerView {
         if (tt < 0) tt = (-b + sq) / (2 * a);
         if (tt < 0 || tt >= best) continue;
         const y = origin.y + dir.y * tt;
-        if (y < t.y0 || y > t.y1) continue;
+        if (y < tg.y0 || y > tg.y1) continue;
         best = tt;
-        monsterId = t.id;
+        monsterId = tg.id;
       }
     }
     return { point: origin.clone().addScaledVector(dir, best), monsterId, dist: best };
@@ -209,10 +210,10 @@ export class PlayerView {
         }
       }
       if (best) {
-        if (best.revIn > 0) prompt = `${Math.ceil(best.revIn)}초 뒤 부활시킬 수 있어요`;
-        else if (me.revLeft <= 0) prompt = '부활 횟수를 다 썼어요';
+        if (best.revIn > 0) prompt = t('player.reviveWait', { n: Math.ceil(best.revIn) });
+        else if (me.revLeft <= 0) prompt = t('player.noRevives');
         else {
-          prompt = `E 길게 누르기: ${this.session.nameOf(best.id)} 부활 (남은 ${me.revLeft}회)`;
+          prompt = t('player.reviveHold', { name: this.session.nameOf(best.id), n: me.revLeft });
           if (holding) {
             target = best.id;
             ring = best.prog;
@@ -260,21 +261,21 @@ export class PlayerView {
 
   // 죽었을 때: 살아 있는 팀원 시점으로 관전
   spectate(me) {
-    if (me?.st === PSTATE.ESCAPED) return '탈출 성공!';
-    if (me?.st === PSTATE.DEAD && me.resIn >= 0) return `다시 시작까지 ${Math.ceil(me.resIn)}초`;
+    if (me?.st === PSTATE.ESCAPED) return t('player.escapedMe');
+    if (me?.st === PSTATE.DEAD && me.resIn >= 0) return t('player.respawnIn', { n: Math.ceil(me.resIn) });
     const alive = this.session.players().filter((p) => p.id !== this.session.me && p.st === PSTATE.ALIVE);
-    let msg = '쓰러졌어요';
-    if (me?.st === PSTATE.DEAD && me.revIn > 0) msg += ` · ${Math.ceil(me.revIn)}초 뒤부터 팀원이 살릴 수 있어요`;
-    else if (me?.st === PSTATE.DEAD && me.revIn === 0) msg += ' · 팀원이 오면 살아나요';
+    let msg = t('player.down');
+    if (me?.st === PSTATE.DEAD && me.revIn > 0) msg += t('player.downRevIn', { n: Math.ceil(me.revIn) });
+    else if (me?.st === PSTATE.DEAD && me.revIn === 0) msg += t('player.downRevNow');
     if (!alive.length) return msg;
-    const t = alive[this.spectateIdx % alive.length];
-    const p = this.session.playerPos(t.id);
+    const target = alive[this.spectateIdx % alive.length];
+    const p = this.session.playerPos(target.id);
     if (p) {
       const back = 4.5;
       this.camera.position.set(p.x + Math.sin(p.yaw) * back, 3.2, p.z + Math.cos(p.yaw) * back);
       this.camera.rotation.set(-0.35, p.yaw, 0);
     }
-    return `${msg}\n관전: ${this.session.nameOf(t.id)} (클릭: 다른 팀원)`;
+    return `${msg}\n${t('player.spectating', { name: this.session.nameOf(target.id) })}`;
   }
 
   dispose() {

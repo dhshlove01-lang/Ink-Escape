@@ -2,7 +2,8 @@ import { el } from './dom.js';
 import { url } from '../render/Images.js';
 import { faceCanvas } from '../render/AnimalModels.js';
 import { CharacterStage } from './CharacterStage.js';
-import { ANIMALS, ANIMAL_NAMES, ROLE, MSG } from '../../shared/protocol.js';
+import { ANIMALS, ROLE, MSG } from '../../shared/protocol.js';
+import { t, tr, LANGS, getLang, setLang, onLangChange } from '../i18n.js';
 
 // 시작 화면 · 로비 · 결과 화면. 화면은 그리기와 버튼만 맡고, 실제 동작은 콜백으로 받는다.
 
@@ -20,64 +21,93 @@ const saveName = (n) => {
   } catch {}
 };
 
-const ROLE_LABEL = { [ROLE.TAGGER]: '👁 술래', [ROLE.PLAYER]: '🔫 플레이어', [ROLE.RANDOM]: '🎲 랜덤', [ROLE.NONE]: '—' };
+const roleLabel = (r) => ({ [ROLE.TAGGER]: t('role.tagger'), [ROLE.PLAYER]: t('role.player'), [ROLE.RANDOM]: t('role.random') })[r] || '—';
 
-const fmtDur = (sec) => `${Math.floor(sec / 60)}분 ${String(Math.floor(sec % 60)).padStart(2, '0')}초`;
-const fmtNum = (n) => Math.round(n).toLocaleString('ko-KR');
+const fmtDur = (sec) => t('common.duration', { m: Math.floor(sec / 60), s: String(Math.floor(sec % 60)).padStart(2, '0') });
+const fmtNum = (n) => Math.round(n).toLocaleString(getLang() === 'ko' ? 'ko-KR' : 'en-US');
+
+// 언어 고르기 (한국어 | English)
+export function langPicker() {
+  const box = el('div', { class: 'lang-picker', role: 'group', 'aria-label': t('common.language') });
+  const draw = () =>
+    box.replaceChildren(
+      ...LANGS.map((l) => el('button', { class: 'lang-btn' + (l.code === getLang() ? ' on' : ''), 'aria-pressed': l.code === getLang() ? 'true' : 'false', onclick: () => setLang(l.code) }, l.label)),
+    );
+  draw();
+  box._off = onLangChange(draw);
+  return box;
+}
 
 export class TitleView {
   constructor(parent, { onCreate, onJoin, onSolo }) {
-    const name = el('input', { id: 'name', maxlength: 12, placeholder: '닉네임', value: loadName() });
-    const code = el('input', { id: 'code', maxlength: 5, placeholder: '방 코드', style: { textTransform: 'uppercase' } });
-    this.status = el('div', { class: 'title-status' });
+    this.cb = { onCreate, onJoin, onSolo };
+    this.root = el('div', { class: 'screen title-screen' });
+    this.nameVal = loadName();
+    this.codeVal = '';
+    this.statusText = '';
+    parent.append(this.root);
+    this.build();
+    this._off = onLangChange(() => this.build());
+  }
+
+  build() {
+    const { onCreate, onJoin, onSolo } = this.cb;
+    const name = el('input', { id: 'name', maxlength: 12, placeholder: t('title.nickname'), value: this.nameVal });
+    const code = el('input', { id: 'code', maxlength: 5, placeholder: t('title.roomCode'), value: this.codeVal, style: { textTransform: 'uppercase' } });
+    name.addEventListener('input', () => (this.nameVal = name.value));
+    code.addEventListener('input', () => (this.codeVal = code.value));
+    this.status = el('div', { class: 'title-status' }, this.statusText);
     const getName = () => {
-      const n = name.value.trim() || '이름없음';
+      const n = name.value.trim() || t('common.noName');
       saveName(n);
       return n;
     };
-    const busy = (b) => this.root.querySelectorAll('button').forEach((x) => (x.disabled = b));
+    const busy = (b) => this.root.querySelectorAll('button:not(.lang-btn)').forEach((x) => (x.disabled = b));
     const run = async (fn) => {
       busy(true);
-      this.status.textContent = '연결 중…';
+      this.status.textContent = this.statusText = t('common.connecting');
       try {
         await fn();
       } catch (e) {
-        this.status.textContent = e.message || String(e);
+        this.status.textContent = this.statusText = tr(e.message || String(e));
         busy(false);
       }
     };
+    const join = () => run(() => onJoin(code.value.trim().toUpperCase(), getName()));
+    code.addEventListener('keydown', (e) => e.key === 'Enter' && join());
     const faces = el('div', { class: 'title-faces' }, ...ANIMALS.map((a) => faceCanvas(a, 64)));
-    this.root = el(
-      'div',
-      { class: 'screen title-screen' },
+    this.picker?._off?.();
+    this.picker = langPicker();
+    this.root.replaceChildren(
       el(
         'div',
         { class: 'title-card' },
+        el('div', { class: 'title-top' }, this.picker),
         faces,
         url('ui.logo') ? el('h1', { class: 'logo' }, el('img', { src: url('ui.logo'), alt: 'INK ESCAPE' })) : el('h1', {}, 'INK ESCAPE'),
-        el('p', { class: 'title-sub' }, '술래가 그린 그림이 3D 전장의 몬스터가 된다 · 비대칭 드로잉 FPS 프로토타입'),
-        el('label', { class: 'field' }, el('span', {}, '닉네임'), name),
+        el('p', { class: 'title-sub' }, t('title.sub')),
+        el('label', { class: 'field' }, el('span', {}, t('title.nickname')), name),
         el('div', { class: 'title-actions' },
-          el('button', { class: 'btn primary', onclick: () => run(() => onCreate(getName())) }, '방 만들기'),
-          el('div', { class: 'join' }, code, el('button', { class: 'btn', onclick: () => run(() => onJoin(code.value.trim().toUpperCase(), getName())) }, '참가')),
-          el('button', { class: 'btn ghost', onclick: () => run(() => onSolo(getName())) }, '혼자 테스트 (술래+플레이어)'),
+          el('button', { class: 'btn primary', onclick: () => run(() => onCreate(getName())) }, t('title.create')),
+          el('div', { class: 'join' }, code, el('button', { class: 'btn', onclick: join }, t('title.join'))),
+          el('button', { class: 'btn ghost', onclick: () => run(() => onSolo(getName())) }, t('title.solo')),
         ),
         this.status,
         el('details', { class: 'howto' },
-          el('summary', {}, '조작법'),
+          el('summary', {}, t('title.howto')),
           el('ul', {},
-            el('li', {}, '플레이어: WASD 이동 · Shift 달리기 · Space 점프 · 클릭 사격 · R 재장전 · G 지우개 수류탄 · E 길게 부활'),
-            el('li', {}, '술래: 바닥 클릭 = 소환 위치 · ◀ ▶(← →) 탑뷰 ↔ 3D 구석 카메라 · 1~5 색 · E 지우개 · Ctrl+Z 되돌리기 · Enter 소환'),
-            el('li', {}, '혼자 테스트: Tab 으로 술래 화면 ↔ 플레이어 화면'),
+            el('li', {}, t('title.howtoPlayer')),
+            el('li', {}, t('title.howtoTagger')),
+            el('li', {}, t('title.howtoSolo')),
           ),
         ),
       ),
     );
-    parent.append(this.root);
-    code.addEventListener('keydown', (e) => e.key === 'Enter' && run(() => onJoin(code.value.trim().toUpperCase(), getName())));
   }
 
   dispose() {
+    this._off?.();
+    this.picker?._off?.();
     this.root.remove();
   }
 }
@@ -96,16 +126,17 @@ export class LobbyView {
     const copy = el('button', { class: 'btn small', onclick: async (e) => {
       try {
         await navigator.clipboard.writeText(this.code);
-        e.target.textContent = '복사됨';
+        e.target.textContent = t('common.copied');
       } catch {
         e.target.textContent = this.code;
       }
-    } }, '복사');
+    } }, t('common.copy'));
+    this.copyBtn = copy;
 
     this.readyCount = el('span', { class: 'lobby-ready-count' }, '');
     this.head = el('header', { class: 'lobby-head' },
-      this.solo ? el('h2', {}, '혼자 테스트') : el('div', { class: 'room-code' }, el('span', {}, '방 코드'), el('b', {}, this.code), copy),
-      el('div', { class: 'lobby-head-right' }, this.readyCount, el('button', { class: 'btn ghost small', onclick: () => this.onLeave() }, '나가기')),
+      this.solo ? (this.titleEl = el('h2', {}, t('lobby.solo'))) : el('div', { class: 'room-code' }, (this.codeLabel = el('span', {}, t('lobby.roomCode'))), el('b', {}, this.code), copy),
+      el('div', { class: 'lobby-head-right' }, this.readyCount, (this.picker = langPicker()), (this.leaveBtn = el('button', { class: 'btn ghost small', onclick: () => this.onLeave() }, t('common.leave')))),
     );
 
     this.stageMount = el('div', { class: 'lobby-stage' });
@@ -123,10 +154,10 @@ export class LobbyView {
         el('div', { class: 'lobby-main' },
           el('div', { class: 'lobby-stage-wrap' }, this.stageMount, this.stageHint),
           el('aside', { class: 'lobby-side' },
-            el('h3', {}, '참가자'), this.memberList,
-            el('h3', {}, '캐릭터'), this.animalGrid,
-            el('h3', {}, '역할 (먼저 누른 사람 우선)'), this.roleRow,
-            el('h3', {}, '경기 시간'), this.timeRow,
+            (this.h3Members = el('h3', {}, t('lobby.members'))), this.memberList,
+            (this.h3Char = el('h3', {}, t('lobby.character'))), this.animalGrid,
+            (this.h3Role = el('h3', {}, t('lobby.role'))), this.roleRow,
+            (this.h3Time = el('h3', {}, t('lobby.time'))), this.timeRow,
             this.actionRow,
             this.note,
           ),
@@ -135,7 +166,19 @@ export class LobbyView {
     );
     parent.append(this.root);
     this.stage = new CharacterStage(this.stageMount, { mode: 'lobby' });
-    this.stageHint.textContent = this.solo ? '혼자 테스트 — 술래와 플레이어를 오갑니다' : '캐릭터를 고르고 READY 를 누르세요';
+    this.stageHint.textContent = this.solo ? t('lobby.stageSolo') : t('lobby.stageHint');
+    // 언어가 바뀌면 고정 글씨 + 상태 다시 그리기
+    this._off = onLangChange(() => {
+      this.titleEl && (this.titleEl.textContent = t('lobby.solo'));
+      this.codeLabel && (this.codeLabel.textContent = t('lobby.roomCode'));
+      this.copyBtn.textContent = t('common.copy');
+      this.leaveBtn.textContent = t('common.leave');
+      this.h3Members.textContent = t('lobby.members');
+      this.h3Char.textContent = t('lobby.character');
+      this.h3Role.textContent = t('lobby.role');
+      this.h3Time.textContent = t('lobby.time');
+      if (this.state) this.render(this.state);
+    });
   }
 
   render(state) {
@@ -151,9 +194,9 @@ export class LobbyView {
         faceCanvas(m.animal, 40),
         el('div', { class: 'm-body' },
           el('b', {}, m.name, m.id === state.ownerId ? ' 👑' : ''),
-          el('span', { class: 'm-role' }, ROLE_LABEL[m.role] || m.role)),
+          el('span', { class: 'm-role' }, roleLabel(m.role))),
         m.ready ? el('span', { class: 'm-ready' }, 'READY') : null,
-        el('span', { class: 'm-ping' }, m.id === state.ownerId ? '방장' : `${m.ping || 0}ms`),
+        el('span', { class: 'm-ping' }, m.id === state.ownerId ? t('lobby.host') : `${m.ping || 0}ms`),
       ),
     ));
 
@@ -162,47 +205,47 @@ export class LobbyView {
       const taken = state.members.some((m) => m.animal === a && m.id !== this.me);
       return el('button', {
         class: 'animal' + (me?.animal === a ? ' on' : ''),
-        title: ANIMAL_NAMES[a],
+        title: t('animal.' + a),
         disabled: taken,
         onclick: () => send({ t: MSG.PICK_ANIMAL, animal: a }),
-      }, faceCanvas(a, 48), el('span', {}, ANIMAL_NAMES[a]));
+      }, faceCanvas(a, 48), el('span', {}, t('animal.' + a)));
     }));
 
     // 역할
     this.roleRow.replaceChildren(
       ...(this.solo
-        ? [el('p', { class: 'muted' }, '혼자 테스트는 술래와 플레이어를 함께 맡습니다.')]
+        ? [el('p', { class: 'muted' }, t('lobby.soloRole'))]
         : [
-            el('button', { class: 'btn' + (me?.role === ROLE.TAGGER ? ' on' : ''), disabled: taggerTaken, onclick: () => send({ t: MSG.PICK_ROLE, role: ROLE.TAGGER }) }, '👁 술래'),
-            el('button', { class: 'btn' + (me?.role === ROLE.PLAYER ? ' on' : ''), onclick: () => send({ t: MSG.PICK_ROLE, role: ROLE.PLAYER }) }, '🔫 플레이어'),
-            el('button', { class: 'btn' + (me?.role === ROLE.RANDOM ? ' on' : ''), onclick: () => send({ t: MSG.PICK_ROLE, role: ROLE.RANDOM }) }, '🎲 랜덤'),
+            el('button', { class: 'btn' + (me?.role === ROLE.TAGGER ? ' on' : ''), disabled: taggerTaken, onclick: () => send({ t: MSG.PICK_ROLE, role: ROLE.TAGGER }) }, t('role.tagger')),
+            el('button', { class: 'btn' + (me?.role === ROLE.PLAYER ? ' on' : ''), onclick: () => send({ t: MSG.PICK_ROLE, role: ROLE.PLAYER }) }, t('role.player')),
+            el('button', { class: 'btn' + (me?.role === ROLE.RANDOM ? ' on' : ''), onclick: () => send({ t: MSG.PICK_ROLE, role: ROLE.RANDOM }) }, t('role.random')),
           ]),
     );
 
     // 경기 시간
-    this.timeRow.replaceChildren(...[[180, '3분'], [300, '5분'], [600, '10분 (기본)']].map(([sec, label]) =>
+    this.timeRow.replaceChildren(...[[180, t('lobby.min3')], [300, t('lobby.min5')], [600, t('lobby.min10')]].map(([sec, label]) =>
       el('button', { class: 'btn small' + (state.settings.matchSeconds === sec ? ' on' : ''), disabled: !owner, onclick: () => send({ t: MSG.SETTINGS, matchSeconds: sec }) }, label)));
 
     // READY / 시작
     const others = state.members.filter((m) => m.id !== state.ownerId);
     const readyN = others.filter((m) => m.ready).length;
-    this.readyCount.textContent = this.solo || !others.length ? '' : `${readyN}/${others.length} READY`;
+    this.readyCount.textContent = this.solo || !others.length ? '' : t('lobby.readyCount', { n: readyN, total: others.length });
     this.readyCount.classList.toggle('all', !!others.length && readyN === others.length);
 
     if (this.solo) {
-      this.actionRow.replaceChildren(el('button', { class: 'btn primary big', onclick: () => send({ t: MSG.START }) }, '게임 시작'));
-      this.note.textContent = '경기 중 Tab 으로 술래 화면 ↔ 플레이어 화면을 오갑니다.';
+      this.actionRow.replaceChildren(el('button', { class: 'btn primary big', onclick: () => send({ t: MSG.START }) }, t('lobby.start')));
+      this.note.textContent = t('lobby.soloNote');
     } else if (owner) {
       const allReady = !!others.length && readyN === others.length;
       this.actionRow.replaceChildren(
-        el('button', { class: 'btn primary big' + (allReady ? ' glow' : ''), onclick: () => send({ t: MSG.START }) }, allReady ? '게임 시작' : '게임 시작 (대기 중)'),
+        el('button', { class: 'btn primary big' + (allReady ? ' glow' : ''), onclick: () => send({ t: MSG.START }) }, allReady ? t('lobby.start') : t('lobby.startWaiting')),
       );
-      this.note.textContent = allReady ? '모두 READY! 바로 시작할 수 있어요.' : '다른 참가자가 READY 를 누르길 기다리는 중… (지금 눌러도 시작됩니다)';
+      this.note.textContent = allReady ? t('lobby.allReady') : t('lobby.waitReady');
     } else {
       this.actionRow.replaceChildren(
         el('button', { class: 'btn big ready-btn' + (me?.ready ? ' on' : ''), onclick: () => send({ t: MSG.READY, ready: !me?.ready }) }, me?.ready ? 'READY ✓' : 'READY'),
       );
-      this.note.textContent = me?.ready ? '방장이 시작하길 기다리는 중…' : 'READY 를 누르면 대기실 캐릭터 머리 위에 표시됩니다.';
+      this.note.textContent = me?.ready ? t('lobby.waitHost') : t('lobby.readyHint');
     }
 
     // 3D 대기실: 지금 로비에 있는 사람들이 각자 단상 위에 선다
@@ -211,14 +254,20 @@ export class LobbyView {
       { me: this.me, ownerId: state.ownerId, solo: this.solo },
     );
     this.stageHint.textContent = this.solo
-      ? '혼자 테스트 — 술래와 플레이어를 오갑니다'
-      : `${state.members.length}명 대기 중 · 캐릭터를 고르고 READY 를 누르세요`;
+      ? t('lobby.stageSolo')
+      : t('lobby.stageWaiting', { n: state.members.length });
   }
 
   // 경기 중에는 3D 를 멈추고 DOM 만 떼어 둔다 (결과 화면 뒤로 숨김)
   dispose() {
     this.pause();
     this.root.remove();
+  }
+
+  // 로비 화면을 완전히 버릴 때 언어 구독도 끊는다
+  _unsub() {
+    this._off?.();
+    this.picker?._off?.();
   }
 
   pause() {
@@ -232,6 +281,7 @@ export class LobbyView {
 
   // 로비를 아주 버릴 때 (WebGL 자원까지 정리)
   destroy() {
+    this._unsub();
     this.stage?.dispose();
     this.stage = null;
     this.root.remove();
@@ -252,18 +302,18 @@ export class ResultView {
 
     const badges = (result.badges || []).map((b) => el('div', { class: 'badge' },
       faceCanvas(b.animal, 34),
-      el('div', { class: 'badge-body' }, el('b', {}, b.label), el('span', {}, b.playerName)),
-      el('em', {}, b.value),
+      el('div', { class: 'badge-body' }, el('b', {}, tr(b.label)), el('span', {}, b.playerName)),
+      el('em', {}, tr(b.value)),
     ));
 
     const score = mine?.score;
     const scoreCard = el('div', { class: 'score-card' },
       ...(score?.items || []).map((it) => el('div', { class: 'score-row' },
-        el('span', { class: 's-label' }, it.label),
-        el('span', { class: 's-detail' }, it.detail),
+        el('span', { class: 's-label' }, tr(it.label)),
+        el('span', { class: 's-detail' }, tr(it.detail)),
         el('b', { class: 's-points' }, fmtNum(it.points)),
       )),
-      el('div', { class: 'score-total' }, el('span', {}, '총점'), el('b', {}, fmtNum(score?.total || 0))),
+      el('div', { class: 'score-total' }, el('span', {}, t('result.total')), el('b', {}, fmtNum(score?.total || 0))),
     );
 
     const entries = [
@@ -283,22 +333,22 @@ export class ResultView {
       this.stageMount,
       el('div', { class: 'result-overlay' },
         el('div', { class: 'result-top' },
-          el('div', { class: 'result-who' }, draw ? '경기 중단' : result.winner === 'tagger' ? '술래 승리' : '플레이어 승리'),
-          el('h2', {}, draw ? '무승부' : won ? '이겼다!' : '졌다…'),
-          el('p', { class: 'result-reason' }, result.reason, ' · ', fmtDur(result.time)),
+          el('div', { class: 'result-who' }, draw ? t('result.stopped') : result.winner === 'tagger' ? t('result.taggerWin') : t('result.playersWin')),
+          el('h2', {}, draw ? t('result.draw') : won ? t('result.won') : t('result.lost')),
+          el('p', { class: 'result-reason' }, tr(result.reason), ' · ', fmtDur(result.time)),
         ),
         el('section', { class: 'result-panel result-left' },
-          el('h3', {}, '플레이 요약'),
-          badges.length ? el('div', { class: 'badges' }, ...badges) : el('p', { class: 'muted' }, '이번 판에는 뱃지가 없어요.'),
+          el('h3', {}, t('result.summary')),
+          badges.length ? el('div', { class: 'badges' }, ...badges) : el('p', { class: 'muted' }, t('result.noBadges')),
         ),
         el('section', { class: 'result-panel result-right' },
-          el('h3', {}, youTagger ? '술래 정산' : '내 점수', el('span', { class: 'who' }, mine?.name || '')),
+          el('h3', {}, youTagger ? t('result.taggerScore') : t('result.myScore'), el('span', { class: 'who' }, mine?.name || '')),
           scoreCard,
-          el('h3', {}, '전체 점수'),
+          el('h3', {}, t('result.allScores')),
           ranking,
         ),
         el('div', { class: 'result-bottom' },
-          el('button', { class: 'btn primary big', onclick: onBack }, disconnected ? '시작 화면으로' : '로비로 돌아가기'),
+          el('button', { class: 'btn primary big', onclick: onBack }, disconnected ? t('result.toTitle') : t('result.toLobby')),
         ),
       ),
     );
@@ -306,7 +356,7 @@ export class ResultView {
 
     this.stage = new CharacterStage(this.stageMount, { mode: 'result' });
     this.stage.setCharacters(
-      [{ id: me || 'me', kind: myAnimal, name: mine?.name || '나', role: youTagger ? ROLE.TAGGER : ROLE.PLAYER, badge }],
+      [{ id: me || 'me', kind: myAnimal, name: mine?.name || t('common.me'), role: youTagger ? ROLE.TAGGER : ROLE.PLAYER, badge }],
       { me: me || 'me' },
     );
   }

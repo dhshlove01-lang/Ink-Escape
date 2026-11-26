@@ -5,6 +5,7 @@ import { COMMANDS } from './commands.js';
 import { SpawnSystem } from './systems/SpawnSystem.js';
 import { NavigationSystem, MonsterSystem, ProjectileSystem, GrenadeSystem, PlayerLifeSystem } from './systems/MonsterSystem.js';
 import { ClockSystem, InkSystem, StatusSystem, EscapeSystem, VictorySystem } from './systems/core.js';
+import { msg } from '../shared/i18n/strings.js';
 
 // 경기 한 판. 상태를 들고, 시스템들을 순서대로 돌리고, 명령을 처리기에 넘긴다.
 // 방장 PC 에서만 돈다 (방장 권한 구조).
@@ -172,12 +173,12 @@ export class Match {
   }
 
   leave(id) {
-    if (id === this.tagger.id && !this.solo) return this.finish('players', '술래가 나갔어요');
+    if (id === this.tagger.id && !this.solo) return this.finish('players', msg('reason.taggerLeft'));
     const p = this.players.get(id);
     if (!p) return;
     p.state = PSTATE.OUT;
     const anyLeft = [...this.players.values()].some((o) => o.state !== PSTATE.OUT);
-    if (!anyLeft) this.finish('tagger', '플레이어가 모두 나갔어요');
+    if (!anyLeft) this.finish('tagger', msg('reason.playersLeft'));
   }
 
   snapshot() {

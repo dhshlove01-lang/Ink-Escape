@@ -48,16 +48,16 @@ class PeerLink extends BaseLink {
 }
 
 function PeerCtor() {
-  if (!window.Peer) throw new Error('PeerJS 를 불러오지 못했어요');
+  if (!window.Peer) throw new Error('net.noPeerjs');
   return window.Peer;
 }
 
 const ERR_KO = {
-  'unavailable-id': '이미 쓰이는 방 코드예요',
-  'peer-unavailable': '그 코드의 방을 찾을 수 없어요',
-  network: '연결 서버에 닿지 않아요 (인터넷 확인)',
-  'server-error': '연결 서버 오류',
-  'browser-incompatible': '이 브라우저는 WebRTC 를 지원하지 않아요',
+  'unavailable-id': 'net.unavailableId',
+  'peer-unavailable': 'net.peerUnavailable',
+  network: 'net.network',
+  'server-error': 'net.serverError',
+  'browser-incompatible': 'net.browser',
 };
 const errText = (e) => ERR_KO[e?.type] || e?.message || String(e);
 
@@ -99,7 +99,7 @@ export function joinRoom(code) {
       peer.destroy();
       reject(new Error(errText(e)));
     };
-    const timer = setTimeout(() => fail({ message: '연결 시간이 초과됐어요' }), 15000);
+    const timer = setTimeout(() => fail({ message: 'net.timeout' }), 15000);
     peer.on('open', () => {
       const conn = peer.connect(ID_PREFIX + code.toUpperCase(), { reliable: true, serialization: 'json' });
       conn.on('open', () => {

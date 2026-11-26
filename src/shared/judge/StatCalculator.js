@@ -1,3 +1,5 @@
+import { msg } from '../i18n/strings.js';
+
 // 판정 결과(색·형태) + 소환 옵션 → 몬스터 스탯과 잉크 비용.
 // 미리보기(술래 화면)와 실제 소환(방장)이 같은 함수를 쓴다.
 
@@ -52,12 +54,12 @@ export class StatCalculator {
    */
   evaluate(analysis, opt) {
     const b = this.b;
-    if (analysis.empty) return fail('그림을 그려주세요');
-    if (analysis.areaPct < b.ink.minAreaPct) return fail(`면적이 너무 작아요 (${b.ink.minAreaPct}% 이상)`, analysis);
-    if (analysis.extent < b.ink.minExtent) return fail('그림 크기가 너무 작아요', analysis);
+    if (analysis.empty) return fail(msg('judge.empty'));
+    if (analysis.areaPct < b.ink.minAreaPct) return fail(msg('judge.smallArea', { n: b.ink.minAreaPct }), analysis);
+    if (analysis.extent < b.ink.minExtent) return fail(msg('judge.smallSize'), analysis);
 
     const attrs = this.attributesFrom(analysis.colorCounts);
-    if (!attrs.length) return fail('색이 없어요', analysis);
+    if (!attrs.length) return fail(msg('judge.noColor'), analysis);
 
     const kind = opt.boss && opt.allIn ? 'giant' : opt.boss ? 'boss' : 'normal';
     const baseInk = Math.ceil(analysis.areaPct);
@@ -67,10 +69,10 @@ export class StatCalculator {
 
     const result = { ok: true, kind, cost: opt.frenzy ? 0 : cost, attrs, traits: analysis.traits, areaPct: analysis.areaPct };
 
-    if (kind !== 'normal' && opt.bossReadyIn > 0) return { ...result, ok: false, reason: `보스 대기 ${Math.ceil(opt.bossReadyIn)}초` };
-    if (kind === 'giant' && opt.frenzy) return { ...result, ok: false, reason: '최후 발악 중엔 올인 불가' };
-    if (kind === 'giant' && opt.ink < b.ink.giantMinInk) return { ...result, ok: false, reason: `올인은 잉크 ${b.ink.giantMinInk} 이상 필요` };
-    if (!opt.frenzy && cost > opt.ink) return { ...result, ok: false, reason: '잉크가 부족해요' };
+    if (kind !== 'normal' && opt.bossReadyIn > 0) return { ...result, ok: false, reason: msg('judge.bossWait', { n: Math.ceil(opt.bossReadyIn) }) };
+    if (kind === 'giant' && opt.frenzy) return { ...result, ok: false, reason: msg('judge.noAllInFrenzy') };
+    if (kind === 'giant' && opt.ink < b.ink.giantMinInk) return { ...result, ok: false, reason: msg('judge.allInMin', { n: b.ink.giantMinInk }) };
+    if (!opt.frenzy && cost > opt.ink) return { ...result, ok: false, reason: msg('judge.noInk') };
 
     result.stats = this.stats(analysis, attrs, kind, opt);
     return result;

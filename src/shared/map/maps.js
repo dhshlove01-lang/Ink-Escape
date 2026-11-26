@@ -59,10 +59,10 @@ function buildDungeon() {
     doors.push({ name, cells: list, center: { x: (cx + 0.5) * CELL, z: (cy + 0.5) * CELL }, dir });
   };
   const nx = colX[1] + Math.floor(colW[1] / 2);
-  door('북쪽 문', [[nx - 1, 0], [nx, 0], [nx + 1, 0], [nx - 1, 1], [nx, 1], [nx + 1, 1]], { x: 0, z: -1 });
+  door('door.north', [[nx - 1, 0], [nx, 0], [nx + 1, 0], [nx - 1, 1], [nx, 1], [nx + 1, 1]], { x: 0, z: -1 });
   const wy = rowY[1] + Math.floor(rowH / 2);
-  door('서쪽 문', [[0, wy - 1], [0, wy], [0, wy + 1], [1, wy - 1], [1, wy], [1, wy + 1]], { x: -1, z: 0 });
-  door('동쪽 문', [[W - 1, wy - 1], [W - 1, wy], [W - 1, wy + 1], [W - 2, wy - 1], [W - 2, wy], [W - 2, wy + 1]], { x: 1, z: 0 });
+  door('door.west', [[0, wy - 1], [0, wy], [0, wy + 1], [1, wy - 1], [1, wy], [1, wy + 1]], { x: -1, z: 0 });
+  door('door.east', [[W - 1, wy - 1], [W - 1, wy], [W - 1, wy + 1], [W - 2, wy - 1], [W - 2, wy], [W - 2, wy + 1]], { x: 1, z: 0 });
 
   // 횃불: 각 방 위쪽 벽 가운데
   const torches = [];
@@ -74,7 +74,7 @@ function buildDungeon() {
 
   return new GameMap({
     id: 'dungeon',
-    name: '낙서 지하감옥',
+    name: 'map.dungeon',
     w: W,
     h: H,
     cells,

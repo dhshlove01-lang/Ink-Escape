@@ -6,9 +6,9 @@ import { img } from '../render/Images.js';
 // 도화지 (마우스로 그리기). 획 데이터만 들고 있고, 판정은 모른다 (SRP).
 
 export const BRUSHES = [
-  { key: 'thin', name: '가늘게', w: 10 },
-  { key: 'mid', name: '보통', w: 18 },
-  { key: 'thick', name: '굵게', w: 34 },
+  { key: 'thin', w: 10 },
+  { key: 'mid', w: 18 },
+  { key: 'thick', w: 34 },
 ];
 
 export class DrawingPad extends Emitter {

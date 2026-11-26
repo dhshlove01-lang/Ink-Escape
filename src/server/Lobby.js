@@ -1,4 +1,5 @@
 import { ROLE, ANIMALS } from '../shared/protocol.js';
+import { msg } from '../shared/i18n/strings.js';
 
 // 로비: 참가자, 역할(먼저 누른 사람 우선), 동물, 설정. 경기 로직은 모른다 (SRP).
 
@@ -32,14 +33,14 @@ export class Lobby {
 
   pickRole(id, role) {
     const m = this.members.get(id);
-    if (!m || !Object.values(ROLE).includes(role)) return '잘못된 역할';
+    if (!m || !Object.values(ROLE).includes(role)) return msg('err.badRole');
     if (role === ROLE.TAGGER) {
       const taken = [...this.members.values()].some((o) => o.id !== id && o.role === ROLE.TAGGER);
-      if (taken) return '술래는 이미 정해졌어요';
+      if (taken) return msg('err.taggerTaken');
     }
     if (role === ROLE.PLAYER) {
       const n = [...this.members.values()].filter((o) => o.id !== id && o.role === ROLE.PLAYER).length;
-      if (n >= MAX_PLAYERS) return '플레이어 자리가 다 찼어요';
+      if (n >= MAX_PLAYERS) return msg('err.playersFull');
     }
     m.role = role;
     return null;
@@ -47,16 +48,16 @@ export class Lobby {
 
   pickAnimal(id, animal) {
     const m = this.members.get(id);
-    if (!m || !ANIMALS.includes(animal)) return '잘못된 캐릭터';
+    if (!m || !ANIMALS.includes(animal)) return msg('err.badAnimal');
     const taken = [...this.members.values()].some((o) => o.id !== id && o.animal === animal);
-    if (taken) return '다른 사람이 고른 캐릭터예요';
+    if (taken) return msg('err.animalTaken');
     m.animal = animal;
     return null;
   }
 
   setReady(id, ready) {
     const m = this.members.get(id);
-    if (!m) return '참가자를 찾을 수 없어요';
+    if (!m) return msg('err.noMember');
     m.ready = !!ready;
     return null;
   }
@@ -67,7 +68,7 @@ export class Lobby {
   }
 
   setSettings(id, s) {
-    if (id !== this.ownerId) return '방 만든 사람만 바꿀 수 있어요';
+    if (id !== this.ownerId) return msg('err.hostOnlySettings');
     const sec = Number(s.matchSeconds);
     if ([180, 300, 600].includes(sec)) this.settings.matchSeconds = sec;
     return null;
@@ -76,16 +77,16 @@ export class Lobby {
   // 랜덤을 누른 사람들을 남은 자리에 배정한다. 결과: { taggerId, players:[...] } 또는 { error }
   resolveRoster(rng = Math.random) {
     const list = [...this.members.values()];
-    if (list.length < 2) return { error: '2명 이상 필요해요 (혼자는 "혼자 테스트")' };
+    if (list.length < 2) return { error: msg('err.needTwo') };
     let tagger = list.find((m) => m.role === ROLE.TAGGER);
     const randoms = list.filter((m) => m.role === ROLE.RANDOM || m.role === ROLE.NONE);
     if (!tagger) {
-      if (!randoms.length) return { error: '술래가 없어요' };
+      if (!randoms.length) return { error: msg('err.noTagger') };
       tagger = randoms.splice(Math.floor(rng() * randoms.length), 1)[0];
     }
     const players = list.filter((m) => m !== tagger && (m.role === ROLE.PLAYER || randoms.includes(m)));
-    if (players.length < 1) return { error: '플레이어가 1명 이상 필요해요' };
-    if (players.length > MAX_PLAYERS) return { error: '플레이어는 최대 4명이에요' };
+    if (players.length < 1) return { error: msg('err.needPlayer') };
+    if (players.length > MAX_PLAYERS) return { error: msg('err.maxPlayers') };
     return {
       taggerId: tagger.id,
       taggerName: tagger.name,
@@ -106,5 +107,5 @@ export class Lobby {
 
 function cleanName(n) {
   const s = String(n || '').replace(/[<>]/g, '').trim().slice(0, 12);
-  return s || '이름없음';
+  return s || 'Player';
 }

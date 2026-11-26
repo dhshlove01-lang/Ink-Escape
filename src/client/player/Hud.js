@@ -1,6 +1,7 @@
 import { el, fmtTime, icon } from '../ui/dom.js';
 import { faceCanvas } from '../render/AnimalModels.js';
 import { PSTATE, STATUS_BIT } from '../../shared/protocol.js';
+import { t } from '../i18n.js';
 
 // 플레이어 HUD: 타이머, 보스 HP, 팀원, 내 HP·상태이상·하트, 탄약·지우개, 조준점, 부활 게이지, 안내.
 
@@ -59,13 +60,13 @@ export class Hud {
     const s = this.session.latest;
     if (s) {
       if (s.open) {
-        this.timer.textContent = '탈출!';
+        this.timer.textContent = t('hud.escape');
         this.timer.classList.add('open');
-        this.timerSub.textContent = '열린 문으로 나가세요 · 술래 폭주 중';
+        this.timerSub.textContent = t('hud.escapeSub');
       } else {
         this.timer.textContent = fmtTime(s.left);
         this.timer.classList.toggle('warn', s.left <= 60);
-        this.timerSub.textContent = this.session.doorRevealed >= 0 ? '빛기둥이 탈출 문' : '';
+        this.timerSub.textContent = this.session.doorRevealed >= 0 ? t('hud.doorHint') : '';
       }
       for (const [id, r] of this.teamRows) {
         const p = s._p.get(id);
@@ -76,10 +77,10 @@ export class Hud {
         r.faceDead.hidden = !dead;
         r.row.classList.toggle('dead', dead || p.st === PSTATE.OUT);
         let info = '';
-        if (p.st === PSTATE.DEAD) info = p.revIn > 0 ? `부활 가능까지 ${Math.ceil(p.revIn)}초` : p.revIn === 0 ? '부활 가능!' : '사망';
-        else if (p.st === PSTATE.ESCAPED) info = '탈출';
-        else if (p.st === PSTATE.OUT) info = '나감';
-        else if (p.bits & STATUS_BIT.AFK) info = '술래 화면 보는 중';
+        if (p.st === PSTATE.DEAD) info = p.revIn > 0 ? t('hud.revIn', { n: Math.ceil(p.revIn) }) : p.revIn === 0 ? t('hud.revNow') : t('hud.dead');
+        else if (p.st === PSTATE.ESCAPED) info = t('hud.escaped');
+        else if (p.st === PSTATE.OUT) info = t('hud.out');
+        else if (p.bits & STATUS_BIT.AFK) info = t('hud.afk');
         r.info.textContent = info;
       }
     }
@@ -89,16 +90,16 @@ export class Hud {
       if (this.lastHp !== null && me.hp <= this.lastHp - 3) this.flashDamage();
       if (this.lastHp === null || me.hp > this.lastHp || me.hp <= this.lastHp - 3) this.lastHp = me.hp;
       const icons = [];
-      if (me.bits & STATUS_BIT.BURN) icons.push('🔥 화상');
-      if (me.bits & STATUS_BIT.SLOW) icons.push('❄ 느려짐');
-      if (me.bits & STATUS_BIT.POISON) icons.push('☠ 독');
-      if (me.bits & STATUS_BIT.INVULN) icons.push('✨ 무적');
+      if (me.bits & STATUS_BIT.BURN) icons.push(t('hud.burn'));
+      if (me.bits & STATUS_BIT.SLOW) icons.push(t('hud.slow'));
+      if (me.bits & STATUS_BIT.POISON) icons.push(t('hud.poison'));
+      if (me.bits & STATUS_BIT.INVULN) icons.push(t('hud.invuln'));
       this.status.textContent = icons.join('  ');
       this.hearts.textContent = this.session.playerCount === 1 ? '❤'.repeat(Math.max(0, me.lives)) + '🖤'.repeat(Math.max(0, 2 - me.lives)) : '';
-      this.gren.textContent = `지우개 ${me.gren} (G)`;
+      this.gren.textContent = t('hud.grenades', { n: me.gren });
     }
     if (weapon) {
-      this.ammo.innerHTML = weapon.reloading ? '<b>재장전…</b>' : `<b>${weapon.ammo}</b> / ∞`;
+      this.ammo.innerHTML = weapon.reloading ? `<b>${t('hud.reloading')}</b>` : `<b>${weapon.ammo}</b> / ∞`;
     }
     this.prompt.hidden = !prompt;
     if (prompt) this.prompt.textContent = prompt;
@@ -108,10 +109,10 @@ export class Hud {
     if (revive) this.ring.style.setProperty('--p', `${Math.round(revive * 100)}%`);
     this.boss.hidden = !boss;
     if (boss) {
-      const label = `${boss.kind === 'giant' ? '초대형' : '보스'} ${boss.attrs.map((a) => a.key).join(',')}`;
+      const label = `${boss.kind} ${boss.attrs.map((a) => a.key).join(',')}`;
       if (this._bossLabel !== label) {
         this._bossLabel = label;
-        this.bossName.replaceChildren(boss.kind === 'giant' ? '초대형 ' : '보스 ', ...boss.attrs.map((a) => icon('icon.' + a.key, this.attributes[a.key].icon)));
+        this.bossName.replaceChildren(boss.kind === 'giant' ? t('hud.giant') : t('hud.boss'), ...boss.attrs.map((a) => icon('icon.' + a.key, this.attributes[a.key].icon)));
       }
       this.bossFill.style.width = `${(boss.hp / boss.maxHp) * 100}%`;
     }

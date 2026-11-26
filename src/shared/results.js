@@ -1,3 +1,5 @@
+import { msg } from './i18n/strings.js';
+
 // 결과 화면에 쓰는 뱃지(플레이 요약)와 점수 정산.
 // 방장 서버가 한 번 계산해서 모든 참가자에게 같은 숫자를 보낸다 (화면은 표시만 한다).
 // 점수 가중치는 src/config/balance.js 의 score 에만 있다.
@@ -13,17 +15,17 @@ export function buildResultStats(players, tagger, sc) {
   const downs = players.reduce((a, p) => a + num(p.deaths), 0);
 
   const playerItems = (p) => [
-    { key: 'survive', label: '생존 시간', detail: `${Math.round(num(p.survivedSec))}초`, points: Math.floor(num(p.survivedSec)) * sc.survivalPerSec },
-    { key: 'kill', label: '몬스터 처치', detail: `${num(p.kills)}마리`, points: num(p.kills) * sc.kill },
-    { key: 'boss', label: '보스 처치', detail: `${num(p.bossKills)}마리`, points: num(p.bossKills) * sc.boss },
-    { key: 'revive', label: '부활·기여', detail: `부활 ${num(p.revives)}회 · 피해 ${Math.round(num(p.dmg))}`, points: num(p.revives) * sc.revive + Math.round(num(p.dmg) * sc.dmg) },
-    { key: 'escape', label: '탈출 보너스', detail: p.escaped ? '탈출 성공' : '—', points: p.escaped ? sc.escape : 0 },
+    { key: 'survive', label: msg('score.survive'), detail: msg('detail.sec', { n: Math.round(num(p.survivedSec)) }), points: Math.floor(num(p.survivedSec)) * sc.survivalPerSec },
+    { key: 'kill', label: msg('score.kill'), detail: msg('detail.count', { n: num(p.kills) }), points: num(p.kills) * sc.kill },
+    { key: 'boss', label: msg('score.boss'), detail: msg('detail.count', { n: num(p.bossKills) }), points: num(p.bossKills) * sc.boss },
+    { key: 'revive', label: msg('score.revive'), detail: msg('detail.reviveDmg', { r: num(p.revives), d: Math.round(num(p.dmg)) }), points: num(p.revives) * sc.revive + Math.round(num(p.dmg) * sc.dmg) },
+    { key: 'escape', label: msg('score.escape'), detail: p.escaped ? msg('detail.escaped') : '—', points: p.escaped ? sc.escape : 0 },
   ];
 
   const taggerItems = [
-    { key: 'spawn', label: '몬스터 소환', detail: `${num(tagger.spawned)}회`, points: num(tagger.spawned) * sc.taggerSpawn },
-    { key: 'boss', label: '보스 소환', detail: `${num(tagger.bosses)}회`, points: num(tagger.bosses) * sc.taggerBoss },
-    { key: 'down', label: '플레이어 무력화', detail: `${downs}회`, points: downs * sc.taggerDown },
+    { key: 'spawn', label: msg('score.spawn'), detail: msg('detail.times', { n: num(tagger.spawned) }), points: num(tagger.spawned) * sc.taggerSpawn },
+    { key: 'boss', label: msg('score.bossSpawn'), detail: msg('detail.times', { n: num(tagger.bosses) }), points: num(tagger.bosses) * sc.taggerBoss },
+    { key: 'down', label: msg('score.down'), detail: msg('detail.times', { n: downs }), points: downs * sc.taggerDown },
   ];
 
   const withScore = (items) => ({ items, total: items.reduce((a, i) => a + i.points, 0) });
@@ -45,13 +47,13 @@ function buildBadges(players) {
 
   const bestKills = Math.max(0, ...players.map((p) => num(p.kills)));
   if (bestKills > 0) {
-    for (const p of players) if (num(p.kills) === bestKills) add('kills', '최다 처치', p, `${bestKills}마리`);
+    for (const p of players) if (num(p.kills) === bestKills) add('kills', msg('badge.kills'), p, msg('detail.count', { n: bestKills }));
   }
-  for (const p of players) if (num(p.bossKills) > 0) add('boss', '보스 막타', p, `${num(p.bossKills)}회`);
-  for (const p of players) if (p.escaped) add('escape', '탈출 성공', p, p.survivedSec ? `${Math.round(num(p.survivedSec))}초 생존 후` : '생존');
-  for (const p of players) if (num(p.revives) > 0) add('revive', '팀원 부활', p, `${num(p.revives)}명`);
-  for (const p of players) if (num(p.grenadeKills) > 0) add('grenade', '지우개 명중', p, `${num(p.grenadeKills)}마리`);
-  for (const p of players) if (p.alive && !p.escaped) add('survive', '끝까지 생존', p, 'HP ' + Math.round(num(p.hp)));
+  for (const p of players) if (num(p.bossKills) > 0) add('boss', msg('badge.boss'), p, msg('detail.times', { n: num(p.bossKills) }));
+  for (const p of players) if (p.escaped) add('escape', msg('badge.escape'), p, p.survivedSec ? msg('detail.survivedFor', { n: Math.round(num(p.survivedSec)) }) : msg('detail.alive'));
+  for (const p of players) if (num(p.revives) > 0) add('revive', msg('badge.revive'), p, msg('detail.people', { n: num(p.revives) }));
+  for (const p of players) if (num(p.grenadeKills) > 0) add('grenade', msg('badge.grenade'), p, msg('detail.count', { n: num(p.grenadeKills) }));
+  for (const p of players) if (p.alive && !p.escaped) add('survive', msg('badge.survive'), p, msg('detail.hp', { n: Math.round(num(p.hp)) }));
 
   return out;
 }

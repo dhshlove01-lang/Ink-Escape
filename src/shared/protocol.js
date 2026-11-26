@@ -54,7 +54,7 @@ export const EV = {
 
 export const ROLE = { TAGGER: 'tagger', PLAYER: 'player', RANDOM: 'random', NONE: 'none' };
 export const ANIMALS = ['shiba', 'bear', 'rabbit', 'cat', 'devil'];
-export const ANIMAL_NAMES = { shiba: '시바견', bear: '곰', rabbit: '토끼', cat: '삼색고양이', devil: '술래 악마' };
+// 캐릭터 이름은 번역 사전의 animal.키 (client/i18n.js 의 t('animal.' + 키))
 
 export const PSTATE = { ALIVE: 0, DEAD: 1, ESCAPED: 2, OUT: 3 };
 export const STATUS_BIT = { BURN: 1, SLOW: 2, POISON: 4, INVULN: 8, AFK: 16 };

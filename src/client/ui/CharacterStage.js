@@ -5,6 +5,7 @@ import { makeTextures } from '../player/SceneBuilder.js';
 import { texture, textureFromUrl } from '../render/Images.js';
 import { DECALS } from '../../config/assets.js';
 import { ROLE } from '../../shared/protocol.js';
+import { t, getLang } from '../i18n.js';
 
 // 로비·결과 화면 뒤에 깔리는 3D 무대. 던전 단상 위에 캐릭터들이 서서 숨쉬고 깡총거린다.
 // 폴가이즈 스타일: 캐릭터마다 단상 하나, 머리 위 이름표(+READY), 내 캐릭터는 노란 링.
@@ -214,7 +215,7 @@ export class CharacterStage {
   }
 
   setPlate(f, c, { mine, owner, solo, badge }) {
-    const label = `${c.name}｜${badge?.text || ''}｜${c.role || ''}｜${mine ? 1 : 0}｜${owner ? 1 : 0}｜${solo ? 1 : 0}`;
+    const label = `${c.name}｜${badge?.text || ''}｜${c.role || ''}｜${mine ? 1 : 0}｜${owner ? 1 : 0}｜${solo ? 1 : 0}｜${getLang()}`;
     if (f.label === label && f.plate) return;
     f.label = label;
     // 결과 화면은 제목(승리/패배)과 패널이 이미 알려주므로 이름표를 달지 않는다
@@ -385,7 +386,7 @@ function makePlateTexture({ name, badge, role, mine, owner, solo }) {
   g.fillText(`${owner ? '👑 ' : ''}${clipped}`, 34, 62);
 
   // 역할
-  const roleText = solo ? '술래 + 플레이어' : role === 'tagger' ? '술래' : role === 'player' ? '플레이어' : '랜덤';
+  const roleText = solo ? t('role.both') : role === 'tagger' ? t('role.taggerShort') : role === 'player' ? t('role.playerShort') : t('role.randomShort');
   g.font = '34px "Jua", "Malgun Gothic", sans-serif';
   g.fillStyle = '#9a92a6';
   g.fillText(`${ROLE_ICON[role] || '🎲'} ${roleText}`, 34, 112);

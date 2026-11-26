@@ -6,6 +6,7 @@ import { TitleView, LobbyView, ResultView } from './ui/screens.js';
 import { PlayerView } from './player/PlayerView.js';
 import { TaggerView } from './tagger/TaggerView.js';
 import { toast, el } from './ui/dom.js';
+import { t, tr } from './i18n.js';
 
 // 화면 흐름: 시작 → 로비 → 경기 → 결과 → 로비.
 // 필요한 것은 모두 생성자로 주입받는다 (main.js 가 조립).
@@ -72,7 +73,7 @@ export class App {
       try {
         hosting = await this.network.hostRoom(code, (link) => server.attach(link));
       } catch (e) {
-        if (i === 3 || !/이미/.test(e.message)) {
+        if (i === 3 || e.message !== 'net.unavailableId') {
           server.close();
           throw e;
         }
@@ -86,7 +87,7 @@ export class App {
   }
 
   async joinRoom(code, name) {
-    if (!/^[A-Z0-9]{5}$/.test(code)) throw new Error('방 코드 5자리를 입력하세요');
+    if (!/^[A-Z0-9]{5}$/.test(code)) throw new Error('title.codeInvalid');
     const link = await this.network.joinRoom(code);
     this.connect(link, name, code, false);
   }
@@ -120,10 +121,10 @@ export class App {
       if (this.quitting) return; // 방을 나가는 중에 도착한 결과는 버린다 (시작 화면으로 가는 중)
       this.endMatch(r);
     });
-    conn.on(MSG.ERROR, (e) => toast(e.message, 'warn'));
+    conn.on(MSG.ERROR, (e) => toast(tr(e.message), 'warn'));
     conn.on('close', () => {
       if (this.conn !== conn) return;
-      toast('방과 연결이 끊어졌어요', 'warn');
+      toast(t('common.disconnected'), 'warn');
       // 결과 화면은 남겨 두고, '로비로' 를 누르면 시작 화면으로
       if (this.screen instanceof ResultView) this.disconnected = true;
       else this.showTitle();
@@ -145,7 +146,7 @@ export class App {
     if (session.role === 'both') {
       this.views.tagger.setActive(false);
       this.views.player.setActive(true);
-      holder.append(el('div', { class: 'solo-hint' }, 'Tab: 술래 ↔ 플레이어'));
+      holder.append(el('div', { class: 'solo-hint' }, t('game.soloHint')));
     }
   }
 

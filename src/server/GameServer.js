@@ -1,6 +1,7 @@
 import { MSG } from '../shared/protocol.js';
 import { Lobby } from './Lobby.js';
 import { Match } from './Match.js';
+import { msg as say } from '../shared/i18n/strings.js';
 
 // 방장 PC 의 서버. 연결(Link)들을 받아 로비 → 경기 → 결과 → 로비를 돈다.
 // 어떤 통신 수단으로 들어온 Link 인지는 모른다 (DIP).
@@ -55,8 +56,8 @@ export class GameServer {
     };
     switch (msg.t) {
       case MSG.HELLO:
-        if (this.match) return this.error(id, '이미 경기 중인 방이에요');
-        if (!this.lobby.join(id, msg.name)) return this.error(id, '방이 가득 찼어요 (최대 5명)');
+        if (this.match) return this.error(id, say('err.inMatch'));
+        if (!this.lobby.join(id, msg.name)) return this.error(id, say('err.roomFull'));
         this.send(id, { t: MSG.WELCOME, id });
         return this.broadcastLobby();
       case MSG.PONG: {
@@ -75,7 +76,7 @@ export class GameServer {
         return lobbyOnly(() => this.lobby.setSettings(id, msg));
       case MSG.START:
         if (this.match) return;
-        if (id !== this.lobby.ownerId) return this.error(id, '방 만든 사람만 시작할 수 있어요');
+        if (id !== this.lobby.ownerId) return this.error(id, say('err.hostOnlyStart'));
         return this.startMatch(id);
       default:
         if (this.match) this.match.handle(id, msg);
@@ -172,7 +173,7 @@ export class GameServer {
   shutdown(hostClientId) {
     if (this.match && !this.match.result) {
       this.match.leave(hostClientId);
-      if (!this.match.result) this.match.finish(null, '방장이 나가서 경기가 끝났어요');
+      if (!this.match.result) this.match.finish(null, say('reason.hostLeft'));
       this.endMatch();
     }
     this.stopLoop();
