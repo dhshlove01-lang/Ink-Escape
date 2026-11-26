@@ -38,6 +38,8 @@ export function langPicker() {
   return box;
 }
 
+const SUB_COUNT = 5; // strings.js 의 title.sub1 ~ title.sub5
+
 // 가운데 팝업 (배경 클릭·Esc 로 닫힘). hidden 으로 열고 닫는다.
 function modalBox({ title, body, actions, onClose, wide = false }) {
   const back = el('div', { class: 'modal-back', hidden: true, onclick: (e) => e.target === back && onClose() },
@@ -58,6 +60,7 @@ export class TitleView {
     this.nameVal = loadName();
     this.codeVal = '';
     this.statusText = '';
+    this.subNo = 1 + Math.floor(Math.random() * SUB_COUNT); // 소개 문구: 들어올 때마다 5개 중 하나 (언어를 바꿔도 같은 번호)
     parent.append(this.root);
     this.build();
     this._off = onLangChange(() => this.build());
@@ -147,7 +150,7 @@ export class TitleView {
         { class: 'title-card' },
         el('div', { class: 'title-top' }, this.picker),
         url('ui.logo') ? el('h1', { class: 'logo' }, el('img', { src: url('ui.logo'), alt: 'INK ESCAPE' })) : el('h1', {}, 'INK ESCAPE'),
-        el('p', { class: 'title-sub' }, t('title.sub')),
+        el('p', { class: 'title-sub' }, t('title.sub' + this.subNo)),
         el('div', { class: 'title-actions' },
           name,
           el('button', { class: 'btn primary', onclick: () => run(() => onCreate(getName())) }, t('title.create')),

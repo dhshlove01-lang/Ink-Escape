@@ -59,7 +59,11 @@ export const STRINGS = {
     'brush.thick': '굵게',
 
     // 시작 화면
-    'title.sub': '술래가 그린 그림이 3D 전장의 몬스터가 된다 · 비대칭 드로잉 FPS 프로토타입',
+    'title.sub1': '네가 그린 낙서가 괴물이 된다!',
+    'title.sub2': '한 명은 그리고, 모두는 도망친다',
+    'title.sub3': '낙서가 깨어났다. 10분 안에 탈출하라!',
+    'title.sub4': '그림 실력은 상관없어요, 일단 그려요!',
+    'title.sub5': '술래는 그리고, 동물 친구들은 탈출!',
     'title.nickname': '닉네임',
     'title.roomCode': '방 코드',
     'title.create': '방 만들기',
@@ -314,7 +318,11 @@ export const STRINGS = {
     'brush.mid': 'Medium',
     'brush.thick': 'Thick',
 
-    'title.sub': "The Tagger's drawings become monsters in a 3D arena · Asymmetric drawing FPS prototype",
+    'title.sub1': 'Your doodles come to life!',
+    'title.sub2': 'One draws. Everyone runs.',
+    'title.sub3': 'The doodles are awake. Escape in 10 minutes!',
+    'title.sub4': "Can't draw? Even better!",
+    'title.sub5': 'Tagger draws, animals escape!',
     'title.nickname': 'Nickname',
     'title.roomCode': 'Room code',
     'title.create': 'Create Room',
