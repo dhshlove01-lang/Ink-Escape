@@ -79,3 +79,19 @@ test('잉크 부족·보스 대기·최후 발악 올인 금지', () => {
   assert.equal(judge.judge(s, { ...opt, boss: true, allIn: true, frenzy: true }).ok, false);
   assert.equal(judge.judge(s, { ...opt, frenzy: true }).cost, 0);
 });
+
+test('자유 색: 가장 가까운 기본 색이 속성, 방장은 rgb 로 다시 계산 (조작 방지)', async () => {
+  const { nearestPaletteIndex, PALETTE: P } = await import('../src/shared/attributes.js');
+  const { sanitizeStrokes } = await import('../src/shared/judge/Judge.js');
+  const key = (hex) => P[nearestPaletteIndex(parseInt(hex.slice(1), 16))].key;
+  assert.equal(key('#8b0000'), 'red');
+  assert.equal(key('#4fc3f7'), 'blue');
+  assert.equal(key('#663399'), 'purple');
+  assert.equal(key('#111111'), 'black');
+  assert.equal(key('#164cd9'), 'blue');   // 진한 파랑은 파랑
+  assert.equal(key('#888888'), 'black');  // 회색 = 방어
+  assert.equal(key('#ff9900'), 'yellow'); // 주황은 노랑 쪽
+  // 보라색인데 빨강(2)이라고 속여 보내도 방장이 보라(5)로 고친다
+  const [s] = sanitizeStrokes([{ c: 2, rgb: 0x663399, w: 18, p: [10, 10, 100, 100] }], P.length);
+  assert.equal(P[s.c].key, 'purple');
+});

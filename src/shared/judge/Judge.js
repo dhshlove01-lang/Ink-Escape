@@ -1,6 +1,7 @@
 import { DrawingAnalyzer } from './DrawingAnalyzer.js';
 import { StatCalculator } from './StatCalculator.js';
 import { defaultDetectors } from './detectors/index.js';
+import { nearestPaletteIndex } from '../attributes.js';
 
 // 판정 창구 (Facade). 술래 미리보기와 방장 소환이 이것 하나만 안다.
 export class Judge {
@@ -41,7 +42,9 @@ export function sanitizeStrokes(strokes, paletteLength) {
     points += s.p.length;
     if (points > 20000) return null;
     const p = s.p.map((v) => Math.max(0, Math.min(512, Math.round(Number(v) || 0))));
-    out.push({ c, w, p });
+    // 자유 색(rgb)이 있으면 속성은 방장이 직접 다시 계산한다
+    const rgb = Number.isInteger(s.rgb) && s.rgb >= 0 && s.rgb <= 0xffffff ? s.rgb : undefined;
+    out.push(rgb !== undefined && c !== 0 ? { c: nearestPaletteIndex(rgb), w, p, rgb } : { c, w, p });
   }
   return out;
 }

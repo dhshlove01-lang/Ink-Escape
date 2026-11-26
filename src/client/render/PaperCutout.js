@@ -22,7 +22,7 @@ export function drawStrokes(ctx, strokes, palette, scale = 1) {
     const p = s.p;
     if (!p || p.length < 2) continue;
     ctx.globalCompositeOperation = s.c === 0 ? 'destination-out' : 'source-over';
-    ctx.strokeStyle = s.c === 0 ? '#000' : palette[s.c].hex;
+    ctx.strokeStyle = s.c === 0 ? '#000' : s.rgb !== undefined ? '#' + s.rgb.toString(16).padStart(6, '0') : palette[s.c].hex;
     ctx.fillStyle = ctx.strokeStyle;
     ctx.lineWidth = s.w * scale;
     if (p.length === 2) {

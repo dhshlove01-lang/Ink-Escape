@@ -343,10 +343,26 @@ th { color: var(--muted); font-weight: 500; font-size: 13px; }
 .pencil { flex: 1; height: 18px; background: #2b2633; border-radius: 3px 10px 10px 3px; overflow: hidden; position: relative; clip-path: polygon(0 0, 90% 0, 100% 50%, 90% 100%, 0 100%); }
 .pencil i { position: absolute; inset: 0; background: linear-gradient(180deg, #ffd34d, var(--pencil)); transition: clip-path 0.3s; }
 .ink-text { font-variant-numeric: tabular-nums; color: var(--muted); min-width: 70px; text-align: right; }
-.tg-padrow { display: flex; gap: 10px; min-height: 0; justify-content: center; }
-.tg-padwrap { aspect-ratio: 1; height: 100%; max-width: calc(100% - 64px); min-height: 0; position: relative; }
+.tg-padrow { display: flex; gap: 10px; min-height: 0; justify-content: center; container-type: size; }
+.tg-padwrap { position: relative; flex: none; width: min(100cqh, 100cqw - 214px); height: min(100cqh, 100cqw - 214px); } /* 남는 공간에 맞춰 정사각형 */
 .pad { width: 100%; height: 100%; display: block; border-radius: 6px; box-shadow: 0 0 0 3px #d8cfbb, 0 10px 30px rgba(0,0,0,0.5); cursor: crosshair; touch-action: none; }
-.tg-tools { display: flex; flex-direction: column; gap: 6px; }
+.tg-side { display: flex; flex-direction: column; gap: 10px; width: 204px; flex: none; }
+.tg-tools { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.tg-tools .tool { width: 100%; }
+/* 컬러 피커 */
+.color-picker { display: flex; gap: 8px; touch-action: none; transition: opacity 0.15s; }
+.color-picker.dim { opacity: 0.45; }
+.cp-square { width: 168px; height: 168px; border-radius: 6px; cursor: crosshair; box-shadow: 0 0 0 2px var(--line); }
+.cp-hue { width: 18px; height: 168px; border-radius: 4px; cursor: ns-resize; box-shadow: 0 0 0 2px var(--line); }
+.cp-info { display: flex; align-items: center; gap: 8px; font-family: var(--font-display); font-size: 16px; }
+.cp-swatch { width: 30px; height: 30px; border-radius: 8px; border: 2px solid var(--paper); flex: none; }
+.cp-attr { display: inline-flex; align-items: center; gap: 2px; }
+/* SPAWN 뒤 지도 클릭을 기다릴 때 */
+.tg-mapwrap.placing { outline: 3px solid var(--red-2); outline-offset: -3px; }
+.place-hint { position: absolute; left: 50%; bottom: 12px; transform: translateX(-50%); z-index: 2; background: rgba(140,10,25,0.92); color: #fff; padding: 6px 14px; border-radius: 999px; font-family: var(--font-display); font-size: 16px; white-space: nowrap; pointer-events: none; animation: pop 0.2s ease-out; }
+.spawn-btn.placing { animation: pulse 0.9s ease-in-out infinite; }
+@keyframes pulse { 50% { transform: scale(1.05); filter: brightness(1.25); } }
+@media (prefers-reduced-motion: reduce) { .spawn-btn.placing { animation: none; } }
 .tg-tools .sep { height: 6px; }
 .swatch { width: 46px; height: 38px; border-radius: 8px; border: 3px solid transparent; }
 .swatch.on { border-color: var(--paper); box-shadow: 0 0 0 2px var(--ink); }
@@ -399,8 +415,19 @@ h1.logo img { display: block; width: min(340px, 78%); height: auto; margin: 0 au
   box-shadow: none; border-radius: 0; padding: 12px 42px; text-shadow: 0 3px 0 #6e0c1b;
 }
 .art-spawn-btn .spawn-btn:hover:not(:disabled) { filter: brightness(1.15); }
-.art-bar-hp .hp-bar { border: 0; border-radius: 0; height: 28px; padding: 4px 4.5%; background: var(--img-bar-hp) center / 100% 100% no-repeat; }
-.art-bar-boss .hud-boss-bar { border: 0; border-radius: 0; height: 26px; padding: 5px 3.6%; background: var(--img-bar-boss) center / 100% 100% no-repeat; }
+/* HP·보스 바 틀: 양 끝 장식은 그대로, 가운데만 늘인다 (border-image).
+   잘라 쓰는 값(위 오른쪽 아래 왼쪽, 원본 px)은 틀 안쪽 빈칸을 잰 값 — bar_hp 750×157: 34 89 37 92, bar_boss 1024×166: 48 104 49 104 */
+.art-bar-hp .hp-bar {
+  box-sizing: border-box; height: 30px; padding: 0; border-radius: 0; background: none;
+  border-style: solid; border-width: 7px 18px 7px 18px;
+  border-image: var(--img-bar-hp) 34 89 37 92 fill / 7px 18px 7px 18px stretch;
+}
+.art-bar-boss .hud-boss-bar {
+  box-sizing: border-box; height: 34px; padding: 0; border-radius: 0; background: none;
+  border-style: solid; border-width: 10px 21px 10px 21px;
+  border-image: var(--img-bar-boss) 48 104 49 104 fill / 10px 21px 10px 21px stretch;
+}
+.art-bar-hp .hp-fill, .art-bar-boss .hud-boss-fill { border-radius: 2px; }
 .art-pencil .pencil { clip-path: none; background: none; border-radius: 0; height: 22px; }
 .art-pencil .pencil::before { content: ''; position: absolute; inset: 0; background: var(--img-pencil) left center / 100% 100% no-repeat; opacity: 0.2; filter: grayscale(1); }
 .art-pencil .pencil i { background: var(--img-pencil) left center / 100% 100% no-repeat; }

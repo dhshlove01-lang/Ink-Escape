@@ -3,6 +3,8 @@ import { MSG, EV, PSTATE } from '../../shared/protocol.js';
 import { DrawingPad, BRUSHES } from './DrawingPad.js';
 import { TopDownMap } from './TopDownMap.js';
 import { CornerCam } from './CornerCam.js';
+import { ColorPicker } from './ColorPicker.js';
+import { nearestPaletteIndex } from '../../shared/attributes.js';
 import { buildCutout } from '../render/PaperCutout.js';
 import { faceCanvas } from '../render/AnimalModels.js';
 import { t, tr } from '../i18n.js';
@@ -26,7 +28,9 @@ export class TaggerView {
     this.preview = null;
     this.waiting = false;
 
-    this.pad = new DrawingPad({ palette });
+    this.pad = new DrawingPad({ palette, classify: nearestPaletteIndex });
+    this.picker = new ColorPicker(this.pad.rgb);
+    this.placing = null; // SPAWN 을 누른 뒤 지도 클릭을 기다리는 그림
     this.topdown = new TopDownMap({ session, palette, balance });
     this.cam = new CornerCam({ session, palette, attributes, balance });
     // 왼쪽 화면 목록: 탑뷰 지도 + 플레이어별 3D 구석 카메라 (◀ ▶ 로 넘김)
@@ -39,11 +43,15 @@ export class TaggerView {
 
     this.pad.on('change', () => this.schedulePreview());
     this.pad.on('tool', () => this.refreshTools());
-    this.topdown.on('pick', () => this.refreshPreview());
-    this.cam.on('pick', (w) => {
-      this.topdown.target = w;
-      this.refreshPreview();
-    });
+    this.picker.on('change', (rgb) => this.pad.setRgb(rgb));
+    this.topdown.on('pick', (w) => this.onPick(w));
+    this.cam.on('pick', (w) => this.onPick(w));
+    for (const c of [this.topdown.canvas, this.cam.root]) {
+      c.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+        this.cancelPlace();
+      });
+    }
     this._off = [
       session.on('spawnResult', (r) => this.onSpawnResult(r)),
       session.on('snap', () => this.onSnap()),
@@ -79,33 +87,35 @@ export class TaggerView {
       'section',
       { class: 'tg-left' },
       el('header', { class: 'tg-head' }, el('span', { class: 'tg-badge' }, t('tagger.badge')), this.timer, el('span', { class: 'tg-hint' }, t('tagger.hint'))),
-      el('div', { class: 'tg-mapwrap' }, this.topdown.canvas, this.cam.root, this.viewLabel, arrow(-1, '◀'), arrow(1, '▶')),
+      (this.mapwrap = el('div', { class: 'tg-mapwrap' }, this.topdown.canvas, this.cam.root, this.viewLabel, arrow(-1, '◀'), arrow(1, '▶'), (this.placeHint = el('div', { class: 'place-hint', hidden: true }, t('tagger.placeHint'))))),
       this.plist,
     );
 
     // 오른쪽
     this.inkBar = el('div', { class: 'ink-pencils' });
     this.inkText = el('span', { class: 'ink-text' });
-    this.colors = this.palette.map((p, i) =>
-      p ? el('button', { class: 'swatch', style: { background: p.hex }, title: `${p.name} (${i})`, onclick: () => this.pad.setColor(i) }) : null,
-    );
+    // 고른 색 + 그 색이 될 속성 (가장 가까운 기본 색)
+    this.cpSwatch = el('span', { class: 'cp-swatch' });
+    this.cpAttr = el('span', { class: 'cp-attr' });
     this.brushBtns = BRUSHES.map((b) => el('button', { class: 'tool brush', title: t('brush.' + b.key), onclick: () => this.pad.setWidth(b.w) }, el('i', { style: { width: `${b.w / 2.4}px`, height: `${b.w / 2.4}px` } })));
     this.eraserBtn = el('button', { class: 'tool', title: t('tagger.eraser'), onclick: () => this.pad.setEraser(!this.pad.eraser) }, '⌫');
     const tools = el(
       'div',
-      { class: 'tg-tools' },
-      ...this.colors.filter(Boolean),
-      el('div', { class: 'sep' }),
+      { class: 'tg-side' },
+      this.picker.root,
+      el('div', { class: 'cp-info' }, this.cpSwatch, this.cpAttr),
+      el('div', { class: 'tg-tools' },
       ...this.brushBtns,
       this.eraserBtn,
       el('button', { class: 'tool', title: t('tagger.undo'), onclick: () => this.pad.undo() }, '↶'),
       el('button', { class: 'tool', title: t('tagger.clear'), onclick: () => this.pad.clear() }, '🗑'),
+      ),
     );
     this.previewEl = el('div', { class: 'tg-preview' });
     this.bossBtn = el('button', { class: 'toggle', onclick: () => this.toggle('boss') }, t('tagger.boss'));
     this.allInBtn = el('button', { class: 'toggle', onclick: () => this.toggle('allIn') }, t('tagger.allIn'));
     this.slots = el('div', { class: 'tg-slots' });
-    this.spawnBtn = el('button', { class: 'spawn-btn', onclick: () => this.spawn(this.pad.getStrokes(), true) }, 'SPAWN');
+    this.spawnBtn = el('button', { class: 'spawn-btn', onclick: () => (this.placing ? this.cancelPlace() : this.beginPlace(this.pad.getStrokes(), true)) }, 'SPAWN');
     const right = el(
       'section',
       { class: 'tg-right' },
@@ -141,12 +151,14 @@ export class TaggerView {
   onKey(e) {
     if (!this.active || e.target instanceof HTMLInputElement) return;
     if (e.code.startsWith('Digit')) {
+      // 1~5: 기본 색 바로 고르기
       const n = Number(e.code.slice(5));
-      if (n >= 1 && n < this.palette.length) this.pad.setColor(n);
+      if (n >= 1 && n < this.palette.length) this.picker.set(parseInt(this.palette[n].hex.slice(1), 16));
     }
+    if (e.code === 'Escape') this.cancelPlace();
     if (e.code === 'KeyE') this.pad.setEraser(!this.pad.eraser);
     if (e.code === 'KeyZ' && (e.ctrlKey || e.metaKey)) this.pad.undo();
-    if (e.code === 'Enter') this.spawn(this.pad.getStrokes(), true);
+    if (e.code === 'Enter') this.beginPlace(this.pad.getStrokes(), true);
     if (e.code === 'ArrowLeft') this.setView(this.viewIdx - 1);
     if (e.code === 'ArrowRight') this.setView(this.viewIdx + 1);
   }
@@ -160,7 +172,11 @@ export class TaggerView {
   }
 
   refreshTools() {
-    this.colors.forEach((b, i) => b && b.classList.toggle('on', !this.pad.eraser && this.pad.color === i));
+    const ai = nearestPaletteIndex(this.pad.rgb);
+    const key = this.palette[ai].key;
+    this.cpSwatch.style.background = '#' + this.pad.rgb.toString(16).padStart(6, '0');
+    this.cpAttr.replaceChildren(t('picker.attr'), ' → ', icon('icon.' + key, this.attributes[key].icon), ' ' + t('attr.' + key));
+    this.picker.root.classList.toggle('dim', this.pad.eraser);
     this.brushBtns.forEach((b, i) => b.classList.toggle('on', this.pad.width === BRUSHES[i].w));
     this.eraserBtn.classList.toggle('on', this.pad.eraser);
     this.bossBtn.classList.toggle('on', this.boss);
@@ -206,14 +222,13 @@ export class TaggerView {
     const info = [];
     if (r.stats) info.push(t('tagger.stats', { hp: r.stats.hp, h: r.stats.height, s: r.stats.speed }));
     if (strokes.length) info.push(t('tagger.inkCost', { n: r.cost }));
-    const spotOk = this.topdown.target && this.topdown.validSpot(this.topdown.target);
-    let reason = r.ok ? (spotOk ? null : this.topdown.target ? t('tagger.badSpot') : t('tagger.pickSpot')) : tr(r.reason);
+    let reason = r.ok ? null : tr(r.reason);
     this.previewEl.replaceChildren(
       el('div', { class: 'chips' }, parts.length ? parts : el('span', { class: 'muted' }, t('tagger.previewEmpty'))),
       el('div', { class: 'pv-info' }, info.join(' · ')),
       reason ? el('div', { class: 'pv-reason' }, reason) : el('div', { class: 'pv-ok' }, t('tagger.ready', { kind: t('kind.' + (r.kind || 'normal')) })),
     );
-    this.spawnBtn.disabled = !r.ok || !spotOk || this.waiting;
+    this.spawnBtn.disabled = !this.placing && (!r.ok || this.waiting);
   }
 
   onSnap() {
@@ -244,14 +259,39 @@ export class TaggerView {
     }
   }
 
-  spawn(strokes, fromPad) {
-    if (this.waiting) return;
-    const spot = this.topdown.target;
-    if (!spot) return toast(t('tagger.pickSpotFirst'), 'warn');
-    if (!strokes.length) return;
+  // 소환 순서: 그림 → SPAWN(또는 재소환 칸) → 지도 클릭. Esc·우클릭 = 취소.
+  beginPlace(strokes, fromPad) {
+    if (this.waiting || !strokes.length) return;
+    const r = this.judge.judge(strokes, this.judgeOpts());
+    if (!r.ok) return toast(tr(r.reason), 'warn');
+    this.placing = { strokes, fromPad };
+    this.showPlacing(true);
+  }
+
+  cancelPlace() {
+    if (!this.placing) return;
+    this.placing = null;
+    this.showPlacing(false);
+  }
+
+  showPlacing(on) {
+    this.mapwrap.classList.toggle('placing', on);
+    this.placeHint.hidden = !on;
+    this.spawnBtn.classList.toggle('placing', on);
+    this.spawnBtn.textContent = on ? t('tagger.placingBtn') : 'SPAWN';
+    this.refreshPreview();
+  }
+
+  onPick(w) {
+    this.topdown.target = w;
+    if (!this.placing) return;
+    if (!this.topdown.validSpot(w)) return toast(t('tagger.badSpot'), 'warn');
+    const { strokes, fromPad } = this.placing;
+    this.placing = null;
+    this.showPlacing(false);
     this.waiting = true;
     this.lastSent = { strokes, fromPad };
-    this.session.send({ t: MSG.SPAWN, strokes, x: spot.x, z: spot.z, boss: this.boss, allIn: this.allIn });
+    this.session.send({ t: MSG.SPAWN, strokes, x: w.x, z: w.z, boss: this.boss, allIn: this.allIn });
     this.refreshPreview();
   }
 
@@ -294,7 +334,7 @@ export class TaggerView {
       const thumb = r.thumb;
       thumb.className = 'slot-thumb';
       nodes.push(
-        el('button', { class: 'slot', title: t('tagger.slotTitle'), onclick: () => this.spawn(r.strokes, false) }, thumb, el('span', { class: 'slot-cost' }, `${res.icons || ''} · ${t('tagger.inkCost', { n: res.cost })}`)),
+        el('button', { class: 'slot', title: t('tagger.slotTitle'), onclick: () => this.beginPlace(r.strokes, false) }, thumb, el('span', { class: 'slot-cost' }, `${res.icons || ''} · ${t('tagger.inkCost', { n: res.cost })}`)),
       );
     }
     this.slots.replaceChildren(...nodes);

@@ -67,7 +67,7 @@ export const STRINGS = {
     'title.solo': '혼자 테스트 (술래+플레이어)',
     'title.howto': '조작법',
     'title.howtoPlayer': '플레이어: WASD 이동 · Shift 달리기 · Space 점프 · 클릭 사격 · R 재장전 · G 지우개 수류탄 · E 길게 부활',
-    'title.howtoTagger': '술래: 바닥 클릭 = 소환 위치 · ◀ ▶(← →) 탑뷰 ↔ 3D 구석 카메라 · 1~5 색 · E 지우개 · Ctrl+Z 되돌리기 · Enter 소환',
+    'title.howtoTagger': '술래: 그림 → SPAWN(Enter) → 지도 클릭 = 소환 · 색은 컬러 피커(가장 가까운 기본 색의 속성) · 1~5 기본 색 · E 지우개 · Ctrl+Z 되돌리기 · ◀ ▶ 화면 전환',
     'title.howtoSolo': '혼자 테스트: Tab 으로 술래 화면 ↔ 플레이어 화면',
     'title.codeInvalid': '방 코드 5자리를 입력하세요',
 
@@ -180,7 +180,10 @@ export const STRINGS = {
 
     // 술래 화면
     'tagger.badge': '👁 술래',
-    'tagger.hint': '바닥을 클릭해 소환 위치를 고르세요 · ◀ ▶ 화면 전환',
+    'tagger.hint': '그림 → SPAWN → 지도 클릭으로 소환 · ◀ ▶ 화면 전환',
+    'tagger.placingBtn': '지도 클릭!',
+    'tagger.placeHint': '지도를 클릭하면 그 자리에 소환 · Esc·우클릭 취소',
+    'picker.attr': '속성',
     'tagger.prevView': '이전 화면 (←)',
     'tagger.nextView': '다음 화면 (→)',
     'tagger.mapView': '🗺 탑뷰 지도',
@@ -313,7 +316,7 @@ export const STRINGS = {
     'title.solo': 'Solo Test (Tagger + Player)',
     'title.howto': 'Controls',
     'title.howtoPlayer': 'Player: WASD move · Shift run · Space jump · Click shoot · R reload · G eraser grenade · Hold E revive',
-    'title.howtoTagger': 'Tagger: Click floor = spawn spot · ◀ ▶ (← →) map ↔ 3D corner cam · 1–5 colors · E eraser · Ctrl+Z undo · Enter spawn',
+    'title.howtoTagger': 'Tagger: Draw → SPAWN (Enter) → click the map = summon · Pick any color (element = nearest base color) · 1–5 base colors · E eraser · Ctrl+Z undo · ◀ ▶ switch view',
     'title.howtoSolo': 'Solo test: Tab switches between Tagger and Player view',
     'title.codeInvalid': 'Enter the 5-character room code',
 
@@ -421,7 +424,10 @@ export const STRINGS = {
     'spawn.failed': 'Summon failed',
 
     'tagger.badge': '👁 Tagger',
-    'tagger.hint': 'Click the floor to pick a spawn spot · ◀ ▶ switch view',
+    'tagger.hint': 'Draw → SPAWN → click the map to summon · ◀ ▶ switch view',
+    'tagger.placingBtn': 'CLICK MAP!',
+    'tagger.placeHint': 'Click the map to summon there · Esc / right-click to cancel',
+    'picker.attr': 'Element',
     'tagger.prevView': 'Previous view (←)',
     'tagger.nextView': 'Next view (→)',
     'tagger.mapView': '🗺 Top-down map',

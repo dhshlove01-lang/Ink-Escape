@@ -28,8 +28,8 @@ const URL = process.env.URL || 'http://localhost:8765/index.html';
       s.push({ c: 2, w: 18, p });
     }
     tv.pad.load(s);
-    tv.topdown.target = { x: sp.x + 12, z: sp.z };
-    tv.spawn(tv.pad.getStrokes(), true);
+    tv.beginPlace(tv.pad.getStrokes(), true); // SPAWN
+    tv.onPick({ x: sp.x + 12, z: sp.z }); // 지도 클릭
   });
   await page.waitForTimeout(3400);
   const n = await page.evaluate(() => window.__app.session.latest.m.length);

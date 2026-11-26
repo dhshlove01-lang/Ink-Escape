@@ -12,11 +12,13 @@ export const BRUSHES = [
 ];
 
 export class DrawingPad extends Emitter {
-  constructor({ palette }) {
+  // classify(rgb) → 속성 인덱스 (판정용). 도화지는 판정 규칙을 모른다.
+  constructor({ palette, classify }) {
     super();
     this.palette = palette;
+    this.classify = classify;
     this.strokes = [];
-    this.color = 1;
+    this.rgb = parseInt(palette[1].hex.slice(1), 16);
     this.width = BRUSHES[1].w;
     this.eraser = false;
     this.cur = null;
@@ -39,7 +41,7 @@ export class DrawingPad extends Emitter {
       if (e.button !== 0) return;
       this.canvas.setPointerCapture(e.pointerId);
       const [x, y] = pos(e);
-      this.cur = { c: this.eraser ? 0 : this.color, w: this.eraser ? Math.max(24, this.width) : this.width, p: [x, y] };
+      this.cur = this.eraser ? { c: 0, w: Math.max(24, this.width), p: [x, y] } : { c: this.classify(this.rgb), rgb: this.rgb, w: this.width, p: [x, y] };
       this.strokes.push(this.cur);
       this.render();
     });
@@ -61,8 +63,8 @@ export class DrawingPad extends Emitter {
     this.render();
   }
 
-  setColor(i) {
-    this.color = i;
+  setRgb(rgb) {
+    this.rgb = rgb;
     this.eraser = false;
     this.emit('tool');
   }
@@ -90,13 +92,13 @@ export class DrawingPad extends Emitter {
   }
 
   load(strokes) {
-    this.strokes = strokes.map((s) => ({ c: s.c, w: s.w, p: [...s.p] }));
+    this.strokes = strokes.map((s) => ({ c: s.c, w: s.w, p: [...s.p], ...(s.rgb !== undefined ? { rgb: s.rgb } : {}) }));
     this.render();
     this.emit('change', this.strokes);
   }
 
   getStrokes() {
-    return this.strokes.filter((s) => s.p.length >= 2).map((s) => ({ c: s.c, w: s.w, p: s.p.map((v) => Math.round(v)) }));
+    return this.strokes.filter((s) => s.p.length >= 2).map((s) => ({ c: s.c, w: s.w, p: s.p.map((v) => Math.round(v)), ...(s.rgb !== undefined ? { rgb: s.rgb } : {}) }));
   }
 
   render() {
