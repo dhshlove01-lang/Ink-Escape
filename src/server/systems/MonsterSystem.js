@@ -1,6 +1,7 @@
 import { EV, PSTATE } from '../../shared/protocol.js';
 import { CELL } from '../../shared/map/GameMap.js';
 import { FlowField } from '../nav/FlowField.js';
+import { monsterSpeedMult, monsterDmgMult, grenadeMax, grenadeRecharge, reviveHoldSec, reviveHpRatio } from '../../shared/augmentMath.js';
 
 // 몬스터 행동: 가장 가까운(갈 수 있는 길 기준) 살아 있는 플레이어를 쫓는다.
 // 근접 공격 · 돌진 · 원거리 발사. 처치되기 전엔 사라지지 않는다.
@@ -40,6 +41,8 @@ export class MonsterSystem {
     const targets = m.targets();
     const mb = m.b.monster;
     const list = [...m.monsters.values()];
+    const spd = monsterSpeedMult(m.b, m.tagger.aug); // 바람 물감
+    const dmgK = monsterDmgMult(m.b, m.tagger.aug); // 뾰족한 심
 
     for (const mon of list) {
       const s = mon.stats;
@@ -54,8 +57,8 @@ export class MonsterSystem {
       let vx = 0, vz = 0;
 
       if (mon.dashUntil > m.time && mon.dashDir) {
-        vx = mon.dashDir.x * s.speed * mb.dashMult;
-        vz = mon.dashDir.z * s.speed * mb.dashMult;
+        vx = mon.dashDir.x * s.speed * spd * mb.dashMult;
+        vz = mon.dashDir.z * s.speed * spd * mb.dashMult;
       } else if (tgt) {
         const dx = tgt.x - mon.x, dz = tgt.z - mon.z;
         const dist = Math.hypot(dx, dz);
@@ -87,8 +90,8 @@ export class MonsterSystem {
         }
         const stop = s.ranged && los ? Math.min(s.ranged * 0.6, dist) : 0; // 원거리형은 거리를 둔다
         if (dir && dist > Math.max(s.reach * 0.7, stop)) {
-          vx = dir.x * s.speed;
-          vz = dir.z * s.speed;
+          vx = dir.x * s.speed * spd;
+          vz = dir.z * s.speed * spd;
         }
       }
 
@@ -113,10 +116,10 @@ export class MonsterSystem {
         const d = Math.hypot(p.x - mon.x, p.z - mon.z);
         if (d > s.reach + m.b.player.radius) continue;
         mon.attacking = true;
-        m.damagePlayer(p, s.dps * dt, { onHit: s.onHit, silent: true });
+        m.damagePlayer(p, s.dps * dmgK * dt, { onHit: s.onHit, silent: true });
         if (mon.dashUntil > m.time && !mon.dashHit) {
           mon.dashHit = true;
-          m.damagePlayer(p, mb.dashBurst * (s.dps / mb.meleeDps), { onHit: s.onHit });
+          m.damagePlayer(p, mb.dashBurst * (s.dps / mb.meleeDps) * dmgK, { onHit: s.onHit });
         }
       }
     }
@@ -201,9 +204,9 @@ export class PlayerLifeSystem {
         m.emit(EV.PRESPAWN, { id: p.id, x: spot.x, z: spot.z });
       }
       // 지우개 수류탄 충전
-      if (p.grenades < b.grenade.max && m.time >= p.grenadeAt) {
+      if (p.grenades < grenadeMax(b, p.aug) && m.time >= p.grenadeAt) {
         p.grenades++;
-        p.grenadeAt = m.time + b.grenade.rechargeSec;
+        p.grenadeAt = m.time + grenadeRecharge(b, p.aug);
       }
       // 부활 시키는 중
       const r = p.reviving;
@@ -220,10 +223,10 @@ export class PlayerLifeSystem {
         p.reviving = null;
         continue;
       }
-      const prog = (m.time - r.start) / b.match.reviveHoldSec;
+      const prog = (m.time - r.start) / reviveHoldSec(b, p.aug); // 구조대면 빨리
       t.reviveProg = Math.min(1, prog);
       if (prog >= 1) {
-        Object.assign(t, { state: PSTATE.ALIVE, hp: Math.round(t.maxHp * b.match.reviveHpRatio), deadAt: 0 });
+        Object.assign(t, { state: PSTATE.ALIVE, hp: Math.round(t.maxHp * reviveHpRatio(b, p.aug)), deadAt: 0 });
         t.invulnUntil = m.time + b.match.reviveInvulnSec;
         p.revivesLeft--;
         p.revives++;

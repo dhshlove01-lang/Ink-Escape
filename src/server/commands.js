@@ -1,4 +1,5 @@
 import { MSG, EV, PSTATE } from '../shared/protocol.js';
+import { grenadeMax, grenadeRecharge } from '../shared/augmentMath.js';
 
 // 클라이언트 명령 처리기. 메시지 종류 하나 = 함수 하나 (새 명령은 여기 한 줄 추가 — OCP).
 // 모든 처리기: (match, player | null, msg, clientId) => void
@@ -20,14 +21,25 @@ export const COMMANDS = {
     p.hitTokens -= 1;
     const mon = m.monsters.get(msg.id);
     if (!mon) return;
-    m.damageMonster(mon, m.b.gun.dmg, p.id);
-    p.dmg += m.b.gun.dmg;
+    const dmg = m.b.gun.dmg * cheerMult(m, p);
+    m.damageMonster(mon, dmg, p.id);
+    p.dmg += dmg;
   },
 
   [MSG.SHOT](m, p, msg) {
     if (!p || p.state !== PSTATE.ALIVE) return;
     if (!Array.isArray(msg.a) || !Array.isArray(msg.b)) return;
-    m.emit(EV.SHOT, { from: p.id, a: msg.a.slice(0, 3).map(num), b: msg.b.slice(0, 3).map(num) });
+    const b = msg.b.slice(0, 3).map(num);
+    m.emit(EV.SHOT, { from: p.id, a: msg.a.slice(0, 3).map(num), b });
+    // 지우개 탄: N 발째마다 맞은 자리에 작은 폭발
+    p.shotN++;
+    const es = m.b.aug.eraserShot;
+    if (p.aug.eraserShot && p.shotN % es.every === 0 && Math.hypot(b[0] - p.x, b[2] - p.z) <= m.b.gun.range + 1) {
+      m.emit(EV.SPLASH, { x: b[0], z: b[2], r: es.radius });
+      for (const mon of [...m.monsters.values()]) {
+        if (Math.hypot(mon.x - b[0], mon.z - b[2]) <= es.radius + mon.stats.radius) m.damageMonster(mon, es.dmg, p.id);
+      }
+    }
   },
 
   [MSG.GRENADE](m, p, msg) {
@@ -39,7 +51,7 @@ export const COMMANDS = {
       x = p.x + ((x - p.x) / d) * g.throwRange;
       z = p.z + ((z - p.z) / d) * g.throwRange;
     }
-    if (p.grenades >= g.max) p.grenadeAt = m.time + g.rechargeSec;
+    if (p.grenades >= grenadeMax(m.b, p.aug)) p.grenadeAt = m.time + grenadeRecharge(m.b, p.aug);
     p.grenades--;
     m.grenades.push({ x, z, at: m.time + g.fuseSec, by: p.id });
     m.emit(EV.GREN_THROW, { from: p.id, sx: p.x, sz: p.z, x, z, fuse: g.fuseSec });
@@ -55,6 +67,10 @@ export const COMMANDS = {
     p.reviving = { target: String(msg.target), start: m.time, x: p.x, z: p.z };
   },
 
+  [MSG.AUG_PICK](m, _p, msg, clientId) {
+    m.supply.pick(m, clientId, msg);
+  },
+
   [MSG.SPAWN](m, _p, msg, clientId) {
     m.spawner.request(m, clientId, msg);
   },
@@ -64,3 +80,14 @@ export const COMMANDS = {
     p.afk = !!msg.tagger;
   },
 };
+
+// 응원단: 주변에 응원단 증강을 가진 다른 팀원이 있으면 피해 증가 (한 명당)
+function cheerMult(m, p) {
+  const a = m.b.aug.cheer;
+  let k = 1;
+  for (const o of m.players.values()) {
+    if (o === p || !o.aug.cheer || o.state !== PSTATE.ALIVE) continue;
+    if (Math.hypot(o.x - p.x, o.z - p.z) <= a.radius) k += a.dmgBonus;
+  }
+  return k;
+}

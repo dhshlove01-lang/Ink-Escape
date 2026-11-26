@@ -573,6 +573,19 @@ export class TopDownMap extends Emitter {
       g.arc(pp.x, pp.z, 1.6, 0, Math.PI * 2);
       g.fill();
       drawAnimalFace(g, S.animalOf(p.id), pp.x, pp.z + 0.2, 1.1, { dead });
+      // 닉네임 (얼굴 아래, 화면 크기와 상관없이 같은 글씨 크기)
+      const fs = 13 * u * dpr;
+      g.font = `${fs}px Jua, "Malgun Gothic", sans-serif`;
+      g.textAlign = 'center';
+      g.textBaseline = 'top';
+      g.lineJoin = 'round';
+      g.lineWidth = 3.5 * u * dpr;
+      g.strokeStyle = 'rgba(8,6,12,0.9)';
+      const label = S.nameOf(p.id);
+      g.strokeText(label, pp.x, pp.z + 1.85);
+      g.fillStyle = dead ? '#9a92a6' : '#f3ecdd';
+      g.fillText(label, pp.x, pp.z + 1.85);
+      g.textBaseline = 'alphabetic';
       if (!dead) {
         g.strokeStyle = 'rgba(255,255,255,0.75)';
         g.lineWidth = 0.35;

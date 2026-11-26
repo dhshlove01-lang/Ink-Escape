@@ -92,9 +92,9 @@ URL=https://dhshlove01-lang.github.io/Ink-Escape/ NODE_PATH=$(npm root -g) node 
 ## 지금 진행 중
 
 2026-11-26 보급·증강 (Claude 작업 중) — 사용자 결정: 플레이어는 맵에 떨어진 상자를 주워서, 술래는 자동 카드. 3·6·9분.
-- [ ] 술래 지도에 플레이어 닉네임
-- [ ] 증강 표 `src/config/augments.js` (20장, ko·en 문구) + 서버 SupplySystem (상자 떨어뜨리기·줍기·카드 3장 제시·10초 자동 선택·적용)
-- [ ] 증강 효과 20개 (서버/클라이언트)
+- [x] 술래 지도에 플레이어 닉네임 (`TopDownMap` 얼굴 아래)
+- [x] 증강 표 `src/config/augments.js` + 수치 `balance.supply`·`balance.aug` + 공용 계산 `shared/augmentMath.js` + 서버 `systems/SupplySystem.js` (상자·줍기·카드 3장·10초 무작위·적용), 문구 ko·en
+- [x] 증강 효과 서버 쪽 (Match 피해/처치, commands HIT·SHOT·GRENADE, Spawn/Monster/Life/Status 시스템). 화면 쪽(연사·재장전·이동·2단 점프·관통) 남음
 - [ ] 화면: 3D 보급 상자 + 빛기둥, 술래 지도 상자 그림, 카드 고르기 창(1/2/3 키), 가진 증강 아이콘 줄, 알림
 - [ ] 테스트·스크린샷·기록
 

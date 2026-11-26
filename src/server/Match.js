@@ -5,6 +5,8 @@ import { COMMANDS } from './commands.js';
 import { SpawnSystem } from './systems/SpawnSystem.js';
 import { NavigationSystem, MonsterSystem, ProjectileSystem, GrenadeSystem, PlayerLifeSystem } from './systems/MonsterSystem.js';
 import { ClockSystem, InkSystem, StatusSystem, EscapeSystem, VictorySystem } from './systems/core.js';
+import { SupplySystem } from './systems/SupplySystem.js';
+import { hitsPerSec, monsterDmgMult } from '../shared/augmentMath.js';
 import { msg } from '../shared/i18n/strings.js';
 
 // 경기 한 판. 상태를 들고, 시스템들을 순서대로 돌리고, 명령을 처리기에 넘긴다.
@@ -33,11 +35,16 @@ export class Match {
     this.pending = [];
     this.projectiles = [];
     this.grenades = [];
+    this.crates = new Map();  // 보급 상자 id → { x, z, opened:Set }
+    this.offers = new Map();  // 'side:id' → { cards, until }  고르는 중인 증강 카드
+    this.puddles = [];        // 끈적 잉크 웅덩이 { x, z, r, until, slow }
 
     this.spawner = new SpawnSystem({ judge, paletteLength });
+    this.supply = new SupplySystem({ rng });
     const nav = new NavigationSystem(map);
     this.systems = [
       new ClockSystem(),
+      this.supply,
       new InkSystem(),
       this.spawner,
       nav,
@@ -73,8 +80,10 @@ export class Match {
   tick(dt) {
     if (this.result) return;
     this.time += dt;
-    const refill = this.b.net.hitsPerSecMax * dt;
-    for (const p of this.players.values()) p.hitTokens = Math.min(this.b.net.hitsPerSecMax, p.hitTokens + refill);
+    for (const p of this.players.values()) {
+      const rate = hitsPerSec(this.b, p.aug); // 연사·관통 증강이면 더 많이
+      p.hitTokens = Math.min(rate, p.hitTokens + rate * dt);
+    }
     for (const s of this.systems) {
       s.update(this, dt);
       if (this.result) return;
@@ -91,6 +100,15 @@ export class Match {
     p.hp -= amount;
     if (onHit) this.applyOnHit(p, onHit);
     if (!silent) this.emit(EV.PDAMAGE, { id: p.id, amount: Math.round(amount) });
+    if (p.hp <= 0 && p.aug.heart && !p.heartUsed) {
+      // 두 번째 심장: 한 번 HP 1 로 버티고 잠깐 무적
+      p.heartUsed = true;
+      p.hp = 1;
+      p.invulnUntil = this.time + this.b.aug.heart.invulnSec;
+      Object.assign(p, { burn: null, poison: null });
+      this.emit(EV.HEART, { id: p.id });
+      return;
+    }
     if (p.hp <= 0) this.killPlayer(p);
   }
 
@@ -126,6 +144,17 @@ export class Match {
       killer.kills++;
       if (mon.stats.kind === 'boss') killer.bossKills++;
       if (grenade) killer.grenadeKills++;
+      // 간식 탄: 처치하면 회복
+      if (killer.aug.snack && killer.state === PSTATE.ALIVE) killer.hp = Math.min(killer.maxHp, killer.hp + killer.aug.snack * this.b.aug.snack.healOnKill);
+    }
+    const t = this.tagger;
+    // 재활용: 쓴 잉크 일부 돌려받기
+    if (t.aug.recycle && mon.cost) t.ink = Math.min(t.max, t.ink + mon.cost * this.b.aug.recycle.refund);
+    // 끈적 잉크: 죽은 자리에 웅덩이
+    if (t.aug.sticky) {
+      const a = this.b.aug.sticky;
+      this.puddles.push({ x: mon.x, z: mon.z, r: a.radius, until: this.time + a.sec, slow: a.slow });
+      this.emit(EV.PUDDLE, { x: mon.x, z: mon.z, r: a.radius, sec: a.sec });
     }
     this.emit(EV.MDIE, { id: mon.id, by });
   }
@@ -140,7 +169,7 @@ export class Match {
       id: this.nextId(),
       x: sx, y: sy, z: sz,
       vx: (dx / d) * mb.projSpeed, vy: (dy / d) * mb.projSpeed, vz: (dz / d) * mb.projSpeed,
-      dmg: mb.projDmg * (s.dps / mb.meleeDps),
+      dmg: mb.projDmg * (s.dps / mb.meleeDps) * monsterDmgMult(this.b, this.tagger.aug),
       onHit: s.onHit,
       ttl: s.ranged / mb.projSpeed + 0.6,
       color: s.attrs[0]?.key || 'black',

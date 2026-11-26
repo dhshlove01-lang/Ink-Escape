@@ -38,6 +38,9 @@ export function createPlayer({ id, name, animal }, spawn, index, balance, player
     bossKills: 0,      // 보스 막타
     survivedSec: 0,    // 살아 있던 시간
     escapedAt: 0,      // 탈출한 시각 (0 = 못 나감)
+    aug: {},           // 보급 증강 { 키: 개수 }
+    heartUsed: false,  // 두 번째 심장 썼나
+    shotN: 0,          // 쏜 총알 수 (지우개 탄)
   };
 }
 
@@ -54,6 +57,7 @@ export function createTagger({ taggerId, taggerName, taggerAnimal }, inkProfile)
     recallUsed: new Map(), // 그림 해시 → 마지막 사용 시각 (최후 발악 재사용 대기)
     spawned: 0,
     bosses: 0,
+    aug: {},               // 보급 증강 { 키: 개수 }
   };
 }
 

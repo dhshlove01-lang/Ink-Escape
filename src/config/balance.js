@@ -98,6 +98,41 @@ export const BALANCE = {
     projDmg: 6,
   },
 
+  // 보급·증강 (그 판 끝까지 유지). 플레이어는 맵에 떨어진 상자를 주워서, 술래는 자동 카드 (2026-11-26 사용자 결정)
+  supply: {
+    times: [180, 360, 540], // 경기 시작 후 이 초에 보급 (3·6·9분)
+    offer: 3,               // 10장 중 보여 주는 장수
+    pickSec: 10,            // 고르는 시간 (지나면 무작위)
+    pickupRadius: 1.8,      // 상자를 줍는 거리 (m)
+    dropMinPlayerDist: 12,  // 상자는 플레이어에게서 이만큼 떨어진 곳에 (가야 하는 목표)
+    dropMinDoorDist: 8,
+  },
+  // 증강 수치. max = 같은 증강을 몇 번까지 가질 수 있나 (수치형 2, 효과형 1). 아이콘·순서는 config/augments.js
+  aug: {
+    // 플레이어
+    tummy: { max: 2, maxHp: 40 },
+    snack: { max: 2, healOnKill: 8 },
+    paws: { max: 2, fireRate: 0.25, reloadSec: 0.7 },
+    pierce: { max: 1 },
+    eraserShot: { max: 1, every: 5, radius: 1.5, dmg: 30 },
+    heart: { max: 1, invulnSec: 2 },
+    cheer: { max: 1, radius: 6, dmgBonus: 0.12 },
+    eraserPro: { max: 2, grenadeMax: 1, recharge: 0.65 },
+    swift: { max: 2, speed: 0.12 },
+    rescue: { max: 1, holdSec: 0.8, reviveHp: 1, revives: 1 },
+    // 술래
+    pencil: { max: 2, ink: 100 },
+    sharpener: { max: 2, regen: 0.35 },
+    twin: { max: 1, chance: 0.25 },
+    thick: { max: 2, hp: 0.2 },
+    sharp: { max: 2, dmg: 0.2 },
+    wind: { max: 2, speed: 0.15 },
+    recycle: { max: 1, refund: 0.3 },
+    bigBrush: { max: 1, bossCooldownSec: 40, bossSize: 0.15 },
+    sticky: { max: 1, sec: 4, radius: 1.6, slow: 0.4 },
+    shadow: { max: 1, minPlayerDist: 5, delaySec: 1.5 },
+  },
+
   boss: { size: 2.5, hp: 3, dmg: 2, speed: 0.9 },
   giant: { size: 4, dmg: 2.5, hpCap: 4000, speed: 0.75 },
 
