@@ -83,3 +83,20 @@ test('술래가 나가면 플레이어 승리', async () => {
   assert.equal(over.winner, 'players');
   srv.close();
 });
+
+test('지우개 수류탄: 일반 몬스터는 최대 HP 의 60% (한 방에 안 지워짐)', async () => {
+  const { srv, cs } = await setup(2);
+  cs[0].link.send({ t: 'role', role: 'tagger' });
+  cs[0].link.send({ t: 'start' });
+  await sleep(20);
+  const sp = srv.match.map.spawn;
+  cs[0].link.send({ t: 'spawn', strokes: blob(), x: sp.x + 14, z: sp.z });
+  await sleep(3300);
+  const mon = [...srv.match.monsters.values()][0];
+  const by = [...srv.match.players.values()].find((p) => p.role !== 'tagger')?.id;
+  srv.match.grenades.push({ x: mon.x, z: mon.z, at: srv.match.time, by });
+  await sleep(120);
+  assert.ok(srv.match.monsters.has(mon.id), '살아 있어야 함');
+  assert.ok(Math.abs(mon.hp - mon.maxHp * (1 - BALANCE.grenade.normalPct)) <= 1, `hp ${mon.hp} / ${mon.maxHp}`);
+  srv.close();
+});

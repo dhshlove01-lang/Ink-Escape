@@ -177,8 +177,8 @@ export class GrenadeSystem {
       for (const mon of [...m.monsters.values()]) {
         if (Math.hypot(mon.x - gr.x, mon.z - gr.z) > g.radius + mon.stats.radius) continue;
         const k = mon.stats.kind;
-        if (k === 'normal') m.damageMonster(mon, mon.hp, gr.by, { grenade: true });
-        else m.damageMonster(mon, mon.maxHp * (k === 'boss' ? g.bossPct : g.giantPct), gr.by, { grenade: true });
+        const pct = k === 'normal' ? g.normalPct : k === 'boss' ? g.bossPct : g.giantPct;
+        m.damageMonster(mon, mon.maxHp * pct, gr.by, { grenade: true });
       }
     }
   }

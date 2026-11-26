@@ -267,7 +267,7 @@ export class PlayerView {
     }
 
     this.view3d.update(dt, this.time, this.camera);
-    this.hud.update({ weapon: this.weapon, me, prompt: rev.prompt, center, revive: rev.ring, boss: this.monsters.bossInfo() });
+    this.hud.update({ weapon: this.weapon, me, prompt: rev.prompt, center, revive: rev.ring, boss: this.monsters.bossInfo(), stamina: { value: this.ctrl.stamina, exhausted: this.ctrl.exhausted } });
     if (this.active) {
       // 전장 → 깊이 지우고 → 손·총 (낙서·이펙트가 손 위에 덮이지 않게)
       const r = this.renderer;

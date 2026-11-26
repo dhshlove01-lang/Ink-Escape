@@ -1,4 +1,5 @@
 // 모든 밸런스 수치는 여기 한 곳에만 둔다 (기획안 v1.1 기준 v0 수치).
+// 2026-11-26 사용자 결정: 목표 승률 술래:플레이어 50:50, 플레이어는 FPS 초보·캐주얼(명중률 40~50%) 기준으로 맞춘다.
 // 코드 곳곳에 숫자를 박지 말고 이 객체를 주입받아 쓴다.
 
 export const BALANCE = {
@@ -24,6 +25,13 @@ export const BALANCE = {
     gravity: 20,
     radius: 0.45,
     eye: 1.35,
+    // 달리기 기력: 쉬지 않고 이만큼(초) 달리면 바닥. 몬스터(4.5m/s)가 걷는 플레이어(4m/s)보다 빨라서 계속 도망만 칠 수는 없다
+    stamina: {
+      sec: 4,            // 가득 → 바닥까지 달릴 수 있는 시간
+      refillSec: 5,      // 바닥 → 가득까지 회복 시간 (달리지 않을 때)
+      regenDelay: 0.8,   // 달리기를 멈추고 이만큼 뒤부터 회복
+      restart: 0.3,      // 바닥난 뒤 이만큼(비율) 차야 다시 달릴 수 있다
+    },
   },
 
   gun: {
@@ -41,6 +49,7 @@ export const BALANCE = {
     startCount: 1,
     max: 2,
     rechargeSec: 90,
+    normalPct: 0.6,      // 일반 몬스터: 최대 HP 의 60% (한 방에 다 지우지 않음 — 총으로 마무리)
     bossPct: 0.2,
     giantPct: 0.1,
     throwRange: 18,
@@ -95,7 +104,6 @@ export const BALANCE = {
   judge: {
     grid: 128,
     blackWeight: 0.6,    // 검정 외곽선 보정
-    dualRatio: 0.55,     // 2위 색(검정은 보정 후)이 1위의 55% 이상이면 속성 2개 반반
     wingSideMin: 0.05,
     wingSymmetry: 0.45,
     wingUpperBias: 1.2,
