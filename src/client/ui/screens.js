@@ -206,8 +206,8 @@ export class LobbyView {
     this.stageHint = el('div', { class: 'stage-hint' }, '');
     this.memberList = el('div', { class: 'members' });
     this.animalGrid = el('div', { class: 'animal-btns' });
-    this.roleRow = el('div', { class: 'role-btns' });
-    this.timeRow = el('div', { class: 'role-btns' });
+    this.roleRow = el('div', { class: 'role-btns role-3' });
+    this.timeRow = el('div', { class: 'role-btns time-btns' });
     this.actionRow = el('div', { class: 'lobby-actions' });
     this.note = el('p', { class: 'muted lobby-note' });
 
@@ -251,13 +251,14 @@ export class LobbyView {
     const send = (msg) => this.conn.send(msg);
     const taggerTaken = state.members.some((m) => m.role === ROLE.TAGGER && m.id !== this.me);
 
-    // 참가자 (이름 · 역할 · READY · 핑)
+    // 참가자: 한 줄에 [얼굴] 이름 👑 [역할] … READY · 방장/핑
     this.memberList.replaceChildren(...state.members.map((m) =>
       el('div', { class: 'member' + (m.id === this.me ? ' me' : '') + (m.ready ? ' ready' : '') },
-        faceCanvas(m.animal, 40),
+        faceCanvas(m.animal, 34),
         el('div', { class: 'm-body' },
-          el('b', {}, m.name, m.id === state.ownerId ? ' 👑' : ''),
-          el('span', { class: 'm-role' }, roleLabel(m.role))),
+          el('b', { class: 'm-name' }, m.name),
+          m.id === state.ownerId ? el('span', { class: 'm-crown', title: t('lobby.host') }, '👑') : null,
+          el('span', { class: 'm-role' }, this.solo ? t('role.both') : roleLabel(m.role))),
         m.ready ? el('span', { class: 'm-ready' }, 'READY') : null,
         el('span', { class: 'm-ping' }, m.id === state.ownerId ? t('lobby.host') : `${m.ping || 0}ms`),
       ),
