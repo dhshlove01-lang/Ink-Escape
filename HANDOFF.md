@@ -126,6 +126,8 @@ URL=https://dhshlove01-lang.github.io/Ink-Escape/ NODE_PATH=$(npm root -g) node 
 - **주의**: 3D 캐릭터는 원본이 -Z 를 보므로 무대(카메라 +Z)에서는 `bodyHolder.rotation.y = Math.PI` 로 돌려 세운다. 모델 교체 시 `rotateY` 를 먼저 확인할 것(프로브: `.work/probe/glb.html` 방식 — 카메라를 +Z/−Z 에 두고 앞뒤 확인).
 - **검증**: 헤드리스 크로미엄으로 타이틀 → 로비(가짜 5인 상태로 5종 캐릭터·READY·이름표) → 혼자 테스트 경기(1인칭·술래 탑뷰·구석 카메라) → 결과(승리·내 점수·뱃지·순위) → 로비 복귀까지 확인. `pageerror 0`, 404 0. 스크린샷: `.work/probe/ink_shots/`. **이 작업 환경에는 node 가 없어 `npm test`·`tools/smoke.cjs` 는 못 돌렸다 — 다음 AI 는 반드시 먼저 돌릴 것.**
 - **남은 것**: 인게임 몸의 총이 살짝 파묻힘(원거리 무해), PeerJS 실서버 2~5인 로비는 사용자 PC 에서 확인 필요, 1인칭 앞발은 아직 임시.
+- **푸시 상태**: 이 작업 환경의 GitHub 연결이 `Ink-Escape` 에 대해 **읽기 전용**이라 `git push` 가 `403 Permission ... denied` / API 는 `Resource not accessible by integration` 으로 막혔다. 커밋(`폴가이즈 스타일 3D 로비 ...`)은 작업 공간 `.work/ink_escape` 에만 있다. 사용자가 Pickle GitHub 앱 권한(Contents: Read and write)·저장소 접근을 열어 주면 그대로 `git push origin main` 하면 된다.
+- **참고**: 방을 나가는 중(`App.quitting`)에 늦게 도착한 `GAME_OVER` 는 버렸다(종료 직후 결과 화면이 떴다가 사라지는 문제).
 
 ### 2026-11-26 · 맵·이펙트·UI 이미지 29장 적용
 - **무엇을**: 사용자가 이미지 AI 로 뽑은 키트(원본 `assets/source/kit/`)를 게임에 적용.

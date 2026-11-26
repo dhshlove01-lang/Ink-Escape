@@ -20,6 +20,7 @@ export class App {
     this.views = null;
     this._raf = 0;
     this._last = 0;
+    this.quitting = false;
     this._tab = (e) => this.onTab(e);
     window.addEventListener('keydown', this._tab);
   }
@@ -101,6 +102,7 @@ export class App {
   connect(link, name, code, solo) {
     const conn = new Connection(link);
     this.disconnected = false;
+    this.quitting = false;
     this.conn = conn;
     this.roomCode = code;
     this.solo = solo;
@@ -114,7 +116,10 @@ export class App {
       if (this.screen === this.lobby) this.lobby.render(st);
     });
     conn.on(MSG.MATCH_START, (m) => this.startMatch(m));
-    conn.on(MSG.GAME_OVER, (r) => this.endMatch(r));
+    conn.on(MSG.GAME_OVER, (r) => {
+      if (this.quitting) return; // 방을 나가는 중에 도착한 결과는 버린다 (시작 화면으로 가는 중)
+      this.endMatch(r);
+    });
     conn.on(MSG.ERROR, (e) => toast(e.message, 'warn'));
     conn.on('close', () => {
       if (this.conn !== conn) return;
@@ -171,7 +176,7 @@ export class App {
         me: this.me,
         disconnected: this.disconnected,
         onBack: () => {
-          if (this.disconnected) return this.showTitle();
+          if (this.disconnected || !this.lobby) return this.showTitle();
           this.setScreen(this.lobby);
           this.root.append(this.lobby.root);
           if (this.lastLobby) this.lobby.render(this.lastLobby);
@@ -180,10 +185,11 @@ export class App {
       }),
     );
     // 로비 화면 객체는 살려 둔다
-    this.lobby.root.remove();
+    this.lobby?.root.remove();
   }
 
   teardownNet() {
+    this.quitting = true;
     this.disposeMatch();
     const conn = this.conn;
     const server = this.server;
