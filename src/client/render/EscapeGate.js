@@ -171,15 +171,16 @@ export class EscapeGate {
     back.position.set(0, WALL_H / 2, -this.depth - 0.25);
     this.group.add(back);
 
-    // 문 옆 배너 (술래 탑뷰 참고 이미지의 보라 깃발)
+    // 문 옆 배너 (술래 탑뷰 참고 이미지의 보라 깃발) — 문틀 기둥(hw+1.15 까지) 바깥에 걸어 가려지지 않게
     const cloth = new THREE.PlaneGeometry(1.1, 2.1);
+    const bx = hw + 2.05;
     for (const s of [-1, 1]) {
       const b = new THREE.Mesh(cloth, mats.cloth);
-      b.position.set(s * (hw + 1.55), 3.4, 0.05);
+      b.position.set(s * bx, 3.4, 0.05);
       this.group.add(b);
       const rod = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 1.35, 6), mats.ironWarm);
       rod.rotation.z = Math.PI / 2;
-      rod.position.set(s * (hw + 1.55), 4.45, 0.05);
+      rod.position.set(s * bx, 4.45, 0.05);
       this.group.add(rod);
     }
   }
@@ -264,15 +265,18 @@ export class EscapeGate {
     this.shackle.add(arc, l1, l2, ring);
     this.lockGroup.add(this.shackle);
 
-    // 열쇠 구멍
-    const holeMat = new THREE.MeshBasicMaterial({ color: 0x100306 });
-    const hole = new THREE.Mesh(new THREE.CircleGeometry(0.12, 12), holeMat);
-    hole.position.set(0, -0.06, 0.21);
-    const slot = new THREE.Mesh(new THREE.PlaneGeometry(0.1, 0.28), holeMat);
-    slot.position.set(0, -0.24, 0.21);
-    const ring2 = new THREE.Mesh(new THREE.RingGeometry(0.15, 0.2, 14), new THREE.MeshBasicMaterial({ color: 0xffc0c6, transparent: true, opacity: 0.9 }));
-    ring2.position.set(0, -0.06, 0.205);
-    this.lockGroup.add(hole, slot, ring2);
+    // 열쇠 구멍: 앞면 위로 튀어나온 쇠판 + 한 덩어리 열쇠 구멍 모양 (면이 겹치면 깜빡여 깨져 보였다)
+    const plate = new THREE.Mesh(new THREE.CylinderGeometry(0.21, 0.21, 0.04, 20), new THREE.MeshBasicMaterial({ color: 0xffb3bb }));
+    plate.rotation.x = Math.PI / 2;
+    plate.position.set(0, -0.1, 0.23); // 앞면(z=0.21)보다 앞
+    const key = new THREE.Shape();
+    key.absarc(0, 0.05, 0.085, -Math.PI * 0.3, Math.PI * 1.3, false); // 둥근 윗부분
+    key.lineTo(-0.065, -0.17); // 아래로 넓어지는 홈
+    key.lineTo(0.065, -0.17);
+    key.closePath();
+    const hole = new THREE.Mesh(new THREE.ShapeGeometry(key, 12), new THREE.MeshBasicMaterial({ color: 0x0d0205 }));
+    hole.position.set(0, -0.08, 0.252); // 쇠판 앞면(0.25)보다 살짝 앞
+    this.lockGroup.add(plate, hole);
 
     // 크레용 광채 (자물쇠 뒤)
     this.aura = new THREE.Sprite(new THREE.SpriteMaterial({

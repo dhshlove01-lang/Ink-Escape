@@ -1,9 +1,10 @@
-import { el } from './dom.js';
+import { el, icon } from './dom.js';
 import { url } from '../render/Images.js';
 import { faceCanvas } from '../render/AnimalModels.js';
 import { CharacterStage } from './CharacterStage.js';
 import { ANIMALS, ROLE, MSG } from '../../shared/protocol.js';
 import { t, tr, LANGS, getLang, setLang, onLangChange } from '../i18n.js';
+import { gfx } from '../render/GraphicsSettings.js';
 
 // 시작 화면 · 로비 · 결과 화면. 화면은 그리기와 버튼만 맡고, 실제 동작은 콜백으로 받는다.
 
@@ -35,6 +36,23 @@ export function langPicker() {
     );
   draw();
   box._off = onLangChange(draw);
+  return box;
+}
+
+// 그래픽 품질 (낮음 | 보통 | 높음) — 팬 소리가 크면 낮음
+export function gfxPicker() {
+  const box = el('div', { class: 'lang-picker gfx-picker', role: 'group' });
+  const draw = () => {
+    box.title = t('gfx.hint');
+    box.setAttribute('aria-label', t('gfx.label'));
+    box.replaceChildren(
+      el('span', { class: 'gfx-label' }, t('gfx.label')),
+      ...gfx.levels.map((lv) => el('button', { class: 'lang-btn' + (lv === gfx.level ? ' on' : ''), 'aria-pressed': lv === gfx.level ? 'true' : 'false', onclick: () => gfx.set(lv) }, t('gfx.' + lv))),
+    );
+  };
+  draw();
+  const offA = onLangChange(draw), offB = gfx.onChange(draw);
+  box._off = () => (offA(), offB());
   return box;
 }
 
@@ -144,11 +162,13 @@ export class TitleView {
     });
     this.picker?._off?.();
     this.picker = langPicker();
+    this.gfxPick?._off?.();
+    this.gfxPick = gfxPicker();
     this.root.replaceChildren(
       el(
         'div',
         { class: 'title-card' },
-        el('div', { class: 'title-top' }, this.picker),
+        el('div', { class: 'title-top' }, this.gfxPick, this.picker),
         url('ui.logo') ? el('h1', { class: 'logo' }, el('img', { src: url('ui.logo'), alt: 'INK ESCAPE' })) : el('h1', {}, 'INK ESCAPE'),
         el('p', { class: 'title-sub' }, t('title.sub' + this.subNo)),
         el('div', { class: 'title-actions' },
@@ -171,6 +191,7 @@ export class TitleView {
   dispose() {
     this._off?.();
     this.picker?._off?.();
+    this.gfxPick?._off?.();
     this.root.remove();
   }
 }
@@ -199,15 +220,15 @@ export class LobbyView {
     this.readyCount = el('span', { class: 'lobby-ready-count' }, '');
     this.head = el('header', { class: 'lobby-head' },
       this.solo ? (this.titleEl = el('h2', {}, t('lobby.solo'))) : el('div', { class: 'room-code' }, (this.codeLabel = el('span', {}, t('lobby.roomCode'))), el('b', {}, this.code), copy),
-      el('div', { class: 'lobby-head-right' }, this.readyCount, (this.picker = langPicker()), (this.leaveBtn = el('button', { class: 'btn ghost small', onclick: () => this.onLeave() }, t('common.leave')))),
+      el('div', { class: 'lobby-head-right' }, this.readyCount, (this.gfxPick = gfxPicker()), (this.picker = langPicker()), (this.leaveBtn = el('button', { class: 'btn ghost small', onclick: () => this.onLeave() }, t('common.leave')))),
     );
 
     this.stageMount = el('div', { class: 'lobby-stage' });
     this.stageHint = el('div', { class: 'stage-hint' }, '');
     this.memberList = el('div', { class: 'members' });
     this.animalGrid = el('div', { class: 'animal-btns' });
-    this.roleRow = el('div', { class: 'role-btns' });
-    this.timeRow = el('div', { class: 'role-btns' });
+    this.roleRow = el('div', { class: 'role-btns role-3' });
+    this.timeRow = el('div', { class: 'role-btns time-btns' });
     this.actionRow = el('div', { class: 'lobby-actions' });
     this.note = el('p', { class: 'muted lobby-note' });
 
@@ -251,14 +272,15 @@ export class LobbyView {
     const send = (msg) => this.conn.send(msg);
     const taggerTaken = state.members.some((m) => m.role === ROLE.TAGGER && m.id !== this.me);
 
-    // 참가자 (이름 · 역할 · READY · 핑)
+    // 참가자: 한 줄에 [얼굴] 이름 👑 [역할] … READY · 방장/핑
     this.memberList.replaceChildren(...state.members.map((m) =>
       el('div', { class: 'member' + (m.id === this.me ? ' me' : '') + (m.ready ? ' ready' : '') },
-        faceCanvas(m.animal, 40),
+        faceCanvas(m.animal, 34),
         el('div', { class: 'm-body' },
-          el('b', {}, m.name, m.id === state.ownerId ? ' 👑' : ''),
-          el('span', { class: 'm-role' }, roleLabel(m.role))),
-        m.ready ? el('span', { class: 'm-ready' }, 'READY') : null,
+          el('b', { class: 'm-name' }, m.name),
+          m.id === state.ownerId ? el('span', { class: 'm-crown', title: t('lobby.host') }, icon('kit.badge_crown', '👑')) : null,
+          el('span', { class: 'm-role' }, this.solo ? t('role.both') : roleLabel(m.role))),
+        m.ready ? el('span', { class: 'm-ready' }, icon('kit.badge_check', ''), 'READY') : null,
         el('span', { class: 'm-ping' }, m.id === state.ownerId ? t('lobby.host') : `${m.ping || 0}ms`),
       ),
     ));
@@ -311,7 +333,8 @@ export class LobbyView {
       this.note.textContent = me?.ready ? t('lobby.waitHost') : t('lobby.readyHint');
     }
 
-    // 3D 대기실: 지금 로비에 있는 사람들이 각자 단상 위에 선다
+    // 3D 대기실: 배경은 이번 판 맵의 테마, 로비에 있는 사람들이 각자 단상 위에 선다
+    this.stage.setTheme(state.settings.mapId || 'dungeon');
     this.stage.setCharacters(
       state.members.map((m) => ({ id: m.id, kind: m.animal, name: m.name, ready: m.ready, role: m.role })),
       { me: this.me, ownerId: state.ownerId, solo: this.solo },
@@ -331,6 +354,7 @@ export class LobbyView {
   _unsub() {
     this._off?.();
     this.picker?._off?.();
+    this.gfxPick?._off?.();
   }
 
   pause() {

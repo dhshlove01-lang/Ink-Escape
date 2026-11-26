@@ -38,7 +38,9 @@ export class Hud {
     this.hpText = el('div', { class: 'hp-text' });
     this.hearts = el('div', { class: 'hearts' });
     this.status = el('div', { class: 'status-icons' });
-    this.root.append(el('div', { class: 'hud-bl' }, this.status, this.hearts, el('div', { class: 'hp-row' }, el('span', { class: 'hp-label' }, 'HP'), this.hpText), el('div', { class: 'hp-bar' }, this.hpFill)));
+    this.stamFill = el('div', { class: 'stam-fill' });
+    this.stam = el('div', { class: 'stam-bar' }, this.stamFill);
+    this.root.append(el('div', { class: 'hud-bl' }, this.status, this.hearts, el('div', { class: 'hp-row' }, el('span', { class: 'hp-label' }, 'HP'), this.hpText), el('div', { class: 'hp-bar' }, this.hpFill), this.stam));
 
     this.ammo = el('div', { class: 'ammo' });
     this.gren = el('div', { class: 'gren' });
@@ -56,7 +58,13 @@ export class Hud {
     this.lastHp = null;
   }
 
-  update({ weapon, me, prompt, center, revive, boss }) {
+  update({ weapon, me, prompt, center, revive, boss, stamina }) {
+    // 달리기 기력 (가득이면 흐리게, 바닥나 쉬는 중이면 빨갛게)
+    if (stamina) {
+      this.stamFill.style.width = `${stamina.value * 100}%`;
+      this.stam.classList.toggle('full', stamina.value >= 1);
+      this.stam.classList.toggle('tired', stamina.exhausted);
+    }
     const s = this.session.latest;
     if (s) {
       if (s.open) {

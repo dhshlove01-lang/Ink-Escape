@@ -9,6 +9,8 @@
 - 밸런스 숫자는 `src/config/balance.js` 에만 둔다. 코드에 숫자를 박지 않는다.
 - **글씨는 `style.css` 의 폰트 토큰 4개만 쓴다**: `--font-display`(주아: 한글 제목·버튼·배너), `--font-num`(Luckiest Guy: 영문·숫자 강조), `--font-body`(Pretendard: 본문), `--font-hand`(개구: 낙서 포인트). 캔버스 글씨도 같은 폰트 이름. 파일·라이선스는 `assets/fonts/` (README.md). 구글 폰트 서버 링크를 다시 넣지 않는다.
 - **화면 글씨는 번역 사전으로**: `src/shared/i18n/strings.js` 에 키를 만들고 **ko·en 둘 다** 채운 뒤 화면에선 `t('키', {값})` (`src/client/i18n.js`). 코드에 한국어·영어 문장을 직접 쓰지 않는다. 방장 서버는 문장 대신 `msg('키', {값})` 를 보내고, 받은 쪽이 `tr()` 로 자기 언어로 표시한다. 함수 안에 `t`·`msg` 라는 지역 변수를 만들지 말 것 (번역 함수를 가린다).
+- 맵 겉모습(텍스처·안개·횃불 색·로비 장식)은 `src/config/themes.js` 테마로. 새 맵은 `MAP_THEME` 에 한 줄 → 전장과 로비 배경이 같이 바뀐다.
+- UI 그림은 공용 키트(`assets/ui/kit`, `body.art-kit` 일 때 `style.css` 맨 끝 블록)를 쓴다. 새 버튼·판도 `.btn`/`.btn.primary`/`.modal-card` 같은 기존 클래스를 쓰면 자동으로 키트 모양.
 - 3D 모델(GLB)은 `assets/models/` + `src/config/models.js` 에 한 줄. 불러오기는 `ModelLibrary`, 실패하면 임시(공 조합) 모델로 대체되어야 한다.
 - 통신은 `Link` 인터페이스 뒤에 둔다. 나중에 Steam 으로 바꿀 수 있어야 한다. 실시간 동기화에 Firebase 를 쓰지 않는다 (저장 기능에만 고려).
 - 몬스터·보스에는 이름이 없다. 속성은 색과 무관하게 술래가 고른다 (C안). 술래는 3D 전장에 보이지 않는다. 모바일은 지원하지 않는다.
@@ -20,4 +22,5 @@
 
 ## 배포
 - GitHub Pages (main 브랜치 루트). 빌드 없음 — 커밋·푸시하면 그대로 반영.
+- 옛 화면 방지: `index.html` 로더가 코드를 `v/<배포시각>/` 주소로 부르고 `sw.js` 가 진짜 파일로 연결, `UpdateWatcher` 가 새 배포를 보면 자동 새로고침 (HANDOFF 2026-11-26). `index.html` 에 main.js·style.css 를 직접 넣지 말 것.
 - 작업 기록은 `HANDOFF.md` "작업 기록" 맨 위에 (무엇을·왜·어디·검증).

@@ -3,10 +3,13 @@ import { EV, MSG, PSTATE } from '../../shared/protocol.js';
 import { el, Banner } from '../ui/dom.js';
 import { WorldRenderer } from '../render/WorldRenderer.js';
 import { CEILING_LAYER } from './SceneBuilder.js';
+import { WALL_H } from '../../shared/map/GameMap.js';
 import { FpsController } from './FpsController.js';
 import { Weapon } from './Weapon.js';
 import { Hud } from './Hud.js';
+import { surfaceAt } from './surface.js';
 import { t } from '../i18n.js';
+import { gfx } from '../render/GraphicsSettings.js';
 
 // 플레이어 1인칭 화면. 하위 부품을 조립하고 입력·네트워크를 잇는다.
 
@@ -19,12 +22,11 @@ export class PlayerView {
     this.root = el('div', { class: 'view player-view' });
     parent.append(this.root);
 
-    this.renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
-    this.renderer.setPixelRatio(1) // 고해상도 모니터에서 픽셀 수가 2배 넘게 늘지 않게;
+    this.renderer = new THREE.WebGLRenderer({ antialias: gfx.preset.antialias });
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.root.append(this.renderer.domElement);
 
-    this.view3d = new WorldRenderer({ session, palette, attributes, sfx, skipPlayerId: session.me });
+    this.view3d = new WorldRenderer({ session, palette, attributes, balance, sfx, skipPlayerId: session.me });
     this.scene = this.view3d.scene;
     this.effects = this.view3d.effects;
     this.monsters = this.view3d.monsters;
@@ -60,6 +62,7 @@ export class PlayerView {
     this.bindEvents();
     this.onResize = () => this.resize();
     window.addEventListener('resize', this.onResize);
+    this._offGfx = gfx.onChange(this.onResize);
     this.resize();
   }
 
@@ -143,6 +146,7 @@ export class PlayerView {
   resize() {
     const w = this.root.clientWidth || window.innerWidth;
     const h = this.root.clientHeight || window.innerHeight;
+    this.renderer.setPixelRatio(gfx.pixelRatio(w)); // 큰 화면은 덜 촘촘히 그려 늘려 보여 줌 (GPU 부담 = 픽셀 수)
     this.renderer.setSize(w, h);
     this.camera.aspect = w / h;
     this.camera.updateProjectionMatrix();
@@ -155,6 +159,7 @@ export class PlayerView {
     const h = Math.hypot(dir.x, dir.z);
     if (h > 1e-6) best = Math.min(best, this.session.map.raycast(origin.x, origin.z, dir.x, dir.z, range * h) / h);
     if (dir.y < -1e-6) best = Math.min(best, -origin.y / dir.y);
+    if (dir.y > 1e-6) best = Math.min(best, (WALL_H - origin.y) / dir.y); // 천장
     const a = dir.x * dir.x + dir.z * dir.z;
     if (a > 1e-8) {
       for (const tg of this.monsters.targets()) {
@@ -176,9 +181,13 @@ export class PlayerView {
     return { point: origin.clone().addScaledVector(dir, best), monsterId, dist: best };
   }
 
-  onShot({ muzzle, point, monsterId }) {
+  onShot({ origin, muzzle, point, monsterId, follow }) {
     this.effects.muzzle(muzzle, 0.75);
-    this.effects.tracer(muzzle, point);
+    this.effects.tracer(muzzle, point, undefined, follow);
+    if (!monsterId) {
+      const s = surfaceAt(this.session.map, point, new THREE.Vector3().subVectors(point, origin));
+      if (s) this.effects.bulletHole(point, s.normal, s.kind);
+    }
     this.effects.spark(point, monsterId ? 0xff5050 : 0xffe0a0);
     if (monsterId) {
       this.session.send({ t: MSG.HIT, id: monsterId });
@@ -259,7 +268,7 @@ export class PlayerView {
     }
 
     this.view3d.update(dt, this.time, this.camera);
-    this.hud.update({ weapon: this.weapon, me, prompt: rev.prompt, center, revive: rev.ring, boss: this.monsters.bossInfo() });
+    this.hud.update({ weapon: this.weapon, me, prompt: rev.prompt, center, revive: rev.ring, boss: this.monsters.bossInfo(), stamina: { value: this.ctrl.stamina, exhausted: this.ctrl.exhausted } });
     if (this.active) {
       // 전장 → 깊이 지우고 → 손·총 (낙서·이펙트가 손 위에 덮이지 않게)
       const r = this.renderer;
@@ -295,6 +304,7 @@ export class PlayerView {
   dispose() {
     this._off.forEach((f) => f());
     window.removeEventListener('resize', this.onResize);
+    this._offGfx?.();
     window.removeEventListener('mouseup', this._up);
     window.removeEventListener('keydown', this._key);
     this.ctrl.dispose();

@@ -7,13 +7,18 @@ import { PlayerView } from './player/PlayerView.js';
 import { TaggerView } from './tagger/TaggerView.js';
 import { toast, el } from './ui/dom.js';
 import { t, tr } from './i18n.js';
+import { gfx } from './render/GraphicsSettings.js';
 
 // 화면 흐름: 시작 → 로비 → 경기 → 결과 → 로비.
 // 필요한 것은 모두 생성자로 주입받는다 (main.js 가 조립).
 
 export class App {
-  constructor({ root, balance, palette, attributes, judge, createMap, createServer, network, sfx }) {
+  constructor({ root, balance, palette, attributes, judge, createMap, createServer, network, sfx, updates = null }) {
     Object.assign(this, { root, balance, palette, attributes, judge, createMap, createServer, network, sfx });
+    // 새 배포가 나오면: 시작 화면이면 바로 새로고침, 방·경기 중이면 알리고 시작 화면으로 돌아갈 때 새로고침
+    this.updatePending = false;
+    this.updates = updates;
+    updates?.on('update', () => this.onUpdate());
     this.screen = null;
     this.server = null;
     this.hosting = null;
@@ -31,12 +36,11 @@ export class App {
     this.loop();
   }
 
-  // 화면 갱신은 초당 최대 60번 (고주사율 모니터에서 쉬지 않고 그려 팬이 도는 것 방지)
+  // 화면 갱신 빈도는 그래픽 설정이 정한다 (최대 60번, 창이 다른 창 뒤면 15번 — 팬이 도는 것 방지)
   loop() {
-    const MIN_FRAME = 1000 / 60 - 0.5;
     const frame = (t) => {
       this._raf = requestAnimationFrame(frame);
-      if (this._last && t - this._last < MIN_FRAME) return;
+      if (this._last && t - this._last < gfx.frameInterval()) return;
       const dt = Math.min(0.05, (t - (this._last || t)) / 1000);
       this._last = t;
       if (!this.views) return;
@@ -52,7 +56,24 @@ export class App {
     this.screen = s;
   }
 
+  onUpdate() {
+    this.updatePending = true;
+    if (this.screen instanceof TitleView) location.reload();
+    else toast(t('common.updateReady'), 'warn');
+  }
+
+  // 방에 들어가기 직전에 한 번 더 확인: 새 버전이 있으면 들어가지 않고 새로고침 (옛 코드로 방에 들어가는 일 방지)
+  async ensureLatest() {
+    await this.updates?.check();
+    if (this.updatePending) await new Promise(() => {}); // 새로고침 중 — 더 진행하지 않음
+  }
+
   showTitle() {
+    if (this.updatePending) {
+      this.teardownNet();
+      location.reload();
+      return;
+    }
     this.teardownNet();
     // 로비 3D 화면(WebGL)까지 정리한 뒤 시작 화면으로
     this.lobby?.destroy();
@@ -69,6 +90,7 @@ export class App {
 
   // 방장: 서버를 내 PC 에 만들고, 내 클라이언트는 메모리 연결로 붙인다.
   async createRoom(name) {
+    await this.ensureLatest();
     const server = this.createServer({ solo: false });
     let code, hosting;
     for (let i = 0; i < 4 && !hosting; i++) {
@@ -91,11 +113,13 @@ export class App {
 
   async joinRoom(code, name) {
     if (!/^[A-Z0-9]{5}$/.test(code)) throw new Error('title.codeInvalid');
+    await this.ensureLatest();
     const link = await this.network.joinRoom(code);
     this.connect(link, name, code, false);
   }
 
   async startSolo(name) {
+    await this.ensureLatest();
     const server = this.createServer({ solo: true });
     this.server = server;
     const [a, b] = MemoryLink.pair();

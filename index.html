@@ -6,7 +6,6 @@
   <title>비대칭 드로잉 FPS</title>
   <meta name="description" content="술래가 그린 그림이 3D 전장의 몬스터가 되는 비대칭 멀티플레이 FPS 프로토타입">
   <link rel="stylesheet" href="assets/fonts/fonts.css">
-  <link rel="stylesheet" href="style.css">
   <script type="importmap">
     { "imports": { "three": "./vendor/three.module.min.js" } }
   </script>
@@ -15,6 +14,31 @@
 <body>
   <div id="app"></div>
   <noscript>이 게임은 JavaScript 가 필요해요.</noscript>
-  <script type="module" src="src/main.js"></script>
+  <script>
+    // 옛 화면이 절대 안 뜨게: 코드(style.css · src/)를 이번 배포 전용 주소 v/<배포시각>/ 로 불러온다 (sw.js 가 진짜 파일로 연결).
+    // 배포 시각 = 이 HTML 의 Last-Modified (GitHub Pages 는 배포마다 모든 파일에 배포 시각을 적는다).
+    // 서비스 워커를 못 쓰면 ?v=<배포시각> 으로 대신한다.
+    (async () => {
+      const ver = Date.parse(document.lastModified) || Date.now();
+      window.BUILD_STAMP = ver;
+      let base = '', q = '?v=' + ver;
+      const sw = navigator.serviceWorker;
+      if (sw) {
+        try {
+          await sw.register('sw.js');
+          if (!sw.controller) await Promise.race([new Promise((r) => sw.addEventListener('controllerchange', r, { once: true })), new Promise((r) => setTimeout(r, 3000))]);
+          if (sw.controller) (base = 'v/' + ver + '/'), (q = '');
+        } catch (e) {}
+      }
+      const css = document.createElement('link');
+      css.rel = 'stylesheet';
+      css.href = base + 'style.css' + q;
+      const js = document.createElement('script');
+      js.type = 'module';
+      js.src = base + 'src/main.js' + q;
+      css.onload = css.onerror = () => document.body.append(js); // 스타일을 먼저 (화면 깜빡임 방지)
+      document.head.append(css);
+    })();
+  </script>
 </body>
 </html>

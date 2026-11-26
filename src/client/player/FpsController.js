@@ -1,4 +1,4 @@
-// 1인칭 이동: 마우스 시점, WASD, Shift 달리기, Space 점프, 벽 충돌.
+// 1인칭 이동: 마우스 시점, WASD, Shift 달리기(기력 소모), Space 점프, 벽 충돌.
 
 export class FpsController {
   constructor({ camera, dom, map, balance }) {
@@ -17,6 +17,10 @@ export class FpsController {
     this.enabled = true;
     this.sensitivity = 0.0022;
     this.moving = false;
+    this.stamina = 1; // 달리기 기력 (0~1)
+    this.exhausted = false; // 바닥난 뒤 restart 만큼 찰 때까지 못 달림
+    this.running = false;
+    this._restAt = 0;
     camera.rotation.order = 'YXZ';
 
     this._onKey = (e) => {
@@ -73,7 +77,8 @@ export class FpsController {
     }
     const len = Math.hypot(fx, fz);
     this.moving = len > 0;
-    const speed = (k.has('ShiftLeft') || k.has('ShiftRight') ? this.b.run : this.b.walk) * (1 - slow);
+    this.updateStamina(dt, this.moving && (k.has('ShiftLeft') || k.has('ShiftRight')));
+    const speed = (this.running ? this.b.run : this.b.walk) * (1 - slow);
     if (len > 0) {
       fx /= len;
       fz /= len;
@@ -100,6 +105,21 @@ export class FpsController {
       this.onGround = true;
     }
     this.applyCamera();
+  }
+
+  // 달리면 기력이 줄고, 멈추면 잠시 뒤 회복. 바닥나면 조금 찰 때까지 걷기만.
+  updateStamina(dt, wantRun) {
+    const st = this.b.stamina;
+    this._t = (this._t || 0) + dt;
+    if (this.exhausted && this.stamina >= st.restart) this.exhausted = false;
+    this.running = wantRun && !this.exhausted && this.stamina > 0;
+    if (this.running) {
+      this.stamina = Math.max(0, this.stamina - dt / st.sec);
+      this._restAt = this._t + st.regenDelay;
+      if (this.stamina <= 0) this.exhausted = true;
+    } else if (this._t >= this._restAt) {
+      this.stamina = Math.min(1, this.stamina + dt / st.refillSec);
+    }
   }
 
   applyCamera() {

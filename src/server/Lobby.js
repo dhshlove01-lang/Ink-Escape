@@ -10,7 +10,7 @@ export class Lobby {
   constructor() {
     this.members = new Map(); // id → { id, name, role, animal, ping }
     this.ownerId = null;
-    this.settings = { matchSeconds: 600 };
+    this.settings = { matchSeconds: 600, mapId: 'dungeon' }; // mapId: 로비 배경·경기 맵 (맵 고르기가 생기면 여기만 바뀜)
   }
 
   get full() {

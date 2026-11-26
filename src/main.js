@@ -14,6 +14,11 @@ import { ModelLibrary } from './client/render/ModelLibrary.js';
 import { setModelLibrary } from './client/render/AnimalModels.js';
 import { IMAGE_DEFS } from './config/assets.js';
 import { loadImages, url } from './client/render/Images.js';
+import { UpdateWatcher } from './client/UpdateWatcher.js';
+
+// 새 배포 감지 (서비스 워커 등록·배포 전용 주소는 index.html 이 한다)
+const updates = new UpdateWatcher({ base: window.BUILD_STAMP });
+updates.start();
 
 // 3D 모델 파일(GLB): 기다리지 않고 불러오기 시작. 늦게 끝나면 임시 모델을 바꿔 끼운다.
 const models = new ModelLibrary(MODEL_DEFS);
@@ -36,6 +41,7 @@ const app = new App({
     joinRoom: PeerNetwork.joinRoom,
   },
   sfx: new Sfx(),
+  updates,
 });
 
 window.addEventListener('pointerdown', () => app.sfx.unlock(), { once: true });
@@ -50,6 +56,12 @@ for (const [key, name] of [['ui.title_bg', 'title-bg'], ['ui.spawn_btn', 'spawn-
   if (!u) continue;
   document.documentElement.style.setProperty(`--img-${name}`, `url("${u}")`);
   document.body.classList.add(`art-${name}`);
+}
+// 공용 UI 키트: 하나라도 없으면 통째로 끄고 기존 CSS 모양 (반쯤 섞인 화면 방지)
+const kitKeys = Object.keys(IMAGE_DEFS).filter((k) => k.startsWith('kit.'));
+if (kitKeys.every((k) => url(k))) {
+  for (const k of kitKeys) document.documentElement.style.setProperty(`--kit-${k.slice(4).replace(/_/g, '-')}`, `url("${url(k)}")`);
+  document.body.classList.add('art-kit');
 }
 app.start();
 window.__app = app; // 디버그·자동 테스트용

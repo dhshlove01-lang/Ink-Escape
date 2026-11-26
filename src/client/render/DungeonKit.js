@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { CELL, TILE } from '../../shared/map/GameMap.js';
 
 // 던전 소품·재질 키트. SceneBuilder(1인칭/구석 카메라)와 TopDownMap(술래 탑뷰)이
 // 같은 배치(planProps)를 쓰도록 여기 한 곳에 모은다.
@@ -231,15 +232,15 @@ export function planProps(map) {
       const kind = pick < 0.42 ? 'barrel' : pick < 0.78 ? 'crate' : 'rubble';
       props.push({ kind, x, z, ry: r() * Math.PI * 2, s: 0.85 + r() * 0.3 });
     }
-    // 벽 배너
+    // 벽 배너: 뒤가 끝까지 진짜 벽이고(통로·문 아님), 문 장식(아치)·횃불·다른 배너와 안 겹칠 때만
     if (r() < 0.62) {
       const f = faces[Math.floor(r() * 4)];
       const t = f.from + 2.4 + r() * Math.max(0.1, f.to - f.from - 4.8);
       const x = f.axis === 'z' ? t : f.at - f.out * 0.1;
       const z = f.axis === 'z' ? f.at - f.out * 0.1 : t;
-      if (map.isFloor(x + (f.axis === 'x' ? -f.out * 0.6 : 0), z + (f.axis === 'z' ? -f.out * 0.6 : 0))) {
-        props.push({ kind: 'banner', x, z, ry: f.ry, s: 0.9 + r() * 0.25, y: 3.7 + r() * 0.5 });
-      }
+      const s = 0.9 + r() * 0.25;
+      const y = 3.7 + r() * 0.5;
+      if (bannerFits(map, f, t, 0.9 * s, props)) props.push({ kind: 'banner', x, z, ry: f.ry, s, y });
     }
     // 벽에 걸린 사슬
     if (r() < 0.45) {
@@ -252,6 +253,22 @@ export function planProps(map) {
     }
   }
   return props;
+}
+
+// 배너(반폭 half)가 이 벽면 자리에 깔끔히 걸리나
+function bannerFits(map, f, t, half, props) {
+  const at = (u, depth) => (f.axis === 'z' ? [u, f.at + f.out * depth] : [f.at + f.out * depth, u]);
+  for (const u of [t - half - 0.2, t, t + half + 0.2]) {
+    const [bx, bz] = at(u, 0.5); // 벽 안쪽
+    const [fx, fz] = at(u, -0.6); // 방 쪽
+    if (map.tile(Math.floor(bx / CELL), Math.floor(bz / CELL)) !== TILE.WALL) return false;
+    if (!map.isFloor(fx, fz)) return false;
+  }
+  const [x, z] = at(t, 0);
+  if (map.doors.some((d) => Math.hypot(x - d.center.x, z - d.center.z) < 8)) return false; // 탈출문 아치 근처
+  if (map.torches.some((tc) => Math.hypot(x - tc.x, z - tc.z) < half + 1.2)) return false;
+  if (props.some((p) => p.kind === 'banner' && Math.hypot(x - p.x, z - p.z) < 3)) return false;
+  return true;
 }
 
 // 벽 윗면·기둥 머리용: 낙서 없는 무늬 돌

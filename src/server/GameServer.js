@@ -92,7 +92,7 @@ export class GameServer {
       roster = this.lobby.resolveRoster();
       if (roster.error) return this.error(id, roster.error);
     }
-    const map = this.createMap('dungeon');
+    const map = this.createMap(this.lobby.settings.mapId);
     this.match = new Match({
       balance: this.b,
       map,

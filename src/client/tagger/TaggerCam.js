@@ -3,6 +3,7 @@ import { Emitter } from '../Emitter.js';
 import { WALL_H } from '../../shared/map/GameMap.js';
 import { PSTATE, STATUS_BIT } from '../../shared/protocol.js';
 import { WorldRenderer, SILENT } from '../render/WorldRenderer.js';
+import { gfx } from '../render/GraphicsSettings.js';
 
 // 술래 왼쪽 화면의 3D 무대. 두 가지 모드:
 //   'top'    = 던전 전체를 위에서 비스듬히 내려다보는 실시간 3D 탑뷰 (IMPORTANT: 소환 위치 고르기)
@@ -68,12 +69,12 @@ export class TaggerCam extends Emitter {
   init() {
     if (this.ready) return;
     this.ready = true;
-    this.renderer = new THREE.WebGLRenderer({ antialias: true });
-    this.renderer.setPixelRatio(1); // 고해상도 모니터에서 픽셀 수가 2배 넘게 늘지 않게
+    this.renderer = new THREE.WebGLRenderer({ antialias: gfx.preset.antialias });
+    this.renderer.setPixelRatio(gfx.pixelRatio(this.root.clientWidth || 1));
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.root.append(this.renderer.domElement);
 
-    this.view3d = new WorldRenderer({ session: this.session, palette: this.palette, attributes: this.attributes, sfx: SILENT, skipPlayerId: null });
+    this.view3d = new WorldRenderer({ session: this.session, palette: this.palette, attributes: this.attributes, balance: this.b, sfx: SILENT, skipPlayerId: null });
     this.scene = this.view3d.scene;
     this.fog = this.scene.fog;
 
@@ -211,9 +212,11 @@ export class TaggerCam extends Emitter {
   resize() {
     const w = this.root.clientWidth, h = this.root.clientHeight;
     if (!w || !h) return;
-    if (w === this._cw && h === this._ch) return;
+    if (w === this._cw && h === this._ch && gfx.level === this._lv) return;
     this._cw = w;
     this._ch = h;
+    this._lv = gfx.level;
+    this.renderer.setPixelRatio(gfx.pixelRatio(w));
     this.renderer.setSize(w, h);
     const aspect = w / h;
     this.followCam.aspect = aspect;

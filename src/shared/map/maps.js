@@ -67,6 +67,8 @@ function buildDungeon() {
   // 횃불: 각 방의 위·아래 벽에 하나씩. 벽 가운데가 통로 구멍이면 옆으로 옮겨 실제 벽 칸에 붙인다.
   const torches = [];
   const isWall = (x, y) => x >= 0 && y >= 0 && x < W && y < H && cells[y * W + x] === TILE.WALL;
+  // 문 장식(아치·배너)과 겹치지 않게: 같은 줄에서 문 칸과 4칸 이내면 횃불을 달지 않는다
+  const nearDoor = (x, y) => { for (let dx = -4; dx <= 4; dx++) if (x + dx >= 0 && x + dx < W && cells[y * W + x + dx] === TILE.DOOR) return true; return false; };
   for (let r = 0; r < 3; r++) {
     for (let c = 0; c < 3; c++) {
       const x0 = colX[c], w = colW[c], y0 = rowY[r];
@@ -74,7 +76,7 @@ function buildDungeon() {
       for (const [wallY, zFace, nz] of [[y0 - 1, y0 * CELL, 1], [y0 + rowH, (y0 + rowH) * CELL, -1]]) {
         for (let k = 0; k < w; k++) {
           const x = mid + (k % 2 ? -1 : 1) * Math.ceil(k / 2);
-          if (x < x0 || x >= x0 + w || !isWall(x, wallY)) continue;
+          if (x < x0 || x >= x0 + w || !isWall(x, wallY) || nearDoor(x, wallY)) continue;
           torches.push({ x: (x + 0.5) * CELL, z: zFace, nx: 0, nz });
           break;
         }

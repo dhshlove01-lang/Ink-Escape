@@ -17,6 +17,7 @@ export const MSG = {
   SPAWN: 'spawn',          // { strokes, x, z, boss, allIn }
   VIEW: 'view',            // { tagger: bool }  (혼자 테스트에서 화면 전환)
   PONG: 'pong',            // { at }
+  AUG_PICK: 'augpick',     // { side: 'player'|'tagger', key }  보급 증강 고르기
 
   // host → client
   WELCOME: 'welcome',      // { id, host: bool }
@@ -28,6 +29,7 @@ export const MSG = {
   GAME_OVER: 'over',       // { winner: 'players'|'tagger', reason, stats }
   PING: 'ping',            // { at }
   ERROR: 'err',            // { message }
+  OFFER: 'offer',          // { side, cards:[key], sec }  나에게 온 증강 카드 3장
 };
 
 export const EV = {
@@ -50,6 +52,13 @@ export const EV = {
   PROJ: 'proj',            // { id, x, y, z, vx, vz, color }
   PROJ_END: 'projend',     // { id }
   NOTICE: 'notice',        // { text }
+  SUPPLY: 'supply',        // { id, x, z }      보급 상자 떨어짐
+  SUPPLY_TAKE: 'supplytake', // { id, by }      누가 상자를 열었나
+  SUPPLY_GONE: 'supplygone', // { id }
+  AUG: 'aug',              // { id, side, key, n }  누가 어떤 증강을 얻었나 (n = 지금 개수)
+  SPLASH: 'splash',        // { x, z, r }       지우개 탄 작은 폭발
+  PUDDLE: 'puddle',        // { x, z, r, sec }  끈적 잉크 웅덩이
+  HEART: 'heart',          // { id }            두 번째 심장 발동
 };
 
 export const ROLE = { TAGGER: 'tagger', PLAYER: 'player', RANDOM: 'random', NONE: 'none' };

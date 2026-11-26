@@ -240,13 +240,15 @@ export function createViewModel(kind) {
   front.position.copy(frontWrist);
   front.rotation.set(1.0, 0.12, 0.75);
   g.add(front);
-  // QA·튜닝용 참조 (배치 값을 화면에서 바꿔 보기 위해)
-  g.userData.paws = { rear, front, rearArm: g.children[1], frontArm: g.children[2] };
+  // Weapon.aimGun 이 총을 조준점 쪽으로 돌릴 때 발도 같이 옮긴다 (배열이어야 함)
+  g.userData.paws = [rear, front];
+  g.userData.pawParts = { rear, front, rearArm: g.children[1], frontArm: g.children[2] };
 
   // 레드도트 사이트 (총 위) — 빛나는 점의 위치를 Weapon 이 받아 쓴다
   const sight = buildRedDotSight();
   sight.position.set(-0.014, 0.085, 0.03);
   g.add(sight);
+  g.userData.sightObj = sight;
   g.userData.sight = { x: -0.014, y: 0.087, z: 0.062 };
 
   toViewModelMaterial(g);
@@ -451,6 +453,7 @@ export function drawAnimalFace(ctx, kind, cx, cy, r, { dead = false } = {}) {
     ctx.restore();
     return;
   }
+  if (kind === 'devil') return drawDevilFace(ctx, cx, cy, r, dead);
   const L = ANIMAL_LOOK[kind] || ANIMAL_LOOK.shiba;
   const hex = (n) => '#' + n.toString(16).padStart(6, '0');
   ctx.save();
@@ -518,6 +521,118 @@ export function drawAnimalFace(ctx, kind, cx, cy, r, { dead = false } = {}) {
   ctx.beginPath();
   ctx.arc(cx, cy + r * 0.2, r * 0.08, 0, Math.PI * 2);
   ctx.fill();
+  ctx.restore();
+}
+
+// 술래 악마 얼굴 (3D 모델과 같은 모습: 까만 털·빨간 뿔과 귀 안쪽·빨간 눈동자·송곳니 웃음)
+function drawDevilFace(ctx, cx, cy, r, dead) {
+  const BLACK = '#1b1620', RED = '#d4283c', DARK_RED = '#7c1424';
+  ctx.save();
+  if (dead) ctx.filter = 'grayscale(1) brightness(0.6)';
+  ctx.lineJoin = 'round';
+  // 큰 뾰족 귀 (바깥 까맣게, 안쪽 빨갛게)
+  for (const s of [-1, 1]) {
+    ctx.fillStyle = BLACK;
+    ctx.beginPath();
+    ctx.moveTo(cx + s * r * 0.35, cy - r * 0.75);
+    ctx.lineTo(cx + s * r * 1.08, cy - r * 1.2);
+    ctx.lineTo(cx + s * r * 0.95, cy - r * 0.2);
+    ctx.closePath();
+    ctx.fill();
+    ctx.fillStyle = DARK_RED;
+    ctx.beginPath();
+    ctx.moveTo(cx + s * r * 0.5, cy - r * 0.7);
+    ctx.lineTo(cx + s * r * 0.98, cy - r * 1.02);
+    ctx.lineTo(cx + s * r * 0.88, cy - r * 0.35);
+    ctx.closePath();
+    ctx.fill();
+  }
+  // 머리 (어두운 카드 위에서도 보이게 옅은 테두리)
+  ctx.fillStyle = BLACK;
+  ctx.strokeStyle = 'rgba(236,200,210,0.28)';
+  ctx.lineWidth = Math.max(1, r * 0.06);
+  ctx.beginPath();
+  ctx.ellipse(cx, cy, r * 1.0, r * 0.94, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+  // 빨간 뿔 (살짝 휜 모양)
+  ctx.fillStyle = RED;
+  for (const s of [-1, 1]) {
+    ctx.beginPath();
+    ctx.moveTo(cx + s * r * 0.12, cy - r * 0.78);
+    ctx.quadraticCurveTo(cx + s * r * 0.08, cy - r * 1.32, cx + s * r * 0.36, cy - r * 1.46);
+    ctx.quadraticCurveTo(cx + s * r * 0.3, cy - r * 1.1, cx + s * r * 0.46, cy - r * 0.8);
+    ctx.closePath();
+    ctx.fill();
+  }
+  // 빨간 턱 (입 주변)
+  ctx.fillStyle = DARK_RED;
+  ctx.beginPath();
+  ctx.ellipse(cx, cy + r * 0.48, r * 0.5, r * 0.32, 0, 0, Math.PI * 2);
+  ctx.fill();
+  // 눈썹
+  ctx.strokeStyle = RED;
+  ctx.lineWidth = r * 0.13;
+  ctx.lineCap = 'round';
+  for (const s of [-1, 1]) {
+    ctx.beginPath();
+    ctx.moveTo(cx + s * r * 0.15, cy - r * 0.3);
+    ctx.lineTo(cx + s * r * 0.6, cy - r * 0.45);
+    ctx.stroke();
+  }
+  // 눈
+  for (const s of [-1, 1]) {
+    const ex = cx + s * r * 0.38, ey = cy - r * 0.02;
+    if (dead) {
+      ctx.strokeStyle = '#f3ecdd';
+      ctx.lineWidth = r * 0.1;
+      const d = r * 0.14;
+      ctx.beginPath();
+      ctx.moveTo(ex - d, ey - d);
+      ctx.lineTo(ex + d, ey + d);
+      ctx.moveTo(ex + d, ey - d);
+      ctx.lineTo(ex - d, ey + d);
+      ctx.stroke();
+      continue;
+    }
+    ctx.fillStyle = '#fbf4ea';
+    ctx.beginPath();
+    ctx.ellipse(ex, ey, r * 0.25, r * 0.22, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = RED;
+    ctx.beginPath();
+    ctx.arc(ex - s * r * 0.02, ey + r * 0.02, r * 0.15, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#120d12';
+    ctx.beginPath();
+    ctx.arc(ex - s * r * 0.02, ey + r * 0.02, r * 0.08, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#fff';
+    ctx.beginPath();
+    ctx.arc(ex - s * r * 0.06, ey - r * 0.04, r * 0.04, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  // 코
+  ctx.fillStyle = '#3a1016';
+  ctx.beginPath();
+  ctx.ellipse(cx, cy + r * 0.24, r * 0.09, r * 0.065, 0, 0, Math.PI * 2);
+  ctx.fill();
+  // 웃는 입 + 송곳니
+  ctx.fillStyle = '#2a070d';
+  ctx.beginPath();
+  ctx.moveTo(cx - r * 0.3, cy + r * 0.4);
+  ctx.quadraticCurveTo(cx, cy + r * 0.78, cx + r * 0.3, cy + r * 0.4);
+  ctx.closePath();
+  ctx.fill();
+  ctx.fillStyle = '#fbf4ea';
+  for (const s of [-1, 1]) {
+    ctx.beginPath();
+    ctx.moveTo(cx + s * r * 0.24, cy + r * 0.41);
+    ctx.lineTo(cx + s * r * 0.12, cy + r * 0.41);
+    ctx.lineTo(cx + s * r * 0.17, cy + r * 0.55);
+    ctx.closePath();
+    ctx.fill();
+  }
   ctx.restore();
 }
 

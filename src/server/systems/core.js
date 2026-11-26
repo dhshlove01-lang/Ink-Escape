@@ -45,7 +45,13 @@ export class StatusSystem {
         else m.damagePlayer(p, s.dps * dt, { silent: true });
       }
       if (p.slow && m.time >= p.slow.until) p.slow = null;
+      // 끈적 잉크 웅덩이: 밟고 있으면 느려짐
+      for (const w of m.puddles) {
+        if (Math.hypot(p.x - w.x, p.z - w.z) > w.r) continue;
+        if (!p.slow || p.slow.amount <= w.slow) p.slow = { until: m.time + 0.3, amount: w.slow };
+      }
     }
+    if (m.puddles.length) m.puddles = m.puddles.filter((w) => w.until > m.time);
   }
 }
 
