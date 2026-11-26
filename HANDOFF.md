@@ -81,13 +81,7 @@ NODE_PATH=$(npm root -g) node tools/smoke.cjs   # 헤드리스 혼자 테스트:
 
 ## 지금 진행 중
 
-**작업: 술래 화면 3D 구석 카메라 (◀ ▶ 로 탑뷰 ↔ 플레이어별 3D 화면)** — 2026-11-26 시작
-- [x] 3D 세계 그리기 부품을 PlayerView 에서 떼어 재사용 가능하게 (`src/client/render/WorldRenderer.js`)
-- [x] 맵에 방 영역 정보 추가 (`GameMap.rooms`, `roomAt()`)
-- [x] 술래 왼쪽 화면에 ◀ ▶ 화살표 + 3D 구석 카메라 (`src/client/tagger/CornerCam.js`, `TaggerView.setView`)
-- [x] 3D 화면에서도 바닥 클릭으로 소환 위치 고르기 (`CornerCam.pickFloor` → 'pick')
-- [x] npm test 11/11
-- [ ] 브라우저 스모크 + 스크린샷 확인 → 작업 기록
+(없음 — 다음 작업을 시작하면 여기에 할 일과 체크 목록을 적고 바로 커밋·푸시)
 
 ## 다음 할 일 (우선순위)
 
@@ -107,6 +101,14 @@ NODE_PATH=$(npm root -g) node tools/smoke.cjs   # 헤드리스 혼자 테스트:
 - 동물 모델·효과음은 임시.
 
 ## 작업 기록
+
+### 2026-11-26 · 술래 화면 3D 구석 카메라
+- **무엇을**: 술래 왼쪽 화면 양쪽 ◀ ▶ 화살표(또는 ← → 키)로 `탑뷰 지도 → 플레이어1 구석 카메라 → 플레이어2 …` 를 넘긴다. 구석 카메라는 그 플레이어가 있는 방의 가장 먼 구석 위(벽 위 18m)에서 실제 3D 전장을 내려다보고, 플레이어가 움직이면 부드럽게 따라간다. 따라가는 플레이어 머리 위에 노란 화살표. 3D 화면에서도 바닥을 클릭하면 소환 위치가 골라지고(초록/빨강 원), 플레이어 주변 8m 금지 원이 보인다. 오른쪽 도화지는 그대로라 그리던 그림을 계속 그릴 수 있다.
+- **왜**: 사용자 요청 — 탑뷰 말고 실제 플레이 화면도 보며 그리기.
+- **어디**: `src/client/render/WorldRenderer.js`(새로: 맵·몬스터·플레이어·연출 묶음, PlayerView 에서 분리 → 1인칭과 술래 카메라가 같이 씀), `src/client/tagger/CornerCam.js`(새로), `TaggerView.setView / update`, `GameMap.rooms / roomAt()`, `RemotePlayers({ skipId })`, `style.css`(.view-arrow, .view-label, .cornercam).
+- **검증**: `npm test` 11/11, `tools/smoke.cjs` 통과, 헤드리스 스크린샷으로 구석 카메라·3D 클릭 소환·화면 전환·플레이어 화면(리팩터 후) pageerror 0 확인.
+- **참고**: 3D 구석 카메라는 처음 켤 때 만든다(탑뷰만 쓰면 3D 를 안 그림). 술래 카메라는 소리를 내지 않는다(혼자 테스트에서 소리 겹침 방지).
+- **저장소 이름 변경**: 사용자가 `asymmetric-drawing-fps` → `Ink-Escape` 로 바꿈 (공개 전환됨, Pages 는 아직 꺼짐).
 
 ### 2026-11-26 · v0.1 첫 프로토타입
 - **무엇을**: 기획안 v1.1 기준 브라우저 멀티플레이 프로토타입 전체.

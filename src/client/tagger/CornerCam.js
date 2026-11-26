@@ -8,8 +8,8 @@ import { WorldRenderer, SILENT } from '../render/WorldRenderer.js';
 // 바닥을 클릭하면 소환 위치를 고른다 ('pick' 이벤트, 탑뷰와 같은 형식).
 // 처음 켤 때 만든다 (술래가 탑뷰만 쓰면 3D 를 그리지 않음).
 
-const CAM_HEIGHT = WALL_H + 4;
-const CORNER_INSET = 1.2;
+const CAM_HEIGHT = WALL_H + 11; // 기둥에 덜 가리도록 높이서 내려다본다
+const CORNER_INSET = 0.5;
 
 export class CornerCam extends Emitter {
   constructor({ session, palette, attributes, balance }) {
@@ -33,7 +33,7 @@ export class CornerCam extends Emitter {
     this.root.append(this.renderer.domElement);
     this.view3d = new WorldRenderer({ session: this.session, palette: this.palette, attributes: this.attributes, sfx: SILENT, skipPlayerId: null });
     this.scene = this.view3d.scene;
-    this.camera = new THREE.PerspectiveCamera(62, 1, 0.1, 220);
+    this.camera = new THREE.PerspectiveCamera(55, 1, 0.1, 220);
     this.camPos = new THREE.Vector3();
     this.lookAt = new THREE.Vector3();
     this.snap = true;
@@ -47,6 +47,11 @@ export class CornerCam extends Emitter {
     this.noGeo = new THREE.RingGeometry(r - 0.25, r, 64);
     this.noMat = new THREE.MeshBasicMaterial({ color: 0xff3040, transparent: true, opacity: 0.45, side: THREE.DoubleSide, depthWrite: false });
     this.noRings = new Map();
+
+    // 따라가는 플레이어 머리 위 화살표
+    this.arrow = new THREE.Mesh(new THREE.ConeGeometry(0.45, 0.9, 4), new THREE.MeshBasicMaterial({ color: 0xffd34d }));
+    this.arrow.rotation.x = Math.PI;
+    this.scene.add(this.arrow);
 
     this.ray = new THREE.Raycaster();
     this.floor = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
@@ -91,9 +96,9 @@ export class CornerCam extends Emitter {
   resize() {
     const w = this.root.clientWidth, h = this.root.clientHeight;
     if (!w || !h) return;
-    if (w !== this._w || h !== this._h) {
-      this._w = w;
-      this._h = h;
+    if (w !== this._cw || h !== this._ch) {
+      this._cw = w;
+      this._ch = h;
       this.renderer.setSize(w, h);
       this.camera.aspect = w / h;
       this.camera.updateProjectionMatrix();
@@ -140,7 +145,10 @@ export class CornerCam extends Emitter {
       }
       this.camera.position.copy(this.camPos);
       this.camera.lookAt(this.lookAt);
-    }
+      this.arrow.visible = true;
+      this.arrow.position.set(p.x, 2.6 + Math.sin(time * 4) * 0.2, p.z);
+      this.arrow.rotation.y = time * 2;
+    } else if (this.arrow) this.arrow.visible = false;
     this.marker.visible = !!target;
     if (target) {
       this.marker.position.set(target.x, 0.08, target.z);
