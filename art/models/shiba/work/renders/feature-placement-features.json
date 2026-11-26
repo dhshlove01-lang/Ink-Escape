@@ -1,0 +1,4 @@
+[{"id": "face-landmark-placement", "score": 0.76, "notes": "Eyes at ±0.092 on head surface with cream rims and catchlights, brow dots above, nose on muzzle front, open mouth with tongue; mouth is an oval, reference smile is wider U."},
+ {"id": "eye-life", "score": 0.8, "notes": "Glossy black eyes with mirrored catchlights; reference iris is dark brown."},
+ {"id": "anatomy-proportion", "score": 0.82, "notes": "unchanged"},
+ {"id": "pose-silhouette", "score": 0.82, "notes": "tier1 IoU 0.869, scale delta 0.006"}]

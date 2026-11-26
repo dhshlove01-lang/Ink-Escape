@@ -1,0 +1,2 @@
+[{"id": "anatomy-proportion", "score": 0.82, "notes": "Head width/torso width 0.84 (ref 0.89); total ~2.6 HU incl. ears; bbox w/h within 3.3% of reference."},
+ {"id": "pose-silhouette", "score": 0.82, "notes": "Arms reach widened to paw x ±0.43 matching reference span; legs short; tier1 IoU 0.875."}]

@@ -1,0 +1,98 @@
+{
+  "angles": [
+    {
+      "azimuth": 0.0,
+      "path": "/home/user/ink-escape/art/models/shiba/work/renders/proportion-lock-front.png",
+      "isReference": true,
+      "segmented": true,
+      "holed": false,
+      "interiorHolePixelCount": 751,
+      "interiorHoleFraction": 0.005407001022362377,
+      "largestHolePixelCount": 306,
+      "largestHoleBBox": {
+        "x": 255,
+        "y": 509,
+        "width": 81,
+        "height": 6
+      },
+      "areaFraction": 0.3534738127958467,
+      "ratio": 1.0,
+      "degenerate": false
+    },
+    {
+      "azimuth": 90.0,
+      "path": "/home/user/ink-escape/art/models/shiba/work/renders/proportion-lock-right.png",
+      "isReference": false,
+      "segmented": true,
+      "holed": false,
+      "interiorHolePixelCount": 787,
+      "interiorHoleFraction": 0.0071326934754434145,
+      "largestHolePixelCount": 657,
+      "largestHoleBBox": {
+        "x": 176,
+        "y": 286,
+        "width": 87,
+        "height": 18
+      },
+      "areaFraction": 0.28079859520537487,
+      "ratio": 0.7943971661842844,
+      "degenerate": false
+    },
+    {
+      "azimuth": 180.0,
+      "path": "/home/user/ink-escape/art/models/shiba/work/renders/proportion-lock-rear.png",
+      "isReference": false,
+      "segmented": true,
+      "holed": false,
+      "interiorHolePixelCount": 103,
+      "interiorHoleFraction": 0.0007626070796591221,
+      "largestHolePixelCount": 14,
+      "largestHoleBBox": {
+        "x": 266,
+        "y": 557,
+        "width": 11,
+        "height": 2
+      },
+      "areaFraction": 0.34372423270728353,
+      "ratio": 0.9724178150244069,
+      "degenerate": false
+    },
+    {
+      "azimuth": 270.0,
+      "path": "/home/user/ink-escape/art/models/shiba/work/renders/proportion-lock-left.png",
+      "isReference": false,
+      "segmented": true,
+      "holed": false,
+      "interiorHolePixelCount": 488,
+      "interiorHoleFraction": 0.004501097603718939,
+      "largestHolePixelCount": 336,
+      "largestHoleBBox": {
+        "x": 325,
+        "y": 279,
+        "width": 61,
+        "height": 14
+      },
+      "areaFraction": 0.27591489794879626,
+      "ratio": 0.7805808746238138,
+      "degenerate": false
+    }
+  ],
+  "referenceAzimuth": 0.0,
+  "requiredAzimuths": [
+    0.0,
+    90.0,
+    180.0,
+    270.0
+  ],
+  "azimuthTolerance": 5.0,
+  "missingAzimuths": [],
+  "covered": true,
+  "collapseRatio": 0.15,
+  "degenerate": false,
+  "allowHoles": false,
+  "holed": false,
+  "unsegmentedAzimuths": [],
+  "segmentationReliable": true,
+  "passed": true,
+  "note": "deterministic; zero token; mandatory azimuth coverage catches off-axis-only defects, interior-hole flood fill catches silhouette-enclosed background that an area-only check misses"
+}

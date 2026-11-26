@@ -1,0 +1,51 @@
+{
+  "verdict": "low-confidence",
+  "action": "probe",
+  "fidelity": 0.5964,
+  "fidelityTarget": 0.85,
+  "hardGateFailures": [
+    "silhouette IoU 0.792 < 0.85"
+  ],
+  "maskWarnings": [],
+  "disagreementSpread": 1.0,
+  "signals": {
+    "silhouetteIoU": 0.7923,
+    "scaleDelta": 0.0061,
+    "aspectRatioDelta": 0.0511,
+    "symmetryParity": 0.9426,
+    "phashSimilarity": 0.9062,
+    "ssim": 0.3682,
+    "edgeOverlap": 0.5778,
+    "blowoutParity": 1.0,
+    "flatRegionScore": 0.6379,
+    "tonalParity": 0.687,
+    "objectness": 0.6147,
+    "hueZoneParity": 0.125
+  },
+  "specularWash": {
+    "satRatio": 0.977,
+    "hueDriftDeg": 0.2,
+    "towardCyan": true,
+    "flagged": false,
+    "advice": null
+  },
+  "reportOnlySignals": [
+    "hueZoneParity",
+    "specularWash"
+  ],
+  "reconstructionModeSuspected": true,
+  "weights": {
+    "proportion": 1.0,
+    "symmetry": 0.5,
+    "phash": 1.0,
+    "ssim": 1.5,
+    "edgeOverlap": 1.0,
+    "blowoutParity": 0.8,
+    "flatRegion": 0.8,
+    "tonalParity": 1.0,
+    "objectness": 1.5
+  },
+  "reference": "/home/user/ink-escape/art/models/shiba/reference.png",
+  "render": "/home/user/ink-escape/art/models/shiba/work/renders/blockout-front.png",
+  "note": "deterministic ensemble; zero VLM/token. hueZoneParity is REPORT-ONLY (colour-aware, CIEDE2000) — not yet in the weighted fidelity; promote after corpus calibration. VLM layer (§3.4) runs only if this passes."
+}

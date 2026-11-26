@@ -1,0 +1,26 @@
+{
+  "referenceAreaFraction": 0.3534738127958467,
+  "angles": [
+    {
+      "path": "/home/user/ink-escape/art/models/shiba/work/renders/proportion-lock-right.png",
+      "areaFraction": 0.28079859520537487,
+      "ratio": 0.7943971661842844,
+      "degenerate": false
+    },
+    {
+      "path": "/home/user/ink-escape/art/models/shiba/work/renders/proportion-lock-rear.png",
+      "areaFraction": 0.34372423270728353,
+      "ratio": 0.9724178150244069,
+      "degenerate": false
+    },
+    {
+      "path": "/home/user/ink-escape/art/models/shiba/work/renders/proportion-lock-left.png",
+      "areaFraction": 0.27591489794879626,
+      "ratio": 0.7805808746238138,
+      "degenerate": false
+    }
+  ],
+  "degenerate": false,
+  "collapseRatio": 0.15,
+  "note": "deterministic; zero token; a flat-plane-faking-a-volume collapses in silhouette area when orbited"
+}

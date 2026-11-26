@@ -1,0 +1,51 @@
+{
+  "verdict": "low-confidence",
+  "action": "probe",
+  "fidelity": 0.6347,
+  "fidelityTarget": 0.85,
+  "hardGateFailures": [
+    "silhouette IoU 0.804 < 0.85"
+  ],
+  "maskWarnings": [],
+  "disagreementSpread": 0.637,
+  "signals": {
+    "silhouetteIoU": 0.804,
+    "scaleDelta": 0.0438,
+    "aspectRatioDelta": 0.0229,
+    "symmetryParity": 0.8776,
+    "phashSimilarity": 0.875,
+    "ssim": 0.363,
+    "edgeOverlap": 0.5706,
+    "blowoutParity": 1.0,
+    "flatRegionScore": 0.5619,
+    "tonalParity": 0.6814,
+    "objectness": 0.5826,
+    "hueZoneParity": 0.0
+  },
+  "specularWash": {
+    "satRatio": 0.994,
+    "hueDriftDeg": 0.8,
+    "towardCyan": true,
+    "flagged": false,
+    "advice": null
+  },
+  "reportOnlySignals": [
+    "hueZoneParity",
+    "specularWash"
+  ],
+  "reconstructionModeSuspected": true,
+  "weights": {
+    "proportion": 1.0,
+    "symmetry": 0.5,
+    "phash": 1.0,
+    "ssim": 1.5,
+    "edgeOverlap": 1.0,
+    "blowoutParity": 0.8,
+    "flatRegion": 0.8,
+    "tonalParity": 1.0,
+    "objectness": 1.5
+  },
+  "reference": "/home/user/ink-escape/art/models/shiba/reference.png",
+  "render": "/home/user/ink-escape/art/models/shiba/work/renders/proportion-lock-front.png",
+  "note": "deterministic ensemble; zero VLM/token. hueZoneParity is REPORT-ONLY (colour-aware, CIEDE2000) — not yet in the weighted fidelity; promote after corpus calibration. VLM layer (§3.4) runs only if this passes."
+}

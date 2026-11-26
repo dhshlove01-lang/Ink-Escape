@@ -92,13 +92,7 @@ URL=https://dhshlove01-lang.github.io/Ink-Escape/ NODE_PATH=$(npm root -g) node 
 
 ## 지금 진행 중
 
-2026-11-26 시바 3D 코드 모델 (img2threejs 스킬, Claude 작업 중) — 사용자 요청: 원본 2D(assets/source/shiba.png)로 캐릭터 하나 시험 제작
-- 작업 폴더 `art/models/shiba/` (reference.png, work/: 스펙 `object-sculpt-spec.json`, 스펙 생성기 `build_spec.py`, 상태 `.img2threejs/state.json`), 재생성 `art/models/shiba/rebuild.sh <pass-id>` (미리보기는 scratch 의 three 0.160 + esbuild 필요 — 스크립트 안 경로 참고)
-- [x] 이미지 분석·적합성·랜드마크·평가·세부 목록·재질 근거·스펙·엄격 검사 통과
-- [ ] 빌드 패스: blockout 진행 중 (렌더 `work/renders/blockout-sheet.png`). 남은 점: 반다나 너무 밝고 넓음, 벨트가 떠 보임, 주황 연함
-- [ ] 이후 structural → feature-placement → material → lighting → interaction → optimization, 각 패스 리뷰 기록
-- [ ] 게임 적용: `src/client/render/models/shiba.js`(순수 JS) + `config/models.js` 한 줄(procedural), ModelLibrary 지원, 기존 GLB 와 비교 사진
-- 주의: 생성기는 transform.rotation 을 라디안으로 쓴다(build_spec.py 에서 변환). 끝점(attachment) 부품은 회전 0. 토러스는 반지름 0.45 기준 scale.
+(없음)
 
 ## 다음 할 일 (우선순위)
 
@@ -119,6 +113,18 @@ URL=https://dhshlove01-lang.github.io/Ink-Escape/ NODE_PATH=$(npm root -g) node 
 - 효과음은 아직 임시.
 
 ## 작업 기록
+
+### 2026-11-26 · 시바 3D 코드 모델 시험 제작 (img2threejs) + 게임 연결
+- **무엇을**: 사용자 요청 "원본 2D 로 캐릭터 하나만 만들어봐" → `assets/source/shiba.png` 를 기준으로 img2threejs 스킬 파이프라인을 돌려 **코드로 만든 시바**(파일 없이 Three.js 도형 ~45개 + 뼈대)를 만들고 게임에 연결. **기본은 기존 GLB 그대로**, 주소에 `?models=code` 를 붙이면 코드 시바로 바뀐다(비교용).
+- **결과/한계**: 패스 blockout → structural → proportion-lock → feature-placement → material 까지 리뷰 기록. 실루엣 일치(Tier 1 IoU) 0.87, 360° 구멍 검사 통과. 사용자에게 보여줄 비교: `art/models/shiba/compare-ingame.jpg`(원본 · 현재 GLB · 코드 모델, 로비 화면). 단점(정직하게): 털 질감·그라데이션 없음(단색 도형), 입이 U 미소가 아닌 타원, 반다나가 털색과 비슷해 로비 조명에서 묻힘, 등·꼬리·두께는 정면 한 장에서 추측. GLB(사진 기반)가 더 원본에 가깝고, 코드 모델은 가볍고(텍스처 0) 부위별로 움직일 수 있다는 장점.
+- **어디**:
+  - 모델 코드 `src/client/render/models/shiba.js` (`createShibaModel`, 순수 JS, `three` 만 import, 160KB) — 스킬이 낸 TypeScript 를 `art/models/shiba/export_game.sh` 가 esbuild 로 묶어 만든다. 손으로 고치지 말고 스펙 → 재생성.
+  - 목록 `src/client/render/models/index.js` (`PROCEDURAL_MODELS`, 이름 → 필요할 때만 import).
+  - `src/config/models.js`: `procedural` 항목 설명, `MODEL_VARIANTS.code.shiba`, `modelDefsFor(variant)`. `src/main.js` 가 `?models=` 로 고른다. 코드 시바를 기본으로 하려면 그 줄을 `MODEL_DEFS.shiba` 로 옮기면 끝.
+  - `ModelLibrary`: `def.procedural` 지원(복제 대신 매번 새로 만듦 — 뼈대 있는 SkinnedMesh 는 clone 하면 깨짐), 완전히 투명한 부품(스킬의 root 상자)은 재질을 꺼서 그리지도 그림자 내지도 않게(`hideClearParts`), 크기 맞춤은 보이는 메시만(`visibleBox` — 처음엔 투명 root 상자가 포함돼 시바가 작고 떠 있었음), 재질 보정은 `def.material` 있을 때만.
+  - 작업 파일 `art/models/shiba/`: `reference.png`, `rebuild.sh`/`gates.sh`/`review.sh`/`export_game.sh`, `work/build_spec.py`(스펙 생성기 — 모양 숫자는 여기서 고친다), `work/object-sculpt-spec.json`, `work/.img2threejs/state.json`, `work/renders/`(최종 material-pass 시트 + 단계별 점수 JSON). 중간 그림은 `.gitignore`.
+  - 주의: 생성기는 `transform.rotation` 을 라디안으로 읽는다(build_spec.py 에서 변환), 끝점 부품(원기둥·캡슐 등)은 회전 0, 토러스는 반지름 0.45 기준 scale. 미리보기 빌드는 three 0.160 + esbuild 가 필요(스크립트 안 경로 참고).
+- **검증**: `npm test` 16 통과. smoke 기본/`?models=code` 둘 다 `errors: []`, `monsters: 1`. 헤드리스로 로비(발이 받침 위, GLB 와 같은 키)·인게임 술래 3D 화면(총 든 몸) 확인, 콘솔 경고 0.
 
 ### 2026-11-26 · img2threejs 스킬 설치
 - **무엇을**: 사용자 요청으로 https://github.com/img2threejs/img2threejs (v2.0.1, 커밋 0c0c49b, Apache-2.0) 를 프로젝트 스킬로 설치 → `.claude/skills/img2threejs/`. 참고 이미지를 보고 Three.js 코드로 모델을 다시 만드는 단계형 파이프라인(intake → spec → build → review, 스크린샷 비교 반복).

@@ -1,7 +1,9 @@
 import * as THREE from 'three';
 import { GLTFLoader } from '../../../vendor/addons/loaders/GLTFLoader.js';
+import { PROCEDURAL_MODELS } from './models/index.js';
 
 // GLB 모델 불러오기·보정·복제. 못 불러오면 null 을 주고, 쓰는 쪽은 임시 모델로 대체한다.
+// procedural(코드 모델)은 복제하지 않고 쓸 때마다 새로 만든다 (뼈대가 있는 SkinnedMesh 는 clone 하면 깨진다).
 // 불러오기가 늦게 끝나면 onReady 로 바꿔 끼울 수 있다.
 
 export class ModelLibrary {
@@ -9,6 +11,7 @@ export class ModelLibrary {
     this.defs = defs;
     this.models = new Map();
     this.waiters = new Map();
+    this.factories = new Map(); // 코드 모델: 이름 → 보정까지 한 새 모델을 돌려주는 함수
     this.loader = new GLTFLoader();
   }
 
@@ -19,9 +22,16 @@ export class ModelLibrary {
   async load(name) {
     const def = this.defs[name];
     try {
-      const gltf = await this.loader.loadAsync(def.url);
-      const root = this.normalize(gltf.scene, def);
-      this.models.set(name, root);
+      if (def.procedural) {
+        const make = await PROCEDURAL_MODELS[def.procedural]();
+        const build = () => this.normalize(make(), def);
+        build(); // 한 번 만들어 보아 오류를 여기서 잡는다
+        this.factories.set(name, build);
+        this.models.set(name, true);
+      } else {
+        const gltf = await this.loader.loadAsync(def.url);
+        this.models.set(name, this.normalize(gltf.scene, def));
+      }
       for (const fn of this.waiters.get(name) || []) fn();
       this.waiters.delete(name);
     } catch (e) {
@@ -32,10 +42,11 @@ export class ModelLibrary {
   // 앞이 -Z, 가장 긴 변 = size, anchor 'bottom' 이면 발이 y=0
   normalize(scene, def) {
     scene.rotation.y = def.rotateY || 0;
+    hideClearParts(scene);
     const holder = new THREE.Group();
     holder.add(scene);
     holder.updateMatrixWorld(true);
-    const box = new THREE.Box3().setFromObject(holder);
+    const box = visibleBox(holder); // 안 보이는 부품(코드 모델의 root 상자 등)은 크기 계산에서 뺀다
     const dim = box.getSize(new THREE.Vector3());
     const k = (def.size || 1) / Math.max(dim.x, dim.y, dim.z);
     const center = box.getCenter(new THREE.Vector3());
@@ -43,9 +54,9 @@ export class ModelLibrary {
     scene.position.z -= center.z;
     scene.position.y = def.anchor === 'bottom' ? -box.min.y : -center.y;
     holder.scale.setScalar(k);
-    scene.traverse((o) => {
+    if (def.material) scene.traverse((o) => {
       if (!o.isMesh) return;
-      const m = def.material || {};
+      const m = def.material;
       if (m.metalness !== undefined) o.material.metalness = m.metalness;
       if (m.roughness !== undefined) o.material.roughness = m.roughness;
       if (m.darkenNeutral && o.material.map) o.material.map = darkenNeutral(o.material.map, m.darkenNeutral);
@@ -61,6 +72,8 @@ export class ModelLibrary {
   }
 
   get(name) {
+    const f = this.factories.get(name);
+    if (f) return f();
     const m = this.models.get(name);
     return m ? m.clone(true) : null;
   }
@@ -122,4 +135,27 @@ function findFrontTip(root) {
   const x = near.reduce((a, p) => a + p.x, 0) / near.length;
   const y = near.reduce((a, p) => a + p.y, 0) / near.length;
   return { x, y, z: minZ };
+}
+
+// 완전히 투명한 부품(코드 모델의 뼈대 받침 root 상자 등)은 재질만 끈다 → 그리지도, 그림자를 내지도 않는다.
+// (메시 자체를 끄면 자식 부품까지 사라지므로 재질만)
+function hideClearParts(root) {
+  root.traverse((o) => {
+    if (!o.isMesh) return;
+    for (const m of Array.isArray(o.material) ? o.material : [o.material]) {
+      if (m && m.transparent && m.opacity === 0) m.visible = false;
+    }
+  });
+}
+
+// 보이는 메시만으로 크기 상자 (재질이 visible:false 인 것 제외)
+function visibleBox(root) {
+  const box = new THREE.Box3();
+  root.traverse((o) => {
+    if (!o.isMesh || !o.visible) return;
+    const mats = Array.isArray(o.material) ? o.material : [o.material];
+    if (mats.every((m) => m && m.visible === false)) return;
+    box.expandByObject(o);
+  });
+  return box.isEmpty() ? new THREE.Box3().setFromObject(root) : box;
 }

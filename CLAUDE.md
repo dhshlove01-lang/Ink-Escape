@@ -19,7 +19,7 @@
 - `img2threejs` (`.claude/skills/img2threejs/`, v2.0.1): 참고 이미지 → 코드로 만든 Three.js 모델(소품·캐릭터). 2026-11-26 사용자가 설치. 설치 기록·업데이트 방법은 그 폴더의 `INSTALLED_FROM.md`.
   **결과물 정리 규칙 (SOLID, 사용자 지시)** — 스킬이 낸 TypeScript·작업 파일을 그대로 두지 않는다:
   1. 모델 코드: `src/client/render/models/<이름>.js` 한 파일 = 모델 하나. 순수 JS(빌드 없음), `export function create<이름>Model(opts)` 가 `THREE.Group` 을 돌려준다. 게임 상태·네트워크를 모른다 (모양만, SRP).
-  2. 등록: `src/config/models.js` 에 한 줄 (`procedural: create<이름>Model`). 게임 코드는 `ModelLibrary` 로만 받는다 → 새 모델 = 파일 하나 + 표 한 줄 (OCP). GLB 로 굽기로 했으면 기존 규칙대로 `assets/models/<이름>.glb` + 한 줄.
+  2. 등록: `src/client/render/models/index.js` 의 `PROCEDURAL_MODELS` 에 한 줄(필요할 때만 import) + `src/config/models.js` 에 한 줄 (`procedural: '<이름>'`, 시험 중이면 `MODEL_VARIANTS` 에 넣고 `?models=<묶음>` 으로 비교). 게임 코드는 `ModelLibrary` 로만 받는다 → 새 모델 = 파일 하나 + 표 한 줄 (OCP). GLB 로 굽기로 했으면 기존 규칙대로 `assets/models/<이름>.glb` + 한 줄.
   3. 작업 파일(참고 이미지·설계 JSON·비교 스크린샷): `art/models/<이름>/` 에 최종본만 (다시 만들 때 쓰게). 임시 파일은 커밋하지 않는다.
   4. 모양·색 숫자는 모델 파일 안에, 게임 수치(HP·속도 등)는 `balance.js` 에만.
   5. HANDOFF 작업 기록에 원본 이미지·결과 스크린샷·등록 위치를 남긴다.

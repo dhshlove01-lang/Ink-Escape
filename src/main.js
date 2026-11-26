@@ -9,7 +9,7 @@ import { GameServer } from './server/GameServer.js';
 import * as PeerNetwork from './net/PeerNetwork.js';
 import { App } from './client/App.js';
 import { Sfx } from './client/render/Sfx.js';
-import { MODEL_DEFS } from './config/models.js';
+import { modelDefsFor } from './config/models.js';
 import { ModelLibrary } from './client/render/ModelLibrary.js';
 import { setModelLibrary } from './client/render/AnimalModels.js';
 import { IMAGE_DEFS } from './config/assets.js';
@@ -21,7 +21,8 @@ const updates = new UpdateWatcher({ base: window.BUILD_STAMP });
 updates.start();
 
 // 3D 모델 파일(GLB): 기다리지 않고 불러오기 시작. 늦게 끝나면 임시 모델을 바꿔 끼운다.
-const models = new ModelLibrary(MODEL_DEFS);
+// ?models=code → 코드로 만든 모델 묶음으로 바꿔 본다 (config/models.js MODEL_VARIANTS)
+const models = new ModelLibrary(modelDefsFor(new URLSearchParams(location.search).get('models')));
 setModelLibrary(models);
 models.loadAll();
 

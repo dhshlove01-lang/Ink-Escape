@@ -6,3 +6,12 @@ work/renders/*-front.png
 work/renders/*-right.png
 work/renders/*-rear.png
 work/renders/*-left.png
+# 중간 단계 그림·확대 잘라낸 것 (최종 material-pass 와 비교 시트만 남긴다; 각 단계 점수 JSON 은 남김)
+work/renders/*-stripped.png
+work/renders/*-crop.png
+work/renders/crop-*.png
+work/renders/tier1-mask-diff.png
+work/renders/blockout-*.png
+work/renders/structural-pass-*.png
+work/renders/proportion-lock-*.png
+work/renders/feature-placement-*.png

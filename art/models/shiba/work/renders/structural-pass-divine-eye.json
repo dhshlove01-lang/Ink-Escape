@@ -1,0 +1,52 @@
+{
+  "verdict": "reject",
+  "action": "refine-code",
+  "fidelity": 0.6316,
+  "fidelityTarget": 0.85,
+  "hardGateFailures": [
+    "silhouette IoU 0.791 < 0.85",
+    "scale delta 0.087 > 0.08"
+  ],
+  "maskWarnings": [],
+  "disagreementSpread": 0.6446,
+  "signals": {
+    "silhouetteIoU": 0.7912,
+    "scaleDelta": 0.0866,
+    "aspectRatioDelta": 0.0229,
+    "symmetryParity": 0.878,
+    "phashSimilarity": 0.875,
+    "ssim": 0.3554,
+    "edgeOverlap": 0.5545,
+    "blowoutParity": 1.0,
+    "flatRegionScore": 0.5245,
+    "tonalParity": 0.6763,
+    "objectness": 0.6051,
+    "hueZoneParity": 0.25
+  },
+  "specularWash": {
+    "satRatio": 1.005,
+    "hueDriftDeg": 0.4,
+    "towardCyan": true,
+    "flagged": false,
+    "advice": null
+  },
+  "reportOnlySignals": [
+    "hueZoneParity",
+    "specularWash"
+  ],
+  "reconstructionModeSuspected": false,
+  "weights": {
+    "proportion": 1.0,
+    "symmetry": 0.5,
+    "phash": 1.0,
+    "ssim": 1.5,
+    "edgeOverlap": 1.0,
+    "blowoutParity": 0.8,
+    "flatRegion": 0.8,
+    "tonalParity": 1.0,
+    "objectness": 1.5
+  },
+  "reference": "/home/user/ink-escape/art/models/shiba/reference.png",
+  "render": "/home/user/ink-escape/art/models/shiba/work/renders/structural-pass-front.png",
+  "note": "deterministic ensemble; zero VLM/token. hueZoneParity is REPORT-ONLY (colour-aware, CIEDE2000) — not yet in the weighted fidelity; promote after corpus calibration. VLM layer (§3.4) runs only if this passes."
+}

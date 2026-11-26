@@ -1,0 +1,26 @@
+{
+  "referenceAreaFraction": 0.36009059907364993,
+  "angles": [
+    {
+      "path": "/home/user/ink-escape/art/models/shiba/work/renders/blockout-right.png",
+      "areaFraction": 0.28064081030182725,
+      "ratio": 0.7793616690460372,
+      "degenerate": false
+    },
+    {
+      "path": "/home/user/ink-escape/art/models/shiba/work/renders/blockout-rear.png",
+      "areaFraction": 0.347472896625439,
+      "ratio": 0.9649596449319405,
+      "degenerate": false
+    },
+    {
+      "path": "/home/user/ink-escape/art/models/shiba/work/renders/blockout-left.png",
+      "areaFraction": 0.2754466330737517,
+      "ratio": 0.7649370291319774,
+      "degenerate": false
+    }
+  ],
+  "degenerate": false,
+  "collapseRatio": 0.15,
+  "note": "deterministic; zero token; a flat-plane-faking-a-volume collapses in silhouette area when orbited"
+}

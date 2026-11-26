@@ -1,0 +1,98 @@
+{
+  "angles": [
+    {
+      "azimuth": 0.0,
+      "path": "/home/user/ink-escape/art/models/shiba/work/renders/material-pass-front.png",
+      "isReference": true,
+      "segmented": true,
+      "holed": false,
+      "interiorHolePixelCount": 360,
+      "interiorHoleFraction": 0.0025296709319729323,
+      "largestHolePixelCount": 52,
+      "largestHoleBBox": {
+        "x": 202,
+        "y": 469,
+        "width": 12,
+        "height": 10
+      },
+      "areaFraction": 0.3621697969155596,
+      "ratio": 1.0,
+      "degenerate": false
+    },
+    {
+      "azimuth": 90.0,
+      "path": "/home/user/ink-escape/art/models/shiba/work/renders/material-pass-right.png",
+      "isReference": false,
+      "segmented": true,
+      "holed": false,
+      "interiorHolePixelCount": 822,
+      "interiorHoleFraction": 0.007307770952054977,
+      "largestHolePixelCount": 557,
+      "largestHoleBBox": {
+        "x": 175,
+        "y": 286,
+        "width": 84,
+        "height": 18
+      },
+      "areaFraction": 0.2862599888023617,
+      "ratio": 0.7904027095586428,
+      "degenerate": false
+    },
+    {
+      "azimuth": 180.0,
+      "path": "/home/user/ink-escape/art/models/shiba/work/renders/material-pass-rear.png",
+      "isReference": false,
+      "segmented": true,
+      "holed": false,
+      "interiorHolePixelCount": 113,
+      "interiorHoleFraction": 0.000825401926911755,
+      "largestHolePixelCount": 24,
+      "largestHoleBBox": {
+        "x": 266,
+        "y": 557,
+        "width": 18,
+        "height": 2
+      },
+      "areaFraction": 0.3484068814577289,
+      "ratio": 0.9619987211108066,
+      "degenerate": false
+    },
+    {
+      "azimuth": 270.0,
+      "path": "/home/user/ink-escape/art/models/shiba/work/renders/material-pass-left.png",
+      "isReference": false,
+      "segmented": true,
+      "holed": false,
+      "interiorHolePixelCount": 604,
+      "interiorHoleFraction": 0.005466953892941837,
+      "largestHolePixelCount": 332,
+      "largestHoleBBox": {
+        "x": 327,
+        "y": 279,
+        "width": 62,
+        "height": 14
+      },
+      "areaFraction": 0.28116760828625237,
+      "ratio": 0.7763419552950932,
+      "degenerate": false
+    }
+  ],
+  "referenceAzimuth": 0.0,
+  "requiredAzimuths": [
+    0.0,
+    90.0,
+    180.0,
+    270.0
+  ],
+  "azimuthTolerance": 5.0,
+  "missingAzimuths": [],
+  "covered": true,
+  "collapseRatio": 0.15,
+  "degenerate": false,
+  "allowHoles": false,
+  "holed": false,
+  "unsegmentedAzimuths": [],
+  "segmentationReliable": true,
+  "passed": true,
+  "note": "deterministic; zero token; mandatory azimuth coverage catches off-axis-only defects, interior-hole flood fill catches silhouette-enclosed background that an area-only check misses"
+}

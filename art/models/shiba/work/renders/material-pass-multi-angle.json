@@ -1,0 +1,26 @@
+{
+  "referenceAreaFraction": 0.3621697969155596,
+  "angles": [
+    {
+      "path": "/home/user/ink-escape/art/models/shiba/work/renders/material-pass-right.png",
+      "areaFraction": 0.2862599888023617,
+      "ratio": 0.7904027095586428,
+      "degenerate": false
+    },
+    {
+      "path": "/home/user/ink-escape/art/models/shiba/work/renders/material-pass-rear.png",
+      "areaFraction": 0.3484068814577289,
+      "ratio": 0.9619987211108066,
+      "degenerate": false
+    },
+    {
+      "path": "/home/user/ink-escape/art/models/shiba/work/renders/material-pass-left.png",
+      "areaFraction": 0.28116760828625237,
+      "ratio": 0.7763419552950932,
+      "degenerate": false
+    }
+  ],
+  "degenerate": false,
+  "collapseRatio": 0.15,
+  "note": "deterministic; zero token; a flat-plane-faking-a-volume collapses in silhouette area when orbited"
+}

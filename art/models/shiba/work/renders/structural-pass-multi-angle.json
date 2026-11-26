@@ -1,0 +1,26 @@
+{
+  "referenceAreaFraction": 0.3471827759963353,
+  "angles": [
+    {
+      "path": "/home/user/ink-escape/art/models/shiba/work/renders/structural-pass-right.png",
+      "areaFraction": 0.27905278159515445,
+      "ratio": 0.8037633226312472,
+      "degenerate": false
+    },
+    {
+      "path": "/home/user/ink-escape/art/models/shiba/work/renders/structural-pass-rear.png",
+      "areaFraction": 0.33818140174072375,
+      "ratio": 0.9740730967146062,
+      "degenerate": false
+    },
+    {
+      "path": "/home/user/ink-escape/art/models/shiba/work/renders/structural-pass-left.png",
+      "areaFraction": 0.2741105512291953,
+      "ratio": 0.7895280819809123,
+      "degenerate": false
+    }
+  ],
+  "degenerate": false,
+  "collapseRatio": 0.15,
+  "note": "deterministic; zero token; a flat-plane-faking-a-volume collapses in silhouette area when orbited"
+}

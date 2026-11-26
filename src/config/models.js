@@ -4,6 +4,7 @@
 //   size       가장 긴 변을 이 길이(m)로 맞춤
 //   anchor     'center'(기본, 물체 중심이 원점) 또는 'bottom'(발이 바닥 y=0)
 //   tip        '-z' 이면 가장 앞쪽 끝 점을 찾아 userData.tip 에 저장 (총구 위치)
+//   procedural 코드로 만든 모델 이름 (src/client/render/models/index.js). url 대신 쓴다
 //   material   재질 보정: metalness·roughness 덮어쓰기,
 //              darkenNeutral = 무채색(회색) 텍스처를 이 배율로 어둡게 (Stable Fast 3D 가 밝게 구워서)
 //
@@ -26,3 +27,16 @@ export const MODEL_DEFS = {
   cat: { url: 'assets/models/cat.glb', ...CHARACTER },
   devil: { url: 'assets/models/devil.glb', ...CHARACTER },
 };
+
+// 다른 모양 묶음: 주소에 ?models=<이름> 을 붙이면 그 묶음의 줄이 위 기본 줄을 대신한다 (비교·시험용).
+// 코드 모델을 기본으로 쓰기로 하면 그 줄을 MODEL_DEFS 로 옮기면 된다.
+export const MODEL_VARIANTS = {
+  code: {
+    // 코드로 만든 시바 (img2threejs, art/models/shiba). 앞이 +Z 라 반 바퀴 돌림. 재질은 모델 것 그대로(눈 광택 유지).
+    shiba: { procedural: 'shiba', rotateY: Math.PI, size: CHARACTER.size, anchor: 'bottom' },
+  },
+};
+
+export function modelDefsFor(variant) {
+  return { ...MODEL_DEFS, ...(MODEL_VARIANTS[variant] || {}) };
+}

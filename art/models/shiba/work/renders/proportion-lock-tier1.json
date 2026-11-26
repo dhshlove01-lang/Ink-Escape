@@ -1,0 +1,201 @@
+STATUS pass=proportion-lock completed=2 blocked=none next=diagnose_render.py
+{
+  "passed": true,
+  "checks": {
+    "silhouetteIoU": 0.8749,
+    "aspectRatioDelta": 0.0116,
+    "scaleDelta": 0.0331,
+    "bilateralSymmetryError": 0.0125,
+    "colorDelta": {
+      "checked": 45,
+      "maxDeltaE": 40.7,
+      "perComponent": [
+        {
+          "componentId": null,
+          "deltaE": 33.52
+        },
+        {
+          "componentId": null,
+          "deltaE": 12.39
+        },
+        {
+          "componentId": null,
+          "deltaE": 10.5
+        },
+        {
+          "componentId": null,
+          "deltaE": 12.39
+        },
+        {
+          "componentId": null,
+          "deltaE": 10.5
+        },
+        {
+          "componentId": null,
+          "deltaE": 10.5
+        },
+        {
+          "componentId": null,
+          "deltaE": 12.39
+        },
+        {
+          "componentId": null,
+          "deltaE": 10.47
+        },
+        {
+          "componentId": null,
+          "deltaE": 10.5
+        },
+        {
+          "componentId": null,
+          "deltaE": 29.02
+        },
+        {
+          "componentId": null,
+          "deltaE": 14.88
+        },
+        {
+          "componentId": null,
+          "deltaE": 10.5
+        },
+        {
+          "componentId": null,
+          "deltaE": 12.39
+        },
+        {
+          "componentId": null,
+          "deltaE": 10.5
+        },
+        {
+          "componentId": null,
+          "deltaE": 12.39
+        },
+        {
+          "componentId": null,
+          "deltaE": 10.5
+        },
+        {
+          "componentId": null,
+          "deltaE": 13.84
+        },
+        {
+          "componentId": null,
+          "deltaE": 7.27
+        },
+        {
+          "componentId": null,
+          "deltaE": 18.37
+        },
+        {
+          "componentId": null,
+          "deltaE": 12.39
+        },
+        {
+          "componentId": null,
+          "deltaE": 10.47
+        },
+        {
+          "componentId": null,
+          "deltaE": 10.5
+        },
+        {
+          "componentId": null,
+          "deltaE": 29.02
+        },
+        {
+          "componentId": null,
+          "deltaE": 14.88
+        },
+        {
+          "componentId": null,
+          "deltaE": 10.5
+        },
+        {
+          "componentId": null,
+          "deltaE": 12.39
+        },
+        {
+          "componentId": null,
+          "deltaE": 10.5
+        },
+        {
+          "componentId": null,
+          "deltaE": 12.39
+        },
+        {
+          "componentId": null,
+          "deltaE": 10.5
+        },
+        {
+          "componentId": null,
+          "deltaE": 13.84
+        },
+        {
+          "componentId": null,
+          "deltaE": 7.27
+        },
+        {
+          "componentId": null,
+          "deltaE": 18.37
+        },
+        {
+          "componentId": null,
+          "deltaE": 12.97
+        },
+        {
+          "componentId": null,
+          "deltaE": 11.25
+        },
+        {
+          "componentId": null,
+          "deltaE": 40.7
+        },
+        {
+          "componentId": null,
+          "deltaE": 15.21
+        },
+        {
+          "componentId": null,
+          "deltaE": 15.21
+        },
+        {
+          "componentId": null,
+          "deltaE": 15.21
+        },
+        {
+          "componentId": null,
+          "deltaE": 15.21
+        },
+        {
+          "componentId": null,
+          "deltaE": 12.39
+        },
+        {
+          "componentId": null,
+          "deltaE": 13.84
+        },
+        {
+          "componentId": null,
+          "deltaE": 18.37
+        },
+        {
+          "componentId": null,
+          "deltaE": 13.84
+        },
+        {
+          "componentId": null,
+          "deltaE": 12.39
+        },
+        {
+          "componentId": null,
+          "deltaE": 10.5
+        }
+      ],
+      "gated": false
+    }
+  },
+  "failures": [],
+  "maskWarnings": [],
+  "renderHash": "fb133ad2c836969b",
+  "passId": "proportion-lock"
+}

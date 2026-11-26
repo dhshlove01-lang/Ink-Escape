@@ -776,12 +776,23 @@
       "interaction-pass",
       "optimization-pass"
     ],
-    "currentPass": "blockout",
-    "completedPasses": [],
-    "lastCompletedPass": "",
+    "currentPass": "material-pass",
+    "completedPasses": [
+      "blockout",
+      "structural-pass",
+      "proportion-lock",
+      "feature-placement"
+    ],
+    "lastCompletedPass": "feature-placement",
     "blockedReason": "",
     "nextRequiredEvidence": [
-      "Humanoid proportions and pose read correctly without materials.",
+      "Skin, hair, shirt, pants, shoe, and any enabled accessory materials match reference palette.",
+      "reference-derived albedo palette with dominant, secondary, and accent colors",
+      "independent albedo, roughness, height/normal, and AO maps",
+      "macro, meso, and micro surface-frequency response at 1024px or higher",
+      "local material masks: AO, dirt, wear, stains, moss, chips, scratches, wetness, or equivalent",
+      "neutral, grazing-light close-up, and reference-matched browser screenshots",
+      "AI vision comparison sheet score meeting the visual acceptance threshold",
       "browser render screenshot from your agent's browser/screenshot tool",
       "side-by-side reference/render comparison sheet for AI vision review",
       "banded interior difference vs the reference baseline (forge/stage4_review/interior_difference.py --from/--to per region)",
@@ -1051,8 +1062,8 @@
       "details": [],
       "fidelityTier": "blockout",
       "colorMaterialRecipe": {
-        "dominantAlbedo": "rgba(0, 0, 0, 1.0)",
-        "secondaryAlbedo": "rgba(0, 0, 0, 0.85)",
+        "dominantAlbedo": "rgba(210, 122, 34, 1.0)",
+        "secondaryAlbedo": "rgba(210, 122, 34, 0.85)",
         "materialClass": "unknown",
         "materialClassConfidence": 0.8,
         "evidenceRefs": [
@@ -1084,8 +1095,8 @@
       "parent": "root",
       "attachment": null,
       "dimensions": {
-        "width": 0.6,
-        "height": 0.5,
+        "width": 0.63,
+        "height": 0.53,
         "depth": 0.5,
         "units": "relative",
         "confidence": 0.8
@@ -1093,7 +1104,7 @@
       "transform": {
         "position": [
           0,
-          0.33,
+          0.315,
           0
         ],
         "rotation": [
@@ -1102,8 +1113,8 @@
           0.0
         ],
         "scale": [
-          0.6,
-          0.5,
+          0.63,
+          0.53,
           0.5
         ]
       },
@@ -1183,8 +1194,8 @@
       "details": [],
       "fidelityTier": "blockout",
       "colorMaterialRecipe": {
-        "dominantAlbedo": "rgba(221, 138, 44, 1.0)",
-        "secondaryAlbedo": "rgba(221, 138, 44, 0.85)",
+        "dominantAlbedo": "rgba(210, 122, 34, 1.0)",
+        "secondaryAlbedo": "rgba(210, 122, 34, 0.85)",
         "materialClass": "fabric",
         "materialClassConfidence": 0.8,
         "evidenceRefs": [
@@ -1348,16 +1359,16 @@
       "parent": "torso",
       "attachment": null,
       "dimensions": {
-        "width": 0.535,
-        "height": 0.39,
-        "depth": 0.46,
+        "width": 0.53,
+        "height": 0.38,
+        "depth": 0.47,
         "units": "relative",
         "confidence": 0.8
       },
       "transform": {
         "position": [
           0,
-          0.43,
+          0.41,
           0.02
         ],
         "rotation": [
@@ -1366,9 +1377,9 @@
           0.0
         ],
         "scale": [
-          0.535,
-          0.39,
-          0.46
+          0.53,
+          0.38,
+          0.47
         ]
       },
       "actionProfile": {
@@ -1457,8 +1468,8 @@
       "details": [],
       "fidelityTier": "blockout",
       "colorMaterialRecipe": {
-        "dominantAlbedo": "rgba(221, 138, 44, 1.0)",
-        "secondaryAlbedo": "rgba(221, 138, 44, 0.85)",
+        "dominantAlbedo": "rgba(210, 122, 34, 1.0)",
+        "secondaryAlbedo": "rgba(210, 122, 34, 0.85)",
         "materialClass": "fabric",
         "materialClassConfidence": 0.8,
         "evidenceRefs": [
@@ -1490,16 +1501,16 @@
       "parent": "head",
       "attachment": null,
       "dimensions": {
-        "width": 0.47,
-        "height": 0.25,
-        "depth": 0.33,
+        "width": 0.56,
+        "height": 0.255,
+        "depth": 0.35,
         "units": "relative",
         "confidence": 0.8
       },
       "transform": {
         "position": [
           0,
-          -0.075,
+          -0.08,
           0.075
         ],
         "rotation": [
@@ -1508,9 +1519,9 @@
           0.0
         ],
         "scale": [
-          0.47,
-          0.25,
-          0.33
+          0.56,
+          0.255,
+          0.35
         ]
       },
       "actionProfile": {
@@ -1737,9 +1748,9 @@
       "role": "ear",
       "importance": 0.8,
       "confidence": 0.8,
-      "primitive": "cone",
+      "primitive": "extrude",
       "topologyClass": "assembled-solid",
-      "topologyRationale": "Ear is a flattened triangular cone embedded into the skull top-lateral.",
+      "topologyRationale": "Shiba ear is a flat rounded-tip triangle slab, embedded into the skull top-lateral.",
       "geometryDescriptor": {
         "topologyIntent": "stylized character part",
         "edgeTreatment": {
@@ -1749,24 +1760,53 @@
         },
         "deformationStack": [],
         "uvStrategy": "generated procedural coordinates",
-        "normalStrategy": "smooth vertex normals"
+        "normalStrategy": "smooth vertex normals",
+        "profile2D": {
+          "points": [
+            [
+              -0.072,
+              0.0
+            ],
+            [
+              0.072,
+              0.0
+            ],
+            [
+              0.03,
+              0.09
+            ],
+            [
+              0.008,
+              0.135
+            ],
+            [
+              -0.008,
+              0.135
+            ],
+            [
+              -0.03,
+              0.09
+            ]
+          ],
+          "depth": 0.05
+        }
       },
       "parent": "head",
       "attachment": {
-        "parentSocket": "head-crown",
+        "parentSocket": "skull-l",
         "localStart": [
-          0.15,
-          0.13,
-          -0.005
+          0.145,
+          0.115,
+          -0.03
         ],
         "localEnd": [
-          0.215,
-          0.255,
-          -0.005
+          0.145,
+          0.10500000000000001,
+          -0.03
         ],
-        "contactType": "socket-joint",
-        "baseRadius": 0.078,
-        "endRadius": 0.006,
+        "contactType": "overlap",
+        "baseRadius": 0.5,
+        "endRadius": 0.5,
         "embedDepth": 0.02,
         "gapTolerance": 0.01,
         "evidenceRefs": [
@@ -1774,27 +1814,27 @@
         ]
       },
       "dimensions": {
-        "width": 0.13,
-        "height": 0.15,
-        "depth": 0.06,
+        "width": 1,
+        "height": 1,
+        "depth": 1,
         "units": "relative",
         "confidence": 0.8
       },
       "transform": {
         "position": [
-          0.15,
-          0.13,
-          -0.005
+          0.145,
+          0.115,
+          -0.03
         ],
         "rotation": [
+          -0.13963,
           0.0,
-          0.0,
-          0.0
+          -0.24435
         ],
         "scale": [
-          0.13,
-          0.15,
-          0.06
+          1,
+          1,
+          1
         ]
       },
       "actionProfile": {
@@ -1873,8 +1913,8 @@
       "details": [],
       "fidelityTier": "blockout",
       "colorMaterialRecipe": {
-        "dominantAlbedo": "rgba(221, 138, 44, 1.0)",
-        "secondaryAlbedo": "rgba(221, 138, 44, 0.85)",
+        "dominantAlbedo": "rgba(210, 122, 34, 1.0)",
+        "secondaryAlbedo": "rgba(210, 122, 34, 0.85)",
         "materialClass": "fabric",
         "materialClassConfidence": 0.8,
         "evidenceRefs": [
@@ -1889,7 +1929,7 @@
       "role": "detail",
       "importance": 0.6,
       "confidence": 0.8,
-      "primitive": "cone",
+      "primitive": "extrude",
       "topologyClass": "assembled-solid",
       "topologyRationale": "Ear inner L: stylized chibi body part built as one smooth closed primitive (no continuous sculpt needed at this scale).",
       "geometryDescriptor": {
@@ -1901,24 +1941,49 @@
         },
         "deformationStack": [],
         "uvStrategy": "generated procedural coordinates",
-        "normalStrategy": "smooth vertex normals"
+        "normalStrategy": "smooth vertex normals",
+        "profile2D": {
+          "points": [
+            [
+              -0.045,
+              0.0
+            ],
+            [
+              0.045,
+              0.0
+            ],
+            [
+              0.016,
+              0.075
+            ],
+            [
+              0.0,
+              0.098
+            ],
+            [
+              -0.016,
+              0.075
+            ]
+          ],
+          "depth": 0.008
+        }
       },
-      "parent": "head",
+      "parent": "ear-l",
       "attachment": {
-        "parentSocket": "ear-front",
+        "parentSocket": "ear-l",
         "localStart": [
-          0.158,
-          0.15,
-          0.022
+          0,
+          0.012,
+          0.051
         ],
         "localEnd": [
-          0.198,
-          0.245,
-          0.022
+          0,
+          0.002,
+          0.051
         ],
         "contactType": "overlap",
-        "baseRadius": 0.046,
-        "endRadius": 0.004,
+        "baseRadius": 0.5,
+        "endRadius": 0.5,
         "embedDepth": 0.02,
         "gapTolerance": 0.01,
         "evidenceRefs": [
@@ -1926,17 +1991,17 @@
         ]
       },
       "dimensions": {
-        "width": 0.08,
-        "height": 0.1,
-        "depth": 0.02,
+        "width": 1,
+        "height": 1,
+        "depth": 1,
         "units": "relative",
         "confidence": 0.8
       },
       "transform": {
         "position": [
-          0.158,
-          0.15,
-          0.022
+          0,
+          0.012,
+          0.051
         ],
         "rotation": [
           0.0,
@@ -1944,9 +2009,9 @@
           0.0
         ],
         "scale": [
-          0.08,
-          0.1,
-          0.02
+          1,
+          1,
+          1
         ]
       },
       "actionProfile": {
@@ -2088,7 +2153,7 @@
         "position": [
           0.092,
           0.006,
-          0.192
+          0.2163
         ],
         "rotation": [
           0.0,
@@ -2220,7 +2285,7 @@
         "position": [
           0.092,
           0.008,
-          0.2
+          0.2242
         ],
         "rotation": [
           0.0,
@@ -2484,9 +2549,9 @@
       "parent": "head",
       "attachment": null,
       "dimensions": {
-        "width": 0.05,
-        "height": 0.032,
-        "depth": 0.02,
+        "width": 0.055,
+        "height": 0.034,
+        "depth": 0.026,
         "units": "relative",
         "confidence": 0.8
       },
@@ -2494,7 +2559,7 @@
         "position": [
           0.072,
           0.085,
-          0.188
+          0.2142
         ],
         "rotation": [
           0.0,
@@ -2502,9 +2567,9 @@
           0.0
         ],
         "scale": [
-          0.05,
-          0.032,
-          0.02
+          0.055,
+          0.034,
+          0.026
         ]
       },
       "actionProfile": {
@@ -2623,7 +2688,7 @@
         ],
         "localEnd": [
           0.395,
-          0.03,
+          0.04,
           0.06
         ],
         "contactType": "socket-joint",
@@ -2735,8 +2800,8 @@
       "details": [],
       "fidelityTier": "blockout",
       "colorMaterialRecipe": {
-        "dominantAlbedo": "rgba(221, 138, 44, 1.0)",
-        "secondaryAlbedo": "rgba(221, 138, 44, 0.85)",
+        "dominantAlbedo": "rgba(210, 122, 34, 1.0)",
+        "secondaryAlbedo": "rgba(210, 122, 34, 0.85)",
         "materialClass": "fabric",
         "materialClassConfidence": 0.8,
         "evidenceRefs": [
@@ -2770,17 +2835,17 @@
         "parentSocket": "wrist-l",
         "localStart": [
           0.405,
-          0.015,
+          0.025,
           0.065
         ],
         "localEnd": [
           0.405,
-          0.004999999999999999,
+          0.015000000000000001,
           0.065
         ],
         "contactType": "overlap",
-        "baseRadius": 0.0575,
-        "endRadius": 0.0575,
+        "baseRadius": 0.055,
+        "endRadius": 0.055,
         "embedDepth": 0.02,
         "gapTolerance": 0.01,
         "evidenceRefs": [
@@ -2788,16 +2853,16 @@
         ]
       },
       "dimensions": {
-        "width": 0.115,
-        "height": 0.11,
-        "depth": 0.11,
+        "width": 0.11,
+        "height": 0.105,
+        "depth": 0.105,
         "units": "relative",
         "confidence": 0.8
       },
       "transform": {
         "position": [
           0.405,
-          0.015,
+          0.025,
           0.065
         ],
         "rotation": [
@@ -2806,9 +2871,9 @@
           0.0
         ],
         "scale": [
-          0.115,
           0.11,
-          0.11
+          0.105,
+          0.105
         ]
       },
       "actionProfile": {
@@ -3039,8 +3104,8 @@
       "details": [],
       "fidelityTier": "blockout",
       "colorMaterialRecipe": {
-        "dominantAlbedo": "rgba(221, 138, 44, 1.0)",
-        "secondaryAlbedo": "rgba(221, 138, 44, 0.85)",
+        "dominantAlbedo": "rgba(210, 122, 34, 1.0)",
+        "secondaryAlbedo": "rgba(210, 122, 34, 0.85)",
         "materialClass": "fabric",
         "materialClassConfidence": 0.8,
         "evidenceRefs": [
@@ -3232,13 +3297,13 @@
       },
       "transform": {
         "position": [
-          0.245,
-          -0.085,
-          0.14
+          0.255,
+          -0.07,
+          0.13
         ],
         "rotation": [
           0.0,
-          0.66323,
+          0.69813,
           0.0
         ],
         "scale": [
@@ -3613,9 +3678,9 @@
       "role": "ear",
       "importance": 0.8,
       "confidence": 0.8,
-      "primitive": "cone",
+      "primitive": "extrude",
       "topologyClass": "assembled-solid",
-      "topologyRationale": "Ear is a flattened triangular cone embedded into the skull top-lateral.",
+      "topologyRationale": "Shiba ear is a flat rounded-tip triangle slab, embedded into the skull top-lateral.",
       "geometryDescriptor": {
         "topologyIntent": "stylized character part",
         "edgeTreatment": {
@@ -3625,24 +3690,53 @@
         },
         "deformationStack": [],
         "uvStrategy": "generated procedural coordinates",
-        "normalStrategy": "smooth vertex normals"
+        "normalStrategy": "smooth vertex normals",
+        "profile2D": {
+          "points": [
+            [
+              -0.072,
+              0.0
+            ],
+            [
+              0.072,
+              0.0
+            ],
+            [
+              0.03,
+              0.09
+            ],
+            [
+              0.008,
+              0.135
+            ],
+            [
+              -0.008,
+              0.135
+            ],
+            [
+              -0.03,
+              0.09
+            ]
+          ],
+          "depth": 0.05
+        }
       },
       "parent": "head",
       "attachment": {
-        "parentSocket": "head-crown",
+        "parentSocket": "skull-r",
         "localStart": [
-          -0.15,
-          0.13,
-          -0.005
+          -0.145,
+          0.115,
+          -0.03
         ],
         "localEnd": [
-          -0.215,
-          0.255,
-          -0.005
+          -0.145,
+          0.10500000000000001,
+          -0.03
         ],
-        "contactType": "socket-joint",
-        "baseRadius": 0.078,
-        "endRadius": 0.006,
+        "contactType": "overlap",
+        "baseRadius": 0.5,
+        "endRadius": 0.5,
         "embedDepth": 0.02,
         "gapTolerance": 0.01,
         "evidenceRefs": [
@@ -3650,27 +3744,27 @@
         ]
       },
       "dimensions": {
-        "width": 0.13,
-        "height": 0.15,
-        "depth": 0.06,
+        "width": 1,
+        "height": 1,
+        "depth": 1,
         "units": "relative",
         "confidence": 0.8
       },
       "transform": {
         "position": [
-          -0.15,
-          0.13,
-          -0.005
+          -0.145,
+          0.115,
+          -0.03
         ],
         "rotation": [
+          -0.13963,
           0.0,
-          0.0,
-          0.0
+          0.24435
         ],
         "scale": [
-          0.13,
-          0.15,
-          0.06
+          1,
+          1,
+          1
         ]
       },
       "actionProfile": {
@@ -3749,8 +3843,8 @@
       "details": [],
       "fidelityTier": "blockout",
       "colorMaterialRecipe": {
-        "dominantAlbedo": "rgba(221, 138, 44, 1.0)",
-        "secondaryAlbedo": "rgba(221, 138, 44, 0.85)",
+        "dominantAlbedo": "rgba(210, 122, 34, 1.0)",
+        "secondaryAlbedo": "rgba(210, 122, 34, 0.85)",
         "materialClass": "fabric",
         "materialClassConfidence": 0.8,
         "evidenceRefs": [
@@ -3765,7 +3859,7 @@
       "role": "detail",
       "importance": 0.6,
       "confidence": 0.8,
-      "primitive": "cone",
+      "primitive": "extrude",
       "topologyClass": "assembled-solid",
       "topologyRationale": "Ear inner R: stylized chibi body part built as one smooth closed primitive (no continuous sculpt needed at this scale).",
       "geometryDescriptor": {
@@ -3777,24 +3871,49 @@
         },
         "deformationStack": [],
         "uvStrategy": "generated procedural coordinates",
-        "normalStrategy": "smooth vertex normals"
+        "normalStrategy": "smooth vertex normals",
+        "profile2D": {
+          "points": [
+            [
+              -0.045,
+              0.0
+            ],
+            [
+              0.045,
+              0.0
+            ],
+            [
+              0.016,
+              0.075
+            ],
+            [
+              0.0,
+              0.098
+            ],
+            [
+              -0.016,
+              0.075
+            ]
+          ],
+          "depth": 0.008
+        }
       },
-      "parent": "head",
+      "parent": "ear-r",
       "attachment": {
-        "parentSocket": "ear-front",
+        "parentSocket": "ear-r",
         "localStart": [
-          -0.158,
-          0.15,
-          0.022
+          0,
+          0.012,
+          0.051
         ],
         "localEnd": [
-          -0.198,
-          0.245,
-          0.022
+          0,
+          0.002,
+          0.051
         ],
         "contactType": "overlap",
-        "baseRadius": 0.046,
-        "endRadius": 0.004,
+        "baseRadius": 0.5,
+        "endRadius": 0.5,
         "embedDepth": 0.02,
         "gapTolerance": 0.01,
         "evidenceRefs": [
@@ -3802,17 +3921,17 @@
         ]
       },
       "dimensions": {
-        "width": 0.08,
-        "height": 0.1,
-        "depth": 0.02,
+        "width": 1,
+        "height": 1,
+        "depth": 1,
         "units": "relative",
         "confidence": 0.8
       },
       "transform": {
         "position": [
-          -0.158,
-          0.15,
-          0.022
+          0,
+          0.012,
+          0.051
         ],
         "rotation": [
           0.0,
@@ -3820,9 +3939,9 @@
           0.0
         ],
         "scale": [
-          0.08,
-          0.1,
-          0.02
+          1,
+          1,
+          1
         ]
       },
       "actionProfile": {
@@ -3964,7 +4083,7 @@
         "position": [
           -0.092,
           0.006,
-          0.192
+          0.2163
         ],
         "rotation": [
           0.0,
@@ -4096,7 +4215,7 @@
         "position": [
           -0.092,
           0.008,
-          0.2
+          0.2242
         ],
         "rotation": [
           0.0,
@@ -4360,9 +4479,9 @@
       "parent": "head",
       "attachment": null,
       "dimensions": {
-        "width": 0.05,
-        "height": 0.032,
-        "depth": 0.02,
+        "width": 0.055,
+        "height": 0.034,
+        "depth": 0.026,
         "units": "relative",
         "confidence": 0.8
       },
@@ -4370,7 +4489,7 @@
         "position": [
           -0.072,
           0.085,
-          0.188
+          0.2142
         ],
         "rotation": [
           0.0,
@@ -4378,9 +4497,9 @@
           0.0
         ],
         "scale": [
-          0.05,
-          0.032,
-          0.02
+          0.055,
+          0.034,
+          0.026
         ]
       },
       "actionProfile": {
@@ -4499,7 +4618,7 @@
         ],
         "localEnd": [
           -0.395,
-          0.03,
+          0.04,
           0.06
         ],
         "contactType": "socket-joint",
@@ -4611,8 +4730,8 @@
       "details": [],
       "fidelityTier": "blockout",
       "colorMaterialRecipe": {
-        "dominantAlbedo": "rgba(221, 138, 44, 1.0)",
-        "secondaryAlbedo": "rgba(221, 138, 44, 0.85)",
+        "dominantAlbedo": "rgba(210, 122, 34, 1.0)",
+        "secondaryAlbedo": "rgba(210, 122, 34, 0.85)",
         "materialClass": "fabric",
         "materialClassConfidence": 0.8,
         "evidenceRefs": [
@@ -4646,17 +4765,17 @@
         "parentSocket": "wrist-r",
         "localStart": [
           -0.405,
-          0.015,
+          0.025,
           0.065
         ],
         "localEnd": [
           -0.405,
-          0.004999999999999999,
+          0.015000000000000001,
           0.065
         ],
         "contactType": "overlap",
-        "baseRadius": 0.0575,
-        "endRadius": 0.0575,
+        "baseRadius": 0.055,
+        "endRadius": 0.055,
         "embedDepth": 0.02,
         "gapTolerance": 0.01,
         "evidenceRefs": [
@@ -4664,16 +4783,16 @@
         ]
       },
       "dimensions": {
-        "width": 0.115,
-        "height": 0.11,
-        "depth": 0.11,
+        "width": 0.11,
+        "height": 0.105,
+        "depth": 0.105,
         "units": "relative",
         "confidence": 0.8
       },
       "transform": {
         "position": [
           -0.405,
-          0.015,
+          0.025,
           0.065
         ],
         "rotation": [
@@ -4682,9 +4801,9 @@
           0.0
         ],
         "scale": [
-          0.115,
           0.11,
-          0.11
+          0.105,
+          0.105
         ]
       },
       "actionProfile": {
@@ -4915,8 +5034,8 @@
       "details": [],
       "fidelityTier": "blockout",
       "colorMaterialRecipe": {
-        "dominantAlbedo": "rgba(221, 138, 44, 1.0)",
-        "secondaryAlbedo": "rgba(221, 138, 44, 0.85)",
+        "dominantAlbedo": "rgba(210, 122, 34, 1.0)",
+        "secondaryAlbedo": "rgba(210, 122, 34, 0.85)",
         "materialClass": "fabric",
         "materialClassConfidence": 0.8,
         "evidenceRefs": [
@@ -5108,13 +5227,13 @@
       },
       "transform": {
         "position": [
-          -0.245,
-          -0.085,
-          0.14
+          -0.255,
+          -0.07,
+          0.13
         ],
         "rotation": [
           0.0,
-          -0.66323,
+          -0.69813,
           0.0
         ],
         "scale": [
@@ -5506,9 +5625,9 @@
       "parent": "head",
       "attachment": null,
       "dimensions": {
-        "width": 0.052,
-        "height": 0.036,
-        "depth": 0.034,
+        "width": 0.062,
+        "height": 0.042,
+        "depth": 0.036,
         "units": "relative",
         "confidence": 0.8
       },
@@ -5516,7 +5635,7 @@
         "position": [
           0,
           -0.035,
-          0.245
+          0.256
         ],
         "rotation": [
           0.0,
@@ -5524,9 +5643,9 @@
           0.0
         ],
         "scale": [
-          0.052,
-          0.036,
-          0.034
+          0.062,
+          0.042,
+          0.036
         ]
       },
       "actionProfile": {
@@ -5638,9 +5757,9 @@
       "parent": "head",
       "attachment": null,
       "dimensions": {
-        "width": 0.11,
-        "height": 0.05,
-        "depth": 0.03,
+        "width": 0.135,
+        "height": 0.062,
+        "depth": 0.035,
         "units": "relative",
         "confidence": 0.8
       },
@@ -5648,7 +5767,7 @@
         "position": [
           0,
           -0.1,
-          0.238
+          0.2378
         ],
         "rotation": [
           0.0,
@@ -5656,9 +5775,9 @@
           0.0
         ],
         "scale": [
-          0.11,
-          0.05,
-          0.03
+          0.135,
+          0.062,
+          0.035
         ]
       },
       "actionProfile": {
@@ -5780,17 +5899,17 @@
       "parent": "mouth",
       "attachment": null,
       "dimensions": {
-        "width": 0.06,
-        "height": 0.028,
-        "depth": 0.025,
+        "width": 0.075,
+        "height": 0.034,
+        "depth": 0.026,
         "units": "relative",
         "confidence": 0.8
       },
       "transform": {
         "position": [
           0,
-          -0.009,
-          0.008
+          -0.012,
+          0.009
         ],
         "rotation": [
           0.0,
@@ -5798,9 +5917,9 @@
           0.0
         ],
         "scale": [
-          0.06,
-          0.028,
-          0.025
+          0.075,
+          0.034,
+          0.026
         ]
       },
       "actionProfile": {
@@ -5912,17 +6031,17 @@
       "parent": "torso",
       "attachment": null,
       "dimensions": {
-        "width": 0.5,
-        "height": 0.42,
-        "depth": 0.5,
+        "width": 0.47,
+        "height": 0.4,
+        "depth": 0.42,
         "units": "relative",
         "confidence": 0.8
       },
       "transform": {
         "position": [
           0,
-          0.215,
-          0.01
+          0.228,
+          -0.02
         ],
         "rotation": [
           1.5708,
@@ -5930,9 +6049,9 @@
           0.0
         ],
         "scale": [
-          0.5,
-          0.42,
-          0.5
+          0.47,
+          0.4,
+          0.42
         ]
       },
       "actionProfile": {
@@ -6011,8 +6130,8 @@
       "details": [],
       "fidelityTier": "blockout",
       "colorMaterialRecipe": {
-        "dominantAlbedo": "rgba(240, 122, 42, 1.0)",
-        "secondaryAlbedo": "rgba(240, 122, 42, 0.85)",
+        "dominantAlbedo": "rgba(226, 96, 30, 1.0)",
+        "secondaryAlbedo": "rgba(226, 96, 30, 0.85)",
         "materialClass": "fabric",
         "materialClassConfidence": 0.8,
         "evidenceRefs": [
@@ -6027,9 +6146,9 @@
       "role": "accessory",
       "importance": 0.85,
       "confidence": 0.8,
-      "primitive": "box",
+      "primitive": "extrude",
       "topologyClass": "assembled-solid",
-      "topologyRationale": "Bandana is a thin cloth panel: a flattened square turned 45 deg so only the downward point shows below the chin.",
+      "topologyRationale": "Bandana is a thin cloth panel: an extruded rounded triangle whose top edge tucks under the chin, point down to mid-chest.",
       "geometryDescriptor": {
         "topologyIntent": "stylized character part",
         "edgeTreatment": {
@@ -6039,32 +6158,77 @@
         },
         "deformationStack": [],
         "uvStrategy": "generated procedural coordinates",
-        "normalStrategy": "smooth vertex normals"
+        "normalStrategy": "smooth vertex normals",
+        "profile2D": {
+          "points": [
+            [
+              -0.25,
+              0.0
+            ],
+            [
+              -0.17,
+              -0.055
+            ],
+            [
+              -0.09,
+              -0.115
+            ],
+            [
+              -0.03,
+              -0.165
+            ],
+            [
+              0.0,
+              -0.18
+            ],
+            [
+              0.03,
+              -0.165
+            ],
+            [
+              0.09,
+              -0.115
+            ],
+            [
+              0.17,
+              -0.055
+            ],
+            [
+              0.25,
+              0.0
+            ],
+            [
+              0.0,
+              0.03
+            ]
+          ],
+          "depth": 0.022
+        }
       },
       "parent": "torso",
       "attachment": null,
       "dimensions": {
-        "width": 0.38,
-        "height": 0.28,
-        "depth": 0.03,
+        "width": 1,
+        "height": 1,
+        "depth": 1,
         "units": "relative",
         "confidence": 0.8
       },
       "transform": {
         "position": [
           0,
-          0.235,
+          0.262,
           0.2
         ],
         "rotation": [
-          -0.24435,
+          0.27925,
           0.0,
-          0.7854
+          0.0
         ],
         "scale": [
-          0.38,
-          0.28,
-          0.03
+          1,
+          1,
+          1
         ]
       },
       "actionProfile": {
@@ -6153,8 +6317,8 @@
       "details": [],
       "fidelityTier": "blockout",
       "colorMaterialRecipe": {
-        "dominantAlbedo": "rgba(240, 122, 42, 1.0)",
-        "secondaryAlbedo": "rgba(240, 122, 42, 0.85)",
+        "dominantAlbedo": "rgba(226, 96, 30, 1.0)",
+        "secondaryAlbedo": "rgba(226, 96, 30, 0.85)",
         "materialClass": "fabric",
         "materialClassConfidence": 0.8,
         "evidenceRefs": [
@@ -6186,17 +6350,17 @@
       "parent": "torso",
       "attachment": null,
       "dimensions": {
-        "width": 0.07,
-        "height": 0.07,
-        "depth": 0.07,
+        "width": 0.085,
+        "height": 0.08,
+        "depth": 0.08,
         "units": "relative",
         "confidence": 0.8
       },
       "transform": {
         "position": [
-          0.27,
-          0.23,
-          0.05
+          0.255,
+          0.255,
+          0.06
         ],
         "rotation": [
           0.0,
@@ -6204,9 +6368,9 @@
           0.0
         ],
         "scale": [
-          0.07,
-          0.07,
-          0.07
+          0.085,
+          0.08,
+          0.08
         ]
       },
       "actionProfile": {
@@ -6285,8 +6449,8 @@
       "details": [],
       "fidelityTier": "blockout",
       "colorMaterialRecipe": {
-        "dominantAlbedo": "rgba(240, 122, 42, 1.0)",
-        "secondaryAlbedo": "rgba(240, 122, 42, 0.85)",
+        "dominantAlbedo": "rgba(226, 96, 30, 1.0)",
+        "secondaryAlbedo": "rgba(226, 96, 30, 0.85)",
         "materialClass": "fabric",
         "materialClassConfidence": 0.8,
         "evidenceRefs": [
@@ -6437,8 +6601,160 @@
       "details": [],
       "fidelityTier": "blockout",
       "colorMaterialRecipe": {
-        "dominantAlbedo": "rgba(240, 122, 42, 1.0)",
-        "secondaryAlbedo": "rgba(240, 122, 42, 0.85)",
+        "dominantAlbedo": "rgba(226, 96, 30, 1.0)",
+        "secondaryAlbedo": "rgba(226, 96, 30, 0.85)",
+        "materialClass": "fabric",
+        "materialClassConfidence": 0.8,
+        "evidenceRefs": [
+          "full-object"
+        ]
+      }
+    },
+    {
+      "id": "neck",
+      "name": "Neck filler",
+      "level": "meso",
+      "role": "body",
+      "importance": 0.5,
+      "confidence": 0.8,
+      "primitive": "ellipsoid",
+      "topologyClass": "assembled-solid",
+      "topologyRationale": "Hidden neck volume joining head underside to torso top so no gap shows from the side.",
+      "geometryDescriptor": {
+        "topologyIntent": "stylized character part",
+        "edgeTreatment": {
+          "type": "none",
+          "bevelRadius": 0.0,
+          "segments": 1
+        },
+        "deformationStack": [],
+        "uvStrategy": "generated procedural coordinates",
+        "normalStrategy": "smooth vertex normals"
+      },
+      "parent": "torso",
+      "attachment": {
+        "parentSocket": "neck",
+        "localStart": [
+          0,
+          0.235,
+          -0.01
+        ],
+        "localEnd": [
+          0,
+          0.22499999999999998,
+          -0.01
+        ],
+        "contactType": "overlap",
+        "baseRadius": 0.21,
+        "endRadius": 0.21,
+        "embedDepth": 0.02,
+        "gapTolerance": 0.01,
+        "evidenceRefs": [
+          "full-object"
+        ]
+      },
+      "dimensions": {
+        "width": 0.42,
+        "height": 0.16,
+        "depth": 0.38,
+        "units": "relative",
+        "confidence": 0.8
+      },
+      "transform": {
+        "position": [
+          0,
+          0.235,
+          -0.01
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          0.42,
+          0.16,
+          0.38
+        ]
+      },
+      "actionProfile": {
+        "animationRole": "static",
+        "pivot": {
+          "mode": "center",
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "confidence": 0.7
+        },
+        "transformChannels": {
+          "translate": true,
+          "rotate": true,
+          "scale": true,
+          "bend": false,
+          "twist": false,
+          "detach": false,
+          "visibility": true,
+          "materialState": false
+        },
+        "sockets": [],
+        "collider": {
+          "type": "box",
+          "offset": [
+            0,
+            0,
+            0
+          ],
+          "scale": [
+            1,
+            1,
+            1
+          ],
+          "isTrigger": false,
+          "notes": "box proxy"
+        },
+        "constraints": [],
+        "destruction": {
+          "breakable": false,
+          "fractureGroup": "head",
+          "seamRefs": [],
+          "detachableFragments": [],
+          "breakImpulse": 0.0,
+          "debrisMaterial": "skin"
+        }
+      },
+      "material": "fur-orange",
+      "materialLayers": [
+        "fur-orange"
+      ],
+      "deformations": [],
+      "joints": [],
+      "seams": [],
+      "localFeatures": [],
+      "surfaceDetail": {
+        "macroRoughness": 0.0,
+        "microRoughness": 0.0,
+        "bumpAmplitude": 0.0,
+        "normalPattern": "",
+        "displacementPattern": "",
+        "occlusionPattern": "",
+        "edgeWearPattern": "",
+        "notes": ""
+      },
+      "evidenceRefs": [
+        "full-object"
+      ],
+      "details": [],
+      "fidelityTier": "blockout",
+      "colorMaterialRecipe": {
+        "dominantAlbedo": "rgba(210, 122, 34, 1.0)",
+        "secondaryAlbedo": "rgba(210, 122, 34, 0.85)",
         "materialClass": "fabric",
         "materialClassConfidence": 0.8,
         "evidenceRefs": [
@@ -6455,7 +6771,7 @@
       "confidence": 0.8,
       "primitive": "torus",
       "topologyClass": "assembled-solid",
-      "topologyRationale": "Belt strap: stylized chibi body part built as one smooth closed primitive (no continuous sculpt needed at this scale).",
+      "topologyRationale": "Belt hugs the waist: a torus whose ring runs just inside the torso surface so only ~2cm of the strap stands proud; vertical thickness scaled separately.",
       "geometryDescriptor": {
         "topologyIntent": "stylized character part",
         "edgeTreatment": {
@@ -6470,9 +6786,9 @@
       "parent": "torso",
       "attachment": null,
       "dimensions": {
-        "width": 0.64,
-        "height": 0.555,
-        "depth": 0.33,
+        "width": 0.585,
+        "height": 0.535,
+        "depth": 0.45,
         "units": "relative",
         "confidence": 0.8
       },
@@ -6488,9 +6804,9 @@
           0.0
         ],
         "scale": [
-          0.64,
-          0.555,
-          0.33
+          0.585,
+          0.535,
+          0.45
         ]
       },
       "actionProfile": {
@@ -6602,8 +6918,8 @@
       "parent": "torso",
       "attachment": null,
       "dimensions": {
-        "width": 0.075,
-        "height": 0.058,
+        "width": 0.078,
+        "height": 0.066,
         "depth": 0.02,
         "units": "relative",
         "confidence": 0.8
@@ -6612,7 +6928,7 @@
         "position": [
           0,
           -0.085,
-          0.265
+          0.274
         ],
         "rotation": [
           0.0,
@@ -6620,8 +6936,8 @@
           0.0
         ],
         "scale": [
-          0.075,
-          0.058,
+          0.078,
+          0.066,
           0.02
         ]
       },
@@ -6995,8 +7311,8 @@
       "details": [],
       "fidelityTier": "blockout",
       "colorMaterialRecipe": {
-        "dominantAlbedo": "rgba(221, 138, 44, 1.0)",
-        "secondaryAlbedo": "rgba(221, 138, 44, 0.85)",
+        "dominantAlbedo": "rgba(210, 122, 34, 1.0)",
+        "secondaryAlbedo": "rgba(210, 122, 34, 0.85)",
         "materialClass": "fabric",
         "materialClassConfidence": 0.8,
         "evidenceRefs": [
@@ -7227,15 +7543,15 @@
       "name": "Orange fur",
       "type": "standard",
       "shaderModel": "MeshStandardMaterial / PBR approximation",
-      "baseColor": "#dd8a2c",
-      "color": "#dd8a2c",
+      "baseColor": "#d27a22",
+      "color": "#d27a22",
       "albedo": {
-        "dominant": "#dd8a2c",
+        "dominant": "#d27a22",
         "secondary": []
       },
       "colorVariation": {
         "palette": [
-          "#dd8a2c"
+          "#d27a22"
         ],
         "pattern": "flat",
         "amplitude": 0.0,
@@ -7705,22 +8021,22 @@
       "name": "Bandana cotton",
       "type": "standard",
       "shaderModel": "MeshStandardMaterial / PBR approximation",
-      "baseColor": "#f07a2a",
-      "color": "#f07a2a",
+      "baseColor": "#e2601e",
+      "color": "#e2601e",
       "albedo": {
-        "dominant": "#f07a2a",
+        "dominant": "#e2601e",
         "secondary": []
       },
       "colorVariation": {
         "palette": [
-          "#f07a2a"
+          "#e2601e"
         ],
         "pattern": "flat",
         "amplitude": 0.0,
         "heightCorrelation": 0.0
       },
       "roughness": {
-        "base": 0.85,
+        "base": 0.88,
         "variation": 0.03
       },
       "metalness": {
@@ -8000,66 +8316,8 @@
       "goal": "Match head-unit proportions and pose silhouette.",
       "componentRefs": [
         "root",
-        "pelvis",
-        "abdomen",
-        "chest",
-        "neck",
-        "head",
-        "hair",
-        "brow-l",
-        "brow-r",
-        "ear-l",
-        "ear-r",
-        "nose",
-        "mouth",
-        "eye-l",
-        "eye-cavity-l",
-        "eye-r",
-        "eye-cavity-r",
-        "clavicle-l",
-        "upper-arm-l",
-        "forearm-l",
-        "hand-l",
-        "thumb-l-1",
-        "thumb-l-2",
-        "thumb-l-3",
-        "index-l-1",
-        "index-l-2",
-        "index-l-3",
-        "middle-l-1",
-        "middle-l-2",
-        "middle-l-3",
-        "ring-l-1",
-        "ring-l-2",
-        "ring-l-3",
-        "little-l-1",
-        "little-l-2",
-        "little-l-3",
-        "clavicle-r",
-        "upper-arm-r",
-        "forearm-r",
-        "hand-r",
-        "thumb-r-1",
-        "thumb-r-2",
-        "thumb-r-3",
-        "index-r-1",
-        "index-r-2",
-        "index-r-3",
-        "middle-r-1",
-        "middle-r-2",
-        "middle-r-3",
-        "ring-r-1",
-        "ring-r-2",
-        "ring-r-3",
-        "little-r-1",
-        "little-r-2",
-        "little-r-3",
-        "thigh-l",
-        "shin-l",
-        "foot-l",
-        "thigh-r",
-        "shin-r",
-        "foot-r"
+        "torso",
+        "head"
       ],
       "acceptance": [
         "Humanoid proportions and pose read correctly without materials."
@@ -8087,6 +8345,7 @@
         "pouch-r",
         "bandana-collar",
         "bandana-front",
+        "neck",
         "belt",
         "tail"
       ],
@@ -8100,66 +8359,26 @@
       "goal": "Lock head/torso/limb head-unit ratios and pose angles.",
       "componentRefs": [
         "root",
-        "pelvis",
-        "abdomen",
-        "chest",
-        "neck",
+        "torso",
+        "belly",
         "head",
-        "hair",
-        "brow-l",
-        "brow-r",
+        "face-mask",
+        "muzzle",
         "ear-l",
-        "ear-r",
-        "nose",
-        "mouth",
-        "eye-l",
-        "eye-cavity-l",
-        "eye-r",
-        "eye-cavity-r",
-        "clavicle-l",
-        "upper-arm-l",
-        "forearm-l",
-        "hand-l",
-        "thumb-l-1",
-        "thumb-l-2",
-        "thumb-l-3",
-        "index-l-1",
-        "index-l-2",
-        "index-l-3",
-        "middle-l-1",
-        "middle-l-2",
-        "middle-l-3",
-        "ring-l-1",
-        "ring-l-2",
-        "ring-l-3",
-        "little-l-1",
-        "little-l-2",
-        "little-l-3",
-        "clavicle-r",
-        "upper-arm-r",
-        "forearm-r",
-        "hand-r",
-        "thumb-r-1",
-        "thumb-r-2",
-        "thumb-r-3",
-        "index-r-1",
-        "index-r-2",
-        "index-r-3",
-        "middle-r-1",
-        "middle-r-2",
-        "middle-r-3",
-        "ring-r-1",
-        "ring-r-2",
-        "ring-r-3",
-        "little-r-1",
-        "little-r-2",
-        "little-r-3",
-        "thigh-l",
-        "shin-l",
+        "arm-l",
+        "leg-l",
         "foot-l",
-        "thigh-r",
-        "shin-r",
-        "foot-r"
+        "pouch-l",
+        "ear-r",
+        "arm-r",
+        "leg-r",
+        "foot-r",
+        "pouch-r",
+        "bandana-collar",
+        "bandana-front",
+        "neck",
+        "belt",
+        "tail"
       ],
       "acceptance": [
         "Head-unit ratios match anatomy; silhouette matches reference."
@@ -8170,66 +8389,50 @@
       "goal": "Place facial features, hair, and any enabled accessories to landmarks.",
       "componentRefs": [
         "root",
-        "pelvis",
-        "abdomen",
-        "chest",
-        "neck",
+        "torso",
+        "belly",
         "head",
-        "hair",
-        "brow-l",
-        "brow-r",
+        "face-mask",
+        "muzzle",
         "ear-l",
+        "ear-inner-l",
+        "eye-rim-l",
+        "eye-l",
+        "catchlight-l",
+        "brow-l",
+        "arm-l",
+        "paw-l",
+        "leg-l",
+        "foot-l",
+        "pouch-l",
+        "pouch-flap-l",
+        "pouch-stud-l",
         "ear-r",
+        "ear-inner-r",
+        "eye-rim-r",
+        "eye-r",
+        "catchlight-r",
+        "brow-r",
+        "arm-r",
+        "paw-r",
+        "leg-r",
+        "foot-r",
+        "pouch-r",
+        "pouch-flap-r",
+        "pouch-stud-r",
         "nose",
         "mouth",
-        "eye-l",
-        "eye-cavity-l",
-        "eye-r",
-        "eye-cavity-r",
-        "clavicle-l",
-        "upper-arm-l",
-        "forearm-l",
-        "hand-l",
-        "thumb-l-1",
-        "thumb-l-2",
-        "thumb-l-3",
-        "index-l-1",
-        "index-l-2",
-        "index-l-3",
-        "middle-l-1",
-        "middle-l-2",
-        "middle-l-3",
-        "ring-l-1",
-        "ring-l-2",
-        "ring-l-3",
-        "little-l-1",
-        "little-l-2",
-        "little-l-3",
-        "clavicle-r",
-        "upper-arm-r",
-        "forearm-r",
-        "hand-r",
-        "thumb-r-1",
-        "thumb-r-2",
-        "thumb-r-3",
-        "index-r-1",
-        "index-r-2",
-        "index-r-3",
-        "middle-r-1",
-        "middle-r-2",
-        "middle-r-3",
-        "ring-r-1",
-        "ring-r-2",
-        "ring-r-3",
-        "little-r-1",
-        "little-r-2",
-        "little-r-3",
-        "thigh-l",
-        "shin-l",
-        "foot-l",
-        "thigh-r",
-        "shin-r",
-        "foot-r"
+        "tongue",
+        "bandana-collar",
+        "bandana-front",
+        "bandana-knot",
+        "bandana-tail",
+        "neck",
+        "belt",
+        "buckle",
+        "buckle-hole",
+        "tail",
+        "tail-tip"
       ],
       "acceptance": [
         "Eyeline/nose/mouth on landmark lines; eyes read as recessed, not flat patches; enabled accessories placed as in reference."
@@ -8240,66 +8443,50 @@
       "goal": "Match skin/hair/cloth/metal color and roughness.",
       "componentRefs": [
         "root",
-        "pelvis",
-        "abdomen",
-        "chest",
-        "neck",
+        "torso",
+        "belly",
         "head",
-        "hair",
-        "brow-l",
-        "brow-r",
+        "face-mask",
+        "muzzle",
         "ear-l",
+        "ear-inner-l",
+        "eye-rim-l",
+        "eye-l",
+        "catchlight-l",
+        "brow-l",
+        "arm-l",
+        "paw-l",
+        "leg-l",
+        "foot-l",
+        "pouch-l",
+        "pouch-flap-l",
+        "pouch-stud-l",
         "ear-r",
+        "ear-inner-r",
+        "eye-rim-r",
+        "eye-r",
+        "catchlight-r",
+        "brow-r",
+        "arm-r",
+        "paw-r",
+        "leg-r",
+        "foot-r",
+        "pouch-r",
+        "pouch-flap-r",
+        "pouch-stud-r",
         "nose",
         "mouth",
-        "eye-l",
-        "eye-cavity-l",
-        "eye-r",
-        "eye-cavity-r",
-        "clavicle-l",
-        "upper-arm-l",
-        "forearm-l",
-        "hand-l",
-        "thumb-l-1",
-        "thumb-l-2",
-        "thumb-l-3",
-        "index-l-1",
-        "index-l-2",
-        "index-l-3",
-        "middle-l-1",
-        "middle-l-2",
-        "middle-l-3",
-        "ring-l-1",
-        "ring-l-2",
-        "ring-l-3",
-        "little-l-1",
-        "little-l-2",
-        "little-l-3",
-        "clavicle-r",
-        "upper-arm-r",
-        "forearm-r",
-        "hand-r",
-        "thumb-r-1",
-        "thumb-r-2",
-        "thumb-r-3",
-        "index-r-1",
-        "index-r-2",
-        "index-r-3",
-        "middle-r-1",
-        "middle-r-2",
-        "middle-r-3",
-        "ring-r-1",
-        "ring-r-2",
-        "ring-r-3",
-        "little-r-1",
-        "little-r-2",
-        "little-r-3",
-        "thigh-l",
-        "shin-l",
-        "foot-l",
-        "thigh-r",
-        "shin-r",
-        "foot-r"
+        "tongue",
+        "bandana-collar",
+        "bandana-front",
+        "bandana-knot",
+        "bandana-tail",
+        "neck",
+        "belt",
+        "buckle",
+        "buckle-hole",
+        "tail",
+        "tail-tip"
       ],
       "acceptance": [
         "Skin, hair, shirt, pants, shoe, and any enabled accessory materials match reference palette."
@@ -8310,66 +8497,50 @@
       "goal": "Soft key from reference direction plus rim.",
       "componentRefs": [
         "root",
-        "pelvis",
-        "abdomen",
-        "chest",
-        "neck",
+        "torso",
+        "belly",
         "head",
-        "hair",
-        "brow-l",
-        "brow-r",
+        "face-mask",
+        "muzzle",
         "ear-l",
+        "ear-inner-l",
+        "eye-rim-l",
+        "eye-l",
+        "catchlight-l",
+        "brow-l",
+        "arm-l",
+        "paw-l",
+        "leg-l",
+        "foot-l",
+        "pouch-l",
+        "pouch-flap-l",
+        "pouch-stud-l",
         "ear-r",
+        "ear-inner-r",
+        "eye-rim-r",
+        "eye-r",
+        "catchlight-r",
+        "brow-r",
+        "arm-r",
+        "paw-r",
+        "leg-r",
+        "foot-r",
+        "pouch-r",
+        "pouch-flap-r",
+        "pouch-stud-r",
         "nose",
         "mouth",
-        "eye-l",
-        "eye-cavity-l",
-        "eye-r",
-        "eye-cavity-r",
-        "clavicle-l",
-        "upper-arm-l",
-        "forearm-l",
-        "hand-l",
-        "thumb-l-1",
-        "thumb-l-2",
-        "thumb-l-3",
-        "index-l-1",
-        "index-l-2",
-        "index-l-3",
-        "middle-l-1",
-        "middle-l-2",
-        "middle-l-3",
-        "ring-l-1",
-        "ring-l-2",
-        "ring-l-3",
-        "little-l-1",
-        "little-l-2",
-        "little-l-3",
-        "clavicle-r",
-        "upper-arm-r",
-        "forearm-r",
-        "hand-r",
-        "thumb-r-1",
-        "thumb-r-2",
-        "thumb-r-3",
-        "index-r-1",
-        "index-r-2",
-        "index-r-3",
-        "middle-r-1",
-        "middle-r-2",
-        "middle-r-3",
-        "ring-r-1",
-        "ring-r-2",
-        "ring-r-3",
-        "little-r-1",
-        "little-r-2",
-        "little-r-3",
-        "thigh-l",
-        "shin-l",
-        "foot-l",
-        "thigh-r",
-        "shin-r",
-        "foot-r"
+        "tongue",
+        "bandana-collar",
+        "bandana-front",
+        "bandana-knot",
+        "bandana-tail",
+        "neck",
+        "belt",
+        "buckle",
+        "buckle-hole",
+        "tail",
+        "tail-tip"
       ],
       "acceptance": [
         "Readable under neutral light; reference-matched lighting added."
@@ -8380,66 +8551,50 @@
       "goal": "Rig-ready pivots and sockets.",
       "componentRefs": [
         "root",
-        "pelvis",
-        "abdomen",
-        "chest",
-        "neck",
+        "torso",
+        "belly",
         "head",
-        "hair",
-        "brow-l",
-        "brow-r",
+        "face-mask",
+        "muzzle",
         "ear-l",
+        "ear-inner-l",
+        "eye-rim-l",
+        "eye-l",
+        "catchlight-l",
+        "brow-l",
+        "arm-l",
+        "paw-l",
+        "leg-l",
+        "foot-l",
+        "pouch-l",
+        "pouch-flap-l",
+        "pouch-stud-l",
         "ear-r",
+        "ear-inner-r",
+        "eye-rim-r",
+        "eye-r",
+        "catchlight-r",
+        "brow-r",
+        "arm-r",
+        "paw-r",
+        "leg-r",
+        "foot-r",
+        "pouch-r",
+        "pouch-flap-r",
+        "pouch-stud-r",
         "nose",
         "mouth",
-        "eye-l",
-        "eye-cavity-l",
-        "eye-r",
-        "eye-cavity-r",
-        "clavicle-l",
-        "upper-arm-l",
-        "forearm-l",
-        "hand-l",
-        "thumb-l-1",
-        "thumb-l-2",
-        "thumb-l-3",
-        "index-l-1",
-        "index-l-2",
-        "index-l-3",
-        "middle-l-1",
-        "middle-l-2",
-        "middle-l-3",
-        "ring-l-1",
-        "ring-l-2",
-        "ring-l-3",
-        "little-l-1",
-        "little-l-2",
-        "little-l-3",
-        "clavicle-r",
-        "upper-arm-r",
-        "forearm-r",
-        "hand-r",
-        "thumb-r-1",
-        "thumb-r-2",
-        "thumb-r-3",
-        "index-r-1",
-        "index-r-2",
-        "index-r-3",
-        "middle-r-1",
-        "middle-r-2",
-        "middle-r-3",
-        "ring-r-1",
-        "ring-r-2",
-        "ring-r-3",
-        "little-r-1",
-        "little-r-2",
-        "little-r-3",
-        "thigh-l",
-        "shin-l",
-        "foot-l",
-        "thigh-r",
-        "shin-r",
-        "foot-r"
+        "tongue",
+        "bandana-collar",
+        "bandana-front",
+        "bandana-knot",
+        "bandana-tail",
+        "neck",
+        "belt",
+        "buckle",
+        "buckle-hole",
+        "tail",
+        "tail-tip"
       ],
       "acceptance": [
         "Head/neck/shoulder/elbow/hip/knee pivots and sockets exposed."
@@ -8450,74 +8605,493 @@
       "goal": "Protect runtime performance.",
       "componentRefs": [
         "root",
-        "pelvis",
-        "abdomen",
-        "chest",
-        "neck",
+        "torso",
+        "belly",
         "head",
-        "hair",
-        "brow-l",
-        "brow-r",
+        "face-mask",
+        "muzzle",
         "ear-l",
+        "ear-inner-l",
+        "eye-rim-l",
+        "eye-l",
+        "catchlight-l",
+        "brow-l",
+        "arm-l",
+        "paw-l",
+        "leg-l",
+        "foot-l",
+        "pouch-l",
+        "pouch-flap-l",
+        "pouch-stud-l",
         "ear-r",
+        "ear-inner-r",
+        "eye-rim-r",
+        "eye-r",
+        "catchlight-r",
+        "brow-r",
+        "arm-r",
+        "paw-r",
+        "leg-r",
+        "foot-r",
+        "pouch-r",
+        "pouch-flap-r",
+        "pouch-stud-r",
         "nose",
         "mouth",
-        "eye-l",
-        "eye-cavity-l",
-        "eye-r",
-        "eye-cavity-r",
-        "clavicle-l",
-        "upper-arm-l",
-        "forearm-l",
-        "hand-l",
-        "thumb-l-1",
-        "thumb-l-2",
-        "thumb-l-3",
-        "index-l-1",
-        "index-l-2",
-        "index-l-3",
-        "middle-l-1",
-        "middle-l-2",
-        "middle-l-3",
-        "ring-l-1",
-        "ring-l-2",
-        "ring-l-3",
-        "little-l-1",
-        "little-l-2",
-        "little-l-3",
-        "clavicle-r",
-        "upper-arm-r",
-        "forearm-r",
-        "hand-r",
-        "thumb-r-1",
-        "thumb-r-2",
-        "thumb-r-3",
-        "index-r-1",
-        "index-r-2",
-        "index-r-3",
-        "middle-r-1",
-        "middle-r-2",
-        "middle-r-3",
-        "ring-r-1",
-        "ring-r-2",
-        "ring-r-3",
-        "little-r-1",
-        "little-r-2",
-        "little-r-3",
-        "thigh-l",
-        "shin-l",
-        "foot-l",
-        "thigh-r",
-        "shin-r",
-        "foot-r"
+        "tongue",
+        "bandana-collar",
+        "bandana-front",
+        "bandana-knot",
+        "bandana-tail",
+        "neck",
+        "belt",
+        "buckle",
+        "buckle-hole",
+        "tail",
+        "tail-tip"
       ],
       "acceptance": [
         "Triangle/draw-call budget documented."
       ]
     }
   ],
-  "visualEvidence": [],
-  "reviewHistory": [],
+  "visualEvidence": [
+    {
+      "timestamp": "2026-11-26T23:40:39.586042+00:00",
+      "passId": "blockout",
+      "estimatedFidelity": 0.62,
+      "aiVisionScore": 0.74,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.81,
+        "componentStructure": 0.75,
+        "formDetail": 0.62,
+        "materialSurface": 0.55,
+        "lightingCamera": 0.6
+      },
+      "featureReviews": [
+        {
+          "id": "anatomy-proportion",
+          "score": 0.8,
+          "notes": "Head ≈ torso width, ~2.6 HU incl. ears; head slightly smaller than reference after lowering."
+        },
+        {
+          "id": "pose-silhouette",
+          "score": 0.8,
+          "notes": "Arms down-out ~35°, short legs, flat triangle ears; turntable 0/90/180/270 no holes."
+        }
+      ],
+      "referenceScreenshot": "/home/user/ink-escape/art/models/shiba/reference.png",
+      "renderScreenshot": "/home/user/ink-escape/art/models/shiba/work/renders/blockout-front.png",
+      "comparisonImage": "/home/user/ink-escape/art/models/shiba/work/renders/blockout-cmp.png",
+      "cameraView": "front",
+      "notes": "",
+      "aiVisionNotes": "Photo-vs-procedural: raw reference IoU limited by gradient bg + floor shadow; Divine Eye objectness 0.61 / pHash 0.91 -> reconstructionModeSuspected. Tier1 run on bg-flattened copy (reference-flatbg.png, character pixels untouched)."
+    },
+    {
+      "timestamp": "2026-11-26T23:41:55.639675+00:00",
+      "passId": "structural-pass",
+      "estimatedFidelity": 0.64,
+      "aiVisionScore": 0.74,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.81,
+        "componentStructure": 0.8,
+        "formDetail": 0.6,
+        "materialSurface": 0.55,
+        "lightingCamera": 0.6
+      },
+      "featureReviews": [
+        {
+          "id": "anatomy-proportion",
+          "score": 0.8,
+          "notes": "Head/torso/neck chain attached; proportions unchanged from blockout."
+        },
+        {
+          "id": "pose-silhouette",
+          "score": 0.8,
+          "notes": "Arms, legs, ears attached at sockets; no floating roots in 4 views."
+        }
+      ],
+      "referenceScreenshot": "/home/user/ink-escape/art/models/shiba/reference.png",
+      "renderScreenshot": "/home/user/ink-escape/art/models/shiba/work/renders/structural-pass-front.png",
+      "comparisonImage": "/home/user/ink-escape/art/models/shiba/work/renders/structural-pass-cmp.png",
+      "cameraView": "front",
+      "notes": "",
+      "aiVisionNotes": "Divine Eye refine-code 0.63 driven by photo-vs-procedural pixel signals; objectness 0.61, pHash 0.875, tier1 IoU 0.859 on bg-flattened reference."
+    },
+    {
+      "timestamp": "2026-11-26T23:43:52.874116+00:00",
+      "passId": "proportion-lock",
+      "estimatedFidelity": 0.68,
+      "aiVisionScore": 0.76,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.84,
+        "componentStructure": 0.8,
+        "formDetail": 0.62,
+        "materialSurface": 0.55,
+        "lightingCamera": 0.6
+      },
+      "featureReviews": [],
+      "referenceScreenshot": "/home/user/ink-escape/art/models/shiba/reference.png",
+      "renderScreenshot": "/home/user/ink-escape/art/models/shiba/work/renders/proportion-lock-front.png",
+      "comparisonImage": "/home/user/ink-escape/art/models/shiba/work/renders/proportion-lock-cmp.png",
+      "cameraView": "front",
+      "notes": "",
+      "aiVisionNotes": "Divine Eye probe 0.63 (reconstruction mode, objectness 0.58, pHash 0.875). Tier1 on bg-flattened reference."
+    },
+    {
+      "timestamp": "2026-11-26T23:48:15.319897+00:00",
+      "passId": "feature-placement",
+      "estimatedFidelity": 0.72,
+      "aiVisionScore": 0.77,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.85,
+        "componentStructure": 0.82,
+        "formDetail": 0.74,
+        "materialSurface": 0.58,
+        "lightingCamera": 0.62
+      },
+      "featureReviews": [
+        {
+          "id": "face-landmark-placement",
+          "score": 0.76,
+          "notes": "Eyes at ±0.092 on head surface with cream rims and catchlights, brow dots above, nose on muzzle front, open mouth with tongue; mouth is an oval, reference smile is wider U."
+        },
+        {
+          "id": "eye-life",
+          "score": 0.8,
+          "notes": "Glossy black eyes with mirrored catchlights; reference iris is dark brown."
+        },
+        {
+          "id": "anatomy-proportion",
+          "score": 0.82,
+          "notes": "unchanged"
+        },
+        {
+          "id": "pose-silhouette",
+          "score": 0.82,
+          "notes": "tier1 IoU 0.869, scale delta 0.006"
+        }
+      ],
+      "referenceScreenshot": "/home/user/ink-escape/art/models/shiba/reference.png",
+      "renderScreenshot": "/home/user/ink-escape/art/models/shiba/work/renders/feature-placement-front.png",
+      "comparisonImage": "/home/user/ink-escape/art/models/shiba/work/renders/feature-placement-cmp.png",
+      "cameraView": "front",
+      "notes": "",
+      "aiVisionNotes": "Tier1 IoU 0.869 (bg-flattened ref), Divine Eye probe 0.62 reconstruction mode (objectness 0.62, pHash 0.91). Brows were buried by skinned head surface offset; raised 1.4cm."
+    },
+    {
+      "timestamp": "2026-11-26T23:49:51.619088+00:00",
+      "passId": "material-pass",
+      "estimatedFidelity": 0.72,
+      "aiVisionScore": 0.76,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.85,
+        "componentStructure": 0.82,
+        "formDetail": 0.74,
+        "materialSurface": 0.62,
+        "lightingCamera": 0.62
+      },
+      "featureReviews": [
+        {
+          "id": "outfit-and-palette",
+          "score": 0.74,
+          "notes": "Orange/cream split, orange bandana, brown belt+pouches, brass buckle all present; fur reads lighter/yellower than reference under ACES preview lighting; no fur fibre texture (textureless by declaration)."
+        },
+        {
+          "id": "face-landmark-placement",
+          "score": 0.76,
+          "notes": "unchanged from feature-placement"
+        },
+        {
+          "id": "eye-life",
+          "score": 0.8,
+          "notes": "catchlights present"
+        }
+      ],
+      "referenceScreenshot": "/home/user/ink-escape/art/models/shiba/reference.png",
+      "renderScreenshot": "/home/user/ink-escape/art/models/shiba/work/renders/material-pass-front.png",
+      "comparisonImage": "/home/user/ink-escape/art/models/shiba/work/renders/material-pass-cmp.png",
+      "cameraView": "front",
+      "notes": "",
+      "aiVisionNotes": "Approximate stylized reconstruction from one front view: back, tail and depth inferred. Tier1 IoU 0.869 on bg-flattened reference; Divine Eye probe (reconstruction mode) objectness 0.62, pHash 0.91."
+    }
+  ],
+  "reviewHistory": [
+    {
+      "timestamp": "2026-11-26T23:40:39.586042+00:00",
+      "passId": "blockout",
+      "estimatedFidelity": 0.62,
+      "aiVisionScore": 0.74,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.81,
+        "componentStructure": 0.75,
+        "formDetail": 0.62,
+        "materialSurface": 0.55,
+        "lightingCamera": 0.6
+      },
+      "featureReviews": [
+        {
+          "id": "anatomy-proportion",
+          "score": 0.8,
+          "notes": "Head ≈ torso width, ~2.6 HU incl. ears; head slightly smaller than reference after lowering."
+        },
+        {
+          "id": "pose-silhouette",
+          "score": 0.8,
+          "notes": "Arms down-out ~35°, short legs, flat triangle ears; turntable 0/90/180/270 no holes."
+        }
+      ],
+      "action": "continue",
+      "summary": "Blockout: macro volumes (head, torso, neck, ears, arms, legs, feet, bandana, belt, pouches, tail) placed and proportioned; tier1 IoU 0.859 vs bg-flattened reference",
+      "matched": [
+        "head/torso proportion",
+        "arm pose",
+        "ear shape",
+        "belt+pouch placement",
+        "bandana triangle"
+      ],
+      "mismatches": [
+        "face mask shape approximate",
+        "mouth is ellipse not smile",
+        "fur colour lighter under ACES",
+        "no fur texture (textureless by design)"
+      ],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [],
+      "mapStrippedRender": "/home/user/ink-escape/art/models/shiba/work/renders/blockout-stripped.png",
+      "visualEvidence": {
+        "referenceScreenshot": "/home/user/ink-escape/art/models/shiba/reference.png",
+        "renderScreenshot": "/home/user/ink-escape/art/models/shiba/work/renders/blockout-front.png",
+        "comparisonImage": "/home/user/ink-escape/art/models/shiba/work/renders/blockout-cmp.png",
+        "cameraView": "front",
+        "notes": "",
+        "aiVisionNotes": "Photo-vs-procedural: raw reference IoU limited by gradient bg + floor shadow; Divine Eye objectness 0.61 / pHash 0.91 -> reconstructionModeSuspected. Tier1 run on bg-flattened copy (reference-flatbg.png, character pixels untouched)."
+      }
+    },
+    {
+      "timestamp": "2026-11-26T23:41:55.639675+00:00",
+      "passId": "structural-pass",
+      "estimatedFidelity": 0.64,
+      "aiVisionScore": 0.74,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.81,
+        "componentStructure": 0.8,
+        "formDetail": 0.6,
+        "materialSurface": 0.55,
+        "lightingCamera": 0.6
+      },
+      "featureReviews": [
+        {
+          "id": "anatomy-proportion",
+          "score": 0.8,
+          "notes": "Head/torso/neck chain attached; proportions unchanged from blockout."
+        },
+        {
+          "id": "pose-silhouette",
+          "score": 0.8,
+          "notes": "Arms, legs, ears attached at sockets; no floating roots in 4 views."
+        }
+      ],
+      "action": "continue",
+      "summary": "Structural: every macro/meso part attached to its parent socket (neck filler joins head/torso, ears embedded, belt hugs waist); no floating parts in 0/90/180/270",
+      "matched": [
+        "attachment chain",
+        "neck join",
+        "ear embed",
+        "belt contact",
+        "tail on rump"
+      ],
+      "mismatches": [
+        "micro parts pending later passes (pass-gated)",
+        "face still approximate"
+      ],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [],
+      "mapStrippedRender": "/home/user/ink-escape/art/models/shiba/work/renders/structural-pass-stripped.png",
+      "visualEvidence": {
+        "referenceScreenshot": "/home/user/ink-escape/art/models/shiba/reference.png",
+        "renderScreenshot": "/home/user/ink-escape/art/models/shiba/work/renders/structural-pass-front.png",
+        "comparisonImage": "/home/user/ink-escape/art/models/shiba/work/renders/structural-pass-cmp.png",
+        "cameraView": "front",
+        "notes": "",
+        "aiVisionNotes": "Divine Eye refine-code 0.63 driven by photo-vs-procedural pixel signals; objectness 0.61, pHash 0.875, tier1 IoU 0.859 on bg-flattened reference."
+      }
+    },
+    {
+      "timestamp": "2026-11-26T23:43:52.874116+00:00",
+      "passId": "proportion-lock",
+      "estimatedFidelity": 0.68,
+      "aiVisionScore": 0.76,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.84,
+        "componentStructure": 0.8,
+        "formDetail": 0.62,
+        "materialSurface": 0.55,
+        "lightingCamera": 0.6
+      },
+      "featureReviews": [],
+      "action": "continue",
+      "summary": "Proportion lock: head enlarged to 0.53 wide (ratio 0.84 of torso), arm reach widened to match reference bbox (scale delta 0.033), tier1 IoU 0.875",
+      "matched": [
+        "head/torso ratio",
+        "arm span",
+        "leg length",
+        "ear height"
+      ],
+      "mismatches": [
+        "head still slightly smaller than reference",
+        "face mask shape approximate"
+      ],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [],
+      "mapStrippedRender": "/home/user/ink-escape/art/models/shiba/work/renders/proportion-lock-stripped.png",
+      "visualEvidence": {
+        "referenceScreenshot": "/home/user/ink-escape/art/models/shiba/reference.png",
+        "renderScreenshot": "/home/user/ink-escape/art/models/shiba/work/renders/proportion-lock-front.png",
+        "comparisonImage": "/home/user/ink-escape/art/models/shiba/work/renders/proportion-lock-cmp.png",
+        "cameraView": "front",
+        "notes": "",
+        "aiVisionNotes": "Divine Eye probe 0.63 (reconstruction mode, objectness 0.58, pHash 0.875). Tier1 on bg-flattened reference."
+      }
+    },
+    {
+      "timestamp": "2026-11-26T23:48:15.319897+00:00",
+      "passId": "feature-placement",
+      "estimatedFidelity": 0.72,
+      "aiVisionScore": 0.77,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.85,
+        "componentStructure": 0.82,
+        "formDetail": 0.74,
+        "materialSurface": 0.58,
+        "lightingCamera": 0.62
+      },
+      "featureReviews": [
+        {
+          "id": "face-landmark-placement",
+          "score": 0.76,
+          "notes": "Eyes at ±0.092 on head surface with cream rims and catchlights, brow dots above, nose on muzzle front, open mouth with tongue; mouth is an oval, reference smile is wider U."
+        },
+        {
+          "id": "eye-life",
+          "score": 0.8,
+          "notes": "Glossy black eyes with mirrored catchlights; reference iris is dark brown."
+        },
+        {
+          "id": "anatomy-proportion",
+          "score": 0.82,
+          "notes": "unchanged"
+        },
+        {
+          "id": "pose-silhouette",
+          "score": 0.82,
+          "notes": "tier1 IoU 0.869, scale delta 0.006"
+        }
+      ],
+      "action": "continue",
+      "summary": "Feature placement: face parts snapped to head surface (eyes, rims, catchlights, brow dots, nose, mouth+tongue); bandana narrowed and tilted onto neck; belt rebuilt as hugging torus strap with buckle; arms pulled in (aspect fixed)",
+      "matched": [
+        "eyes+catchlights",
+        "brow dots",
+        "nose",
+        "mouth+tongue",
+        "bandana triangle",
+        "belt+buckle",
+        "pouches+studs",
+        "paw tips",
+        "feet",
+        "tail"
+      ],
+      "mismatches": [
+        "mouth oval vs reference U smile",
+        "eye iris black vs dark brown",
+        "bandana knot flat",
+        "fur colour still light"
+      ],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [],
+      "mapStrippedRender": "/home/user/ink-escape/art/models/shiba/work/renders/feature-placement-stripped.png",
+      "visualEvidence": {
+        "referenceScreenshot": "/home/user/ink-escape/art/models/shiba/reference.png",
+        "renderScreenshot": "/home/user/ink-escape/art/models/shiba/work/renders/feature-placement-front.png",
+        "comparisonImage": "/home/user/ink-escape/art/models/shiba/work/renders/feature-placement-cmp.png",
+        "cameraView": "front",
+        "notes": "",
+        "aiVisionNotes": "Tier1 IoU 0.869 (bg-flattened ref), Divine Eye probe 0.62 reconstruction mode (objectness 0.62, pHash 0.91). Brows were buried by skinned head surface offset; raised 1.4cm."
+      }
+    },
+    {
+      "timestamp": "2026-11-26T23:49:51.619088+00:00",
+      "passId": "material-pass",
+      "estimatedFidelity": 0.72,
+      "aiVisionScore": 0.76,
+      "visualAcceptanceThreshold": 0.7,
+      "layerScores": {
+        "silhouetteProportion": 0.85,
+        "componentStructure": 0.82,
+        "formDetail": 0.74,
+        "materialSurface": 0.62,
+        "lightingCamera": 0.62
+      },
+      "featureReviews": [
+        {
+          "id": "outfit-and-palette",
+          "score": 0.74,
+          "notes": "Orange/cream split, orange bandana, brown belt+pouches, brass buckle all present; fur reads lighter/yellower than reference under ACES preview lighting; no fur fibre texture (textureless by declaration)."
+        },
+        {
+          "id": "face-landmark-placement",
+          "score": 0.76,
+          "notes": "unchanged from feature-placement"
+        },
+        {
+          "id": "eye-life",
+          "score": 0.8,
+          "notes": "catchlights present"
+        }
+      ],
+      "action": "stop",
+      "summary": "Stopped at material-pass for game integration (user goal: one trial character compared against the current GLB). Remaining blocker is the per-part colour gate: it compares each part's albedo to the render's top-5 colour clusters, so small accent parts (eyes, tongue) cannot match by construction.",
+      "matched": [
+        "palette regions",
+        "bandana colour",
+        "belt/pouch leather",
+        "brass buckle",
+        "cream face/belly/paws/feet"
+      ],
+      "mismatches": [
+        "per-part deltaE: eyes 25, tongue 39 (accent parts below 5-cluster palette)",
+        "fur lighter than reference",
+        "mouth oval vs U smile",
+        "no fur texture"
+      ],
+      "specFixes": [],
+      "codeFixes": [],
+      "evidence": [],
+      "mapStrippedRender": "/home/user/ink-escape/art/models/shiba/work/renders/material-pass-stripped.png",
+      "visualEvidence": {
+        "referenceScreenshot": "/home/user/ink-escape/art/models/shiba/reference.png",
+        "renderScreenshot": "/home/user/ink-escape/art/models/shiba/work/renders/material-pass-front.png",
+        "comparisonImage": "/home/user/ink-escape/art/models/shiba/work/renders/material-pass-cmp.png",
+        "cameraView": "front",
+        "notes": "",
+        "aiVisionNotes": "Approximate stylized reconstruction from one front view: back, tail and depth inferred. Tier1 IoU 0.869 on bg-flattened reference; Divine Eye probe (reconstruction mode) objectness 0.62, pHash 0.91."
+      }
+    }
+  ],
   "lodPlan": [
     {
       "tier": "near",
@@ -8702,7 +9276,7 @@
         ],
         "tipPos": [
           0,
-          0.33,
+          0.315,
           0
         ],
         "component": "root",
@@ -8714,12 +9288,12 @@
         "parent": "root",
         "jointPos": [
           0,
-          0.33,
+          0.315,
           0
         ],
         "tipPos": [
           0,
-          0.5700000000000001,
+          0.5549999999999999,
           0
         ],
         "component": "torso",
@@ -8731,7 +9305,7 @@
         "parent": "torso",
         "jointPos": [
           0,
-          0.76,
+          0.725,
           0.02
         ],
         "tipPos": [
@@ -8748,12 +9322,12 @@
         "parent": "torso",
         "jointPos": [
           0,
-          0.4,
+          0.385,
           -0.25
         ],
         "tipPos": [
           0,
-          0.5,
+          0.485,
           -0.3
         ],
         "component": "tail",
@@ -8765,12 +9339,12 @@
         "parent": "torso",
         "jointPos": [
           0.255,
-          0.53,
+          0.515,
           0.02
         ],
         "tipPos": [
           0.395,
-          0.36,
+          0.355,
           0.06
         ],
         "component": "arm-l",
@@ -8782,12 +9356,12 @@
         "parent": "torso",
         "jointPos": [
           0.13,
-          0.2,
+          0.185,
           0.0
         ],
         "tipPos": [
           0.13,
-          0.06,
+          0.045,
           0.02
         ],
         "component": "leg-l",
@@ -8795,33 +9369,16 @@
         "chain": "leg-l"
       },
       {
-        "id": "ear-l",
-        "parent": "head",
-        "jointPos": [
-          0.15,
-          0.89,
-          0.015
-        ],
-        "tipPos": [
-          0.215,
-          1.015,
-          0.015
-        ],
-        "component": "ear-l",
-        "role": "rigid",
-        "chain": "ear-l"
-      },
-      {
         "id": "arm-r",
         "parent": "torso",
         "jointPos": [
           -0.255,
-          0.53,
+          0.515,
           0.02
         ],
         "tipPos": [
           -0.395,
-          0.36,
+          0.355,
           0.06
         ],
         "component": "arm-r",
@@ -8833,12 +9390,12 @@
         "parent": "torso",
         "jointPos": [
           -0.13,
-          0.2,
+          0.185,
           0.0
         ],
         "tipPos": [
           -0.13,
-          0.06,
+          0.045,
           0.02
         ],
         "component": "leg-r",
@@ -8846,22 +9403,2452 @@
         "chain": "leg-r"
       },
       {
+        "id": "ear-l",
+        "parent": "head",
+        "jointPos": [
+          0.145,
+          0.84,
+          -0.01
+        ],
+        "tipPos": [
+          0.175,
+          0.97,
+          -0.01
+        ],
+        "component": "ear-l",
+        "role": "rigid",
+        "chain": "ear-l"
+      },
+      {
         "id": "ear-r",
         "parent": "head",
         "jointPos": [
-          -0.15,
-          0.89,
-          0.015
+          -0.145,
+          0.84,
+          -0.01
         ],
         "tipPos": [
-          -0.215,
-          1.015,
-          0.015
+          -0.175,
+          0.97,
+          -0.01
         ],
         "component": "ear-r",
         "role": "rigid",
         "chain": "ear-r"
       }
     ]
-  }
+  },
+  "tier1Results": [
+    {
+      "passed": true,
+      "checks": {
+        "silhouetteIoU": 0.8588,
+        "aspectRatioDelta": 0.0395,
+        "scaleDelta": 0.005,
+        "bilateralSymmetryError": 0.019,
+        "colorDelta": {
+          "checked": 45,
+          "maxDeltaE": 35.34,
+          "perComponent": [
+            {
+              "componentId": null,
+              "deltaE": 28.83
+            },
+            {
+              "componentId": null,
+              "deltaE": 9.81
+            },
+            {
+              "componentId": null,
+              "deltaE": 9.25
+            },
+            {
+              "componentId": null,
+              "deltaE": 9.81
+            },
+            {
+              "componentId": null,
+              "deltaE": 9.25
+            },
+            {
+              "componentId": null,
+              "deltaE": 9.25
+            },
+            {
+              "componentId": null,
+              "deltaE": 9.81
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.73
+            },
+            {
+              "componentId": null,
+              "deltaE": 9.25
+            },
+            {
+              "componentId": null,
+              "deltaE": 25.01
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.85
+            },
+            {
+              "componentId": null,
+              "deltaE": 9.25
+            },
+            {
+              "componentId": null,
+              "deltaE": 9.81
+            },
+            {
+              "componentId": null,
+              "deltaE": 9.25
+            },
+            {
+              "componentId": null,
+              "deltaE": 9.81
+            },
+            {
+              "componentId": null,
+              "deltaE": 9.25
+            },
+            {
+              "componentId": null,
+              "deltaE": 19.63
+            },
+            {
+              "componentId": null,
+              "deltaE": 13.44
+            },
+            {
+              "componentId": null,
+              "deltaE": 21.82
+            },
+            {
+              "componentId": null,
+              "deltaE": 9.81
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.73
+            },
+            {
+              "componentId": null,
+              "deltaE": 9.25
+            },
+            {
+              "componentId": null,
+              "deltaE": 25.01
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.85
+            },
+            {
+              "componentId": null,
+              "deltaE": 9.25
+            },
+            {
+              "componentId": null,
+              "deltaE": 9.81
+            },
+            {
+              "componentId": null,
+              "deltaE": 9.25
+            },
+            {
+              "componentId": null,
+              "deltaE": 9.81
+            },
+            {
+              "componentId": null,
+              "deltaE": 9.25
+            },
+            {
+              "componentId": null,
+              "deltaE": 19.63
+            },
+            {
+              "componentId": null,
+              "deltaE": 13.44
+            },
+            {
+              "componentId": null,
+              "deltaE": 21.82
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.02
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.78
+            },
+            {
+              "componentId": null,
+              "deltaE": 35.34
+            },
+            {
+              "componentId": null,
+              "deltaE": 16.0
+            },
+            {
+              "componentId": null,
+              "deltaE": 16.0
+            },
+            {
+              "componentId": null,
+              "deltaE": 16.0
+            },
+            {
+              "componentId": null,
+              "deltaE": 16.0
+            },
+            {
+              "componentId": null,
+              "deltaE": 9.81
+            },
+            {
+              "componentId": null,
+              "deltaE": 19.63
+            },
+            {
+              "componentId": null,
+              "deltaE": 21.82
+            },
+            {
+              "componentId": null,
+              "deltaE": 19.63
+            },
+            {
+              "componentId": null,
+              "deltaE": 9.81
+            },
+            {
+              "componentId": null,
+              "deltaE": 9.25
+            }
+          ],
+          "gated": false
+        }
+      },
+      "failures": [],
+      "maskWarnings": [],
+      "renderHash": "2c04280fc763e3e5",
+      "passId": "blockout",
+      "mapStrippedRender": "/home/user/ink-escape/art/models/shiba/work/renders/blockout-stripped.png"
+    },
+    {
+      "passed": true,
+      "checks": {
+        "silhouetteIoU": 0.8594,
+        "aspectRatioDelta": 0.0337,
+        "scaleDelta": 0.0764,
+        "bilateralSymmetryError": 0.0126,
+        "colorDelta": {
+          "checked": 45,
+          "maxDeltaE": 35.12,
+          "perComponent": [
+            {
+              "componentId": null,
+              "deltaE": 30.19
+            },
+            {
+              "componentId": null,
+              "deltaE": 9.76
+            },
+            {
+              "componentId": null,
+              "deltaE": 9.36
+            },
+            {
+              "componentId": null,
+              "deltaE": 9.76
+            },
+            {
+              "componentId": null,
+              "deltaE": 9.36
+            },
+            {
+              "componentId": null,
+              "deltaE": 9.36
+            },
+            {
+              "componentId": null,
+              "deltaE": 9.76
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.88
+            },
+            {
+              "componentId": null,
+              "deltaE": 9.36
+            },
+            {
+              "componentId": null,
+              "deltaE": 26.36
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.82
+            },
+            {
+              "componentId": null,
+              "deltaE": 9.36
+            },
+            {
+              "componentId": null,
+              "deltaE": 9.76
+            },
+            {
+              "componentId": null,
+              "deltaE": 9.36
+            },
+            {
+              "componentId": null,
+              "deltaE": 9.76
+            },
+            {
+              "componentId": null,
+              "deltaE": 9.36
+            },
+            {
+              "componentId": null,
+              "deltaE": 18.35
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.28
+            },
+            {
+              "componentId": null,
+              "deltaE": 21.85
+            },
+            {
+              "componentId": null,
+              "deltaE": 9.76
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.88
+            },
+            {
+              "componentId": null,
+              "deltaE": 9.36
+            },
+            {
+              "componentId": null,
+              "deltaE": 26.36
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.82
+            },
+            {
+              "componentId": null,
+              "deltaE": 9.36
+            },
+            {
+              "componentId": null,
+              "deltaE": 9.76
+            },
+            {
+              "componentId": null,
+              "deltaE": 9.36
+            },
+            {
+              "componentId": null,
+              "deltaE": 9.76
+            },
+            {
+              "componentId": null,
+              "deltaE": 9.36
+            },
+            {
+              "componentId": null,
+              "deltaE": 18.35
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.28
+            },
+            {
+              "componentId": null,
+              "deltaE": 21.85
+            },
+            {
+              "componentId": null,
+              "deltaE": 11.2
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.15
+            },
+            {
+              "componentId": null,
+              "deltaE": 35.12
+            },
+            {
+              "componentId": null,
+              "deltaE": 16.12
+            },
+            {
+              "componentId": null,
+              "deltaE": 16.12
+            },
+            {
+              "componentId": null,
+              "deltaE": 16.12
+            },
+            {
+              "componentId": null,
+              "deltaE": 16.12
+            },
+            {
+              "componentId": null,
+              "deltaE": 9.76
+            },
+            {
+              "componentId": null,
+              "deltaE": 18.35
+            },
+            {
+              "componentId": null,
+              "deltaE": 21.85
+            },
+            {
+              "componentId": null,
+              "deltaE": 18.35
+            },
+            {
+              "componentId": null,
+              "deltaE": 9.76
+            },
+            {
+              "componentId": null,
+              "deltaE": 9.36
+            }
+          ],
+          "gated": false
+        }
+      },
+      "failures": [],
+      "maskWarnings": [],
+      "renderHash": "582be6b417c3e832",
+      "passId": "structural-pass"
+    },
+    {
+      "passed": false,
+      "checks": {
+        "silhouetteIoU": 0.8624,
+        "aspectRatioDelta": 0.045,
+        "scaleDelta": 0.0872,
+        "bilateralSymmetryError": 0.0124,
+        "colorDelta": {
+          "checked": 45,
+          "maxDeltaE": 40.74,
+          "perComponent": [
+            {
+              "componentId": null,
+              "deltaE": 33.98
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.28
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.44
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.28
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.44
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.44
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.28
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.48
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.44
+            },
+            {
+              "componentId": null,
+              "deltaE": 29.45
+            },
+            {
+              "componentId": null,
+              "deltaE": 14.69
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.44
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.28
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.44
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.28
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.44
+            },
+            {
+              "componentId": null,
+              "deltaE": 13.5
+            },
+            {
+              "componentId": null,
+              "deltaE": 6.99
+            },
+            {
+              "componentId": null,
+              "deltaE": 18.33
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.28
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.48
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.44
+            },
+            {
+              "componentId": null,
+              "deltaE": 29.45
+            },
+            {
+              "componentId": null,
+              "deltaE": 14.69
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.44
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.28
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.44
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.28
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.44
+            },
+            {
+              "componentId": null,
+              "deltaE": 13.5
+            },
+            {
+              "componentId": null,
+              "deltaE": 6.99
+            },
+            {
+              "componentId": null,
+              "deltaE": 18.33
+            },
+            {
+              "componentId": null,
+              "deltaE": 13.43
+            },
+            {
+              "componentId": null,
+              "deltaE": 11.67
+            },
+            {
+              "componentId": null,
+              "deltaE": 40.74
+            },
+            {
+              "componentId": null,
+              "deltaE": 14.93
+            },
+            {
+              "componentId": null,
+              "deltaE": 14.93
+            },
+            {
+              "componentId": null,
+              "deltaE": 14.93
+            },
+            {
+              "componentId": null,
+              "deltaE": 14.93
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.28
+            },
+            {
+              "componentId": null,
+              "deltaE": 13.5
+            },
+            {
+              "componentId": null,
+              "deltaE": 18.33
+            },
+            {
+              "componentId": null,
+              "deltaE": 13.5
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.28
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.44
+            }
+          ],
+          "gated": false
+        }
+      },
+      "failures": [
+        "scale delta 0.087 exceeds threshold 0.08"
+      ],
+      "maskWarnings": [],
+      "renderHash": "c9d024558000591c",
+      "passId": "proportion-lock"
+    },
+    {
+      "passed": false,
+      "checks": {
+        "silhouetteIoU": 0.8625,
+        "aspectRatioDelta": 0.045,
+        "scaleDelta": 0.0872,
+        "bilateralSymmetryError": 0.0122,
+        "colorDelta": {
+          "checked": 45,
+          "maxDeltaE": 40.73,
+          "perComponent": [
+            {
+              "componentId": null,
+              "deltaE": 33.59
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.37
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.47
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.37
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.47
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.47
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.37
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.49
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.47
+            },
+            {
+              "componentId": null,
+              "deltaE": 29.06
+            },
+            {
+              "componentId": null,
+              "deltaE": 14.75
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.47
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.37
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.47
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.37
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.47
+            },
+            {
+              "componentId": null,
+              "deltaE": 13.85
+            },
+            {
+              "componentId": null,
+              "deltaE": 7.31
+            },
+            {
+              "componentId": null,
+              "deltaE": 18.22
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.37
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.49
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.47
+            },
+            {
+              "componentId": null,
+              "deltaE": 29.06
+            },
+            {
+              "componentId": null,
+              "deltaE": 14.75
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.47
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.37
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.47
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.37
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.47
+            },
+            {
+              "componentId": null,
+              "deltaE": 13.85
+            },
+            {
+              "componentId": null,
+              "deltaE": 7.31
+            },
+            {
+              "componentId": null,
+              "deltaE": 18.22
+            },
+            {
+              "componentId": null,
+              "deltaE": 13.03
+            },
+            {
+              "componentId": null,
+              "deltaE": 11.52
+            },
+            {
+              "componentId": null,
+              "deltaE": 40.73
+            },
+            {
+              "componentId": null,
+              "deltaE": 14.94
+            },
+            {
+              "componentId": null,
+              "deltaE": 14.94
+            },
+            {
+              "componentId": null,
+              "deltaE": 14.94
+            },
+            {
+              "componentId": null,
+              "deltaE": 14.94
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.37
+            },
+            {
+              "componentId": null,
+              "deltaE": 13.85
+            },
+            {
+              "componentId": null,
+              "deltaE": 18.22
+            },
+            {
+              "componentId": null,
+              "deltaE": 13.85
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.37
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.47
+            }
+          ],
+          "gated": false
+        }
+      },
+      "failures": [
+        "scale delta 0.087 exceeds threshold 0.08"
+      ],
+      "maskWarnings": [],
+      "renderHash": "650191c2d753b3a3",
+      "passId": "proportion-lock"
+    },
+    {
+      "passed": true,
+      "checks": {
+        "silhouetteIoU": 0.8749,
+        "aspectRatioDelta": 0.0116,
+        "scaleDelta": 0.0331,
+        "bilateralSymmetryError": 0.0125,
+        "colorDelta": {
+          "checked": 45,
+          "maxDeltaE": 40.7,
+          "perComponent": [
+            {
+              "componentId": null,
+              "deltaE": 33.52
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.39
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.5
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.39
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.5
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.5
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.39
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.47
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.5
+            },
+            {
+              "componentId": null,
+              "deltaE": 29.02
+            },
+            {
+              "componentId": null,
+              "deltaE": 14.88
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.5
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.39
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.5
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.39
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.5
+            },
+            {
+              "componentId": null,
+              "deltaE": 13.84
+            },
+            {
+              "componentId": null,
+              "deltaE": 7.27
+            },
+            {
+              "componentId": null,
+              "deltaE": 18.37
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.39
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.47
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.5
+            },
+            {
+              "componentId": null,
+              "deltaE": 29.02
+            },
+            {
+              "componentId": null,
+              "deltaE": 14.88
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.5
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.39
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.5
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.39
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.5
+            },
+            {
+              "componentId": null,
+              "deltaE": 13.84
+            },
+            {
+              "componentId": null,
+              "deltaE": 7.27
+            },
+            {
+              "componentId": null,
+              "deltaE": 18.37
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.97
+            },
+            {
+              "componentId": null,
+              "deltaE": 11.25
+            },
+            {
+              "componentId": null,
+              "deltaE": 40.7
+            },
+            {
+              "componentId": null,
+              "deltaE": 15.21
+            },
+            {
+              "componentId": null,
+              "deltaE": 15.21
+            },
+            {
+              "componentId": null,
+              "deltaE": 15.21
+            },
+            {
+              "componentId": null,
+              "deltaE": 15.21
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.39
+            },
+            {
+              "componentId": null,
+              "deltaE": 13.84
+            },
+            {
+              "componentId": null,
+              "deltaE": 18.37
+            },
+            {
+              "componentId": null,
+              "deltaE": 13.84
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.39
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.5
+            }
+          ],
+          "gated": false
+        }
+      },
+      "failures": [],
+      "maskWarnings": [],
+      "renderHash": "fb133ad2c836969b",
+      "passId": "proportion-lock"
+    },
+    {
+      "passed": true,
+      "checks": {
+        "silhouetteIoU": 0.8749,
+        "aspectRatioDelta": 0.0116,
+        "scaleDelta": 0.0331,
+        "bilateralSymmetryError": 0.0125,
+        "colorDelta": {
+          "checked": 45,
+          "maxDeltaE": 40.7,
+          "perComponent": [
+            {
+              "componentId": null,
+              "deltaE": 33.52
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.39
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.5
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.39
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.5
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.5
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.39
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.47
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.5
+            },
+            {
+              "componentId": null,
+              "deltaE": 29.02
+            },
+            {
+              "componentId": null,
+              "deltaE": 14.88
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.5
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.39
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.5
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.39
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.5
+            },
+            {
+              "componentId": null,
+              "deltaE": 13.84
+            },
+            {
+              "componentId": null,
+              "deltaE": 7.27
+            },
+            {
+              "componentId": null,
+              "deltaE": 18.37
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.39
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.47
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.5
+            },
+            {
+              "componentId": null,
+              "deltaE": 29.02
+            },
+            {
+              "componentId": null,
+              "deltaE": 14.88
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.5
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.39
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.5
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.39
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.5
+            },
+            {
+              "componentId": null,
+              "deltaE": 13.84
+            },
+            {
+              "componentId": null,
+              "deltaE": 7.27
+            },
+            {
+              "componentId": null,
+              "deltaE": 18.37
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.97
+            },
+            {
+              "componentId": null,
+              "deltaE": 11.25
+            },
+            {
+              "componentId": null,
+              "deltaE": 40.7
+            },
+            {
+              "componentId": null,
+              "deltaE": 15.21
+            },
+            {
+              "componentId": null,
+              "deltaE": 15.21
+            },
+            {
+              "componentId": null,
+              "deltaE": 15.21
+            },
+            {
+              "componentId": null,
+              "deltaE": 15.21
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.39
+            },
+            {
+              "componentId": null,
+              "deltaE": 13.84
+            },
+            {
+              "componentId": null,
+              "deltaE": 18.37
+            },
+            {
+              "componentId": null,
+              "deltaE": 13.84
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.39
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.5
+            }
+          ],
+          "gated": false
+        }
+      },
+      "failures": [],
+      "maskWarnings": [],
+      "renderHash": "fb133ad2c836969b",
+      "passId": "feature-placement"
+    },
+    {
+      "passed": false,
+      "checks": {
+        "silhouetteIoU": 0.8667,
+        "aspectRatioDelta": 0.0957,
+        "scaleDelta": 0.0593,
+        "bilateralSymmetryError": 0.0187,
+        "colorDelta": {
+          "checked": 45,
+          "maxDeltaE": 40.55,
+          "perComponent": [
+            {
+              "componentId": null,
+              "deltaE": 30.61
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.28
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.66
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.28
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.66
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.66
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.28
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.49
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.66
+            },
+            {
+              "componentId": null,
+              "deltaE": 26.07
+            },
+            {
+              "componentId": null,
+              "deltaE": 15.1
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.66
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.28
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.66
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.28
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.66
+            },
+            {
+              "componentId": null,
+              "deltaE": 16.79
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.2
+            },
+            {
+              "componentId": null,
+              "deltaE": 18.59
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.28
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.49
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.66
+            },
+            {
+              "componentId": null,
+              "deltaE": 26.07
+            },
+            {
+              "componentId": null,
+              "deltaE": 15.1
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.66
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.28
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.66
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.28
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.66
+            },
+            {
+              "componentId": null,
+              "deltaE": 16.79
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.2
+            },
+            {
+              "componentId": null,
+              "deltaE": 18.59
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.06
+            },
+            {
+              "componentId": null,
+              "deltaE": 11.7
+            },
+            {
+              "componentId": null,
+              "deltaE": 40.55
+            },
+            {
+              "componentId": null,
+              "deltaE": 15.02
+            },
+            {
+              "componentId": null,
+              "deltaE": 15.02
+            },
+            {
+              "componentId": null,
+              "deltaE": 15.02
+            },
+            {
+              "componentId": null,
+              "deltaE": 15.02
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.28
+            },
+            {
+              "componentId": null,
+              "deltaE": 16.79
+            },
+            {
+              "componentId": null,
+              "deltaE": 18.59
+            },
+            {
+              "componentId": null,
+              "deltaE": 16.79
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.28
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.66
+            }
+          ],
+          "gated": false
+        }
+      },
+      "failures": [
+        "aspect-ratio delta 0.096 exceeds threshold 0.05"
+      ],
+      "maskWarnings": [],
+      "renderHash": "0020941f7d030949",
+      "passId": "feature-placement"
+    },
+    {
+      "passed": true,
+      "checks": {
+        "silhouetteIoU": 0.8679,
+        "aspectRatioDelta": 0.0283,
+        "scaleDelta": 0.0059,
+        "bilateralSymmetryError": 0.0183,
+        "colorDelta": {
+          "checked": 45,
+          "maxDeltaE": 40.61,
+          "perComponent": [
+            {
+              "componentId": null,
+              "deltaE": 30.8
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.2
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.61
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.2
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.61
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.61
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.2
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.43
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.61
+            },
+            {
+              "componentId": null,
+              "deltaE": 26.23
+            },
+            {
+              "componentId": null,
+              "deltaE": 15.03
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.61
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.2
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.61
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.2
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.61
+            },
+            {
+              "componentId": null,
+              "deltaE": 16.68
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.05
+            },
+            {
+              "componentId": null,
+              "deltaE": 18.51
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.2
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.43
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.61
+            },
+            {
+              "componentId": null,
+              "deltaE": 26.23
+            },
+            {
+              "componentId": null,
+              "deltaE": 15.03
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.61
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.2
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.61
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.2
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.61
+            },
+            {
+              "componentId": null,
+              "deltaE": 16.68
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.05
+            },
+            {
+              "componentId": null,
+              "deltaE": 18.51
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.2
+            },
+            {
+              "componentId": null,
+              "deltaE": 11.59
+            },
+            {
+              "componentId": null,
+              "deltaE": 40.61
+            },
+            {
+              "componentId": null,
+              "deltaE": 14.57
+            },
+            {
+              "componentId": null,
+              "deltaE": 14.57
+            },
+            {
+              "componentId": null,
+              "deltaE": 14.57
+            },
+            {
+              "componentId": null,
+              "deltaE": 14.57
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.2
+            },
+            {
+              "componentId": null,
+              "deltaE": 16.68
+            },
+            {
+              "componentId": null,
+              "deltaE": 18.51
+            },
+            {
+              "componentId": null,
+              "deltaE": 16.68
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.2
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.61
+            }
+          ],
+          "gated": false
+        }
+      },
+      "failures": [],
+      "maskWarnings": [],
+      "renderHash": "601841f3ea63c247",
+      "passId": "feature-placement"
+    },
+    {
+      "passed": true,
+      "checks": {
+        "silhouetteIoU": 0.8665,
+        "aspectRatioDelta": 0.0283,
+        "scaleDelta": 0.0059,
+        "bilateralSymmetryError": 0.0199,
+        "colorDelta": {
+          "checked": 45,
+          "maxDeltaE": 40.34,
+          "perComponent": [
+            {
+              "componentId": null,
+              "deltaE": 30.32
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.79
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.56
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.79
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.56
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.56
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.79
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.41
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.56
+            },
+            {
+              "componentId": null,
+              "deltaE": 25.71
+            },
+            {
+              "componentId": null,
+              "deltaE": 14.96
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.56
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.79
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.56
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.79
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.56
+            },
+            {
+              "componentId": null,
+              "deltaE": 17.29
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.72
+            },
+            {
+              "componentId": null,
+              "deltaE": 19.51
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.79
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.41
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.56
+            },
+            {
+              "componentId": null,
+              "deltaE": 25.71
+            },
+            {
+              "componentId": null,
+              "deltaE": 14.96
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.56
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.79
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.56
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.79
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.56
+            },
+            {
+              "componentId": null,
+              "deltaE": 17.29
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.72
+            },
+            {
+              "componentId": null,
+              "deltaE": 19.51
+            },
+            {
+              "componentId": null,
+              "deltaE": 9.79
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.32
+            },
+            {
+              "componentId": null,
+              "deltaE": 40.34
+            },
+            {
+              "componentId": null,
+              "deltaE": 18.3
+            },
+            {
+              "componentId": null,
+              "deltaE": 18.3
+            },
+            {
+              "componentId": null,
+              "deltaE": 18.3
+            },
+            {
+              "componentId": null,
+              "deltaE": 18.3
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.79
+            },
+            {
+              "componentId": null,
+              "deltaE": 17.29
+            },
+            {
+              "componentId": null,
+              "deltaE": 19.51
+            },
+            {
+              "componentId": null,
+              "deltaE": 17.29
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.79
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.56
+            }
+          ],
+          "gated": false
+        }
+      },
+      "failures": [],
+      "maskWarnings": [],
+      "renderHash": "39e7c53e10723bb0",
+      "passId": "feature-placement"
+    },
+    {
+      "passed": true,
+      "checks": {
+        "silhouetteIoU": 0.8692,
+        "aspectRatioDelta": 0.0283,
+        "scaleDelta": 0.0059,
+        "bilateralSymmetryError": 0.0191,
+        "colorDelta": {
+          "checked": 45,
+          "maxDeltaE": 39.12,
+          "perComponent": [
+            {
+              "componentId": null,
+              "deltaE": 29.53
+            },
+            {
+              "componentId": null,
+              "deltaE": 11.59
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.26
+            },
+            {
+              "componentId": null,
+              "deltaE": 11.59
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.26
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.26
+            },
+            {
+              "componentId": null,
+              "deltaE": 11.59
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.36
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.26
+            },
+            {
+              "componentId": null,
+              "deltaE": 24.95
+            },
+            {
+              "componentId": null,
+              "deltaE": 14.27
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.26
+            },
+            {
+              "componentId": null,
+              "deltaE": 11.59
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.26
+            },
+            {
+              "componentId": null,
+              "deltaE": 11.59
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.26
+            },
+            {
+              "componentId": null,
+              "deltaE": 17.96
+            },
+            {
+              "componentId": null,
+              "deltaE": 11.35
+            },
+            {
+              "componentId": null,
+              "deltaE": 18.5
+            },
+            {
+              "componentId": null,
+              "deltaE": 11.59
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.36
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.26
+            },
+            {
+              "componentId": null,
+              "deltaE": 24.95
+            },
+            {
+              "componentId": null,
+              "deltaE": 14.27
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.26
+            },
+            {
+              "componentId": null,
+              "deltaE": 11.59
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.26
+            },
+            {
+              "componentId": null,
+              "deltaE": 11.59
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.26
+            },
+            {
+              "componentId": null,
+              "deltaE": 17.96
+            },
+            {
+              "componentId": null,
+              "deltaE": 11.35
+            },
+            {
+              "componentId": null,
+              "deltaE": 18.5
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.97
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.16
+            },
+            {
+              "componentId": null,
+              "deltaE": 39.12
+            },
+            {
+              "componentId": null,
+              "deltaE": 19.38
+            },
+            {
+              "componentId": null,
+              "deltaE": 19.38
+            },
+            {
+              "componentId": null,
+              "deltaE": 19.38
+            },
+            {
+              "componentId": null,
+              "deltaE": 19.38
+            },
+            {
+              "componentId": null,
+              "deltaE": 11.59
+            },
+            {
+              "componentId": null,
+              "deltaE": 17.96
+            },
+            {
+              "componentId": null,
+              "deltaE": 18.5
+            },
+            {
+              "componentId": null,
+              "deltaE": 17.96
+            },
+            {
+              "componentId": null,
+              "deltaE": 11.59
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.26
+            }
+          ],
+          "gated": false
+        }
+      },
+      "failures": [],
+      "maskWarnings": [],
+      "renderHash": "1f186088951658bf",
+      "passId": "feature-placement"
+    },
+    {
+      "passed": false,
+      "checks": {
+        "silhouetteIoU": 0.8692,
+        "aspectRatioDelta": 0.0283,
+        "scaleDelta": 0.0059,
+        "bilateralSymmetryError": 0.0191,
+        "colorDelta": {
+          "checked": 45,
+          "maxDeltaE": 39.12,
+          "perComponent": [
+            {
+              "componentId": null,
+              "deltaE": 29.53
+            },
+            {
+              "componentId": null,
+              "deltaE": 11.59
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.26
+            },
+            {
+              "componentId": null,
+              "deltaE": 11.59
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.26
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.26
+            },
+            {
+              "componentId": null,
+              "deltaE": 11.59
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.36
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.26
+            },
+            {
+              "componentId": null,
+              "deltaE": 24.95
+            },
+            {
+              "componentId": null,
+              "deltaE": 14.27
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.26
+            },
+            {
+              "componentId": null,
+              "deltaE": 11.59
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.26
+            },
+            {
+              "componentId": null,
+              "deltaE": 11.59
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.26
+            },
+            {
+              "componentId": null,
+              "deltaE": 17.96
+            },
+            {
+              "componentId": null,
+              "deltaE": 11.35
+            },
+            {
+              "componentId": null,
+              "deltaE": 18.5
+            },
+            {
+              "componentId": null,
+              "deltaE": 11.59
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.36
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.26
+            },
+            {
+              "componentId": null,
+              "deltaE": 24.95
+            },
+            {
+              "componentId": null,
+              "deltaE": 14.27
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.26
+            },
+            {
+              "componentId": null,
+              "deltaE": 11.59
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.26
+            },
+            {
+              "componentId": null,
+              "deltaE": 11.59
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.26
+            },
+            {
+              "componentId": null,
+              "deltaE": 17.96
+            },
+            {
+              "componentId": null,
+              "deltaE": 11.35
+            },
+            {
+              "componentId": null,
+              "deltaE": 18.5
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.97
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.16
+            },
+            {
+              "componentId": null,
+              "deltaE": 39.12
+            },
+            {
+              "componentId": null,
+              "deltaE": 19.38
+            },
+            {
+              "componentId": null,
+              "deltaE": 19.38
+            },
+            {
+              "componentId": null,
+              "deltaE": 19.38
+            },
+            {
+              "componentId": null,
+              "deltaE": 19.38
+            },
+            {
+              "componentId": null,
+              "deltaE": 11.59
+            },
+            {
+              "componentId": null,
+              "deltaE": 17.96
+            },
+            {
+              "componentId": null,
+              "deltaE": 18.5
+            },
+            {
+              "componentId": null,
+              "deltaE": 17.96
+            },
+            {
+              "componentId": null,
+              "deltaE": 11.59
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.26
+            }
+          ],
+          "gated": true
+        }
+      },
+      "failures": [
+        "max per-part color delta-E 39.12 exceeds threshold 20.0"
+      ],
+      "maskWarnings": [],
+      "renderHash": "1f186088951658bf",
+      "passId": "material-pass"
+    },
+    {
+      "passed": false,
+      "checks": {
+        "silhouetteIoU": 0.8692,
+        "aspectRatioDelta": 0.0283,
+        "scaleDelta": 0.0059,
+        "bilateralSymmetryError": 0.0191,
+        "colorDelta": {
+          "checked": 45,
+          "maxDeltaE": 39.12,
+          "perComponent": [
+            {
+              "componentId": null,
+              "deltaE": 11.59
+            },
+            {
+              "componentId": null,
+              "deltaE": 11.59
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.26
+            },
+            {
+              "componentId": null,
+              "deltaE": 11.59
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.26
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.26
+            },
+            {
+              "componentId": null,
+              "deltaE": 11.59
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.36
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.26
+            },
+            {
+              "componentId": null,
+              "deltaE": 24.95
+            },
+            {
+              "componentId": null,
+              "deltaE": 14.27
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.26
+            },
+            {
+              "componentId": null,
+              "deltaE": 11.59
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.26
+            },
+            {
+              "componentId": null,
+              "deltaE": 11.59
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.26
+            },
+            {
+              "componentId": null,
+              "deltaE": 17.96
+            },
+            {
+              "componentId": null,
+              "deltaE": 11.35
+            },
+            {
+              "componentId": null,
+              "deltaE": 18.5
+            },
+            {
+              "componentId": null,
+              "deltaE": 11.59
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.36
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.26
+            },
+            {
+              "componentId": null,
+              "deltaE": 24.95
+            },
+            {
+              "componentId": null,
+              "deltaE": 14.27
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.26
+            },
+            {
+              "componentId": null,
+              "deltaE": 11.59
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.26
+            },
+            {
+              "componentId": null,
+              "deltaE": 11.59
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.26
+            },
+            {
+              "componentId": null,
+              "deltaE": 17.96
+            },
+            {
+              "componentId": null,
+              "deltaE": 11.35
+            },
+            {
+              "componentId": null,
+              "deltaE": 18.5
+            },
+            {
+              "componentId": null,
+              "deltaE": 8.97
+            },
+            {
+              "componentId": null,
+              "deltaE": 12.16
+            },
+            {
+              "componentId": null,
+              "deltaE": 39.12
+            },
+            {
+              "componentId": null,
+              "deltaE": 19.38
+            },
+            {
+              "componentId": null,
+              "deltaE": 19.38
+            },
+            {
+              "componentId": null,
+              "deltaE": 19.38
+            },
+            {
+              "componentId": null,
+              "deltaE": 19.38
+            },
+            {
+              "componentId": null,
+              "deltaE": 11.59
+            },
+            {
+              "componentId": null,
+              "deltaE": 17.96
+            },
+            {
+              "componentId": null,
+              "deltaE": 18.5
+            },
+            {
+              "componentId": null,
+              "deltaE": 17.96
+            },
+            {
+              "componentId": null,
+              "deltaE": 11.59
+            },
+            {
+              "componentId": null,
+              "deltaE": 10.26
+            }
+          ],
+          "gated": true
+        }
+      },
+      "failures": [
+        "max per-part color delta-E 39.12 exceeds threshold 20.0"
+      ],
+      "maskWarnings": [],
+      "renderHash": "1f186088951658bf",
+      "passId": "material-pass"
+    }
+  ]
 }
