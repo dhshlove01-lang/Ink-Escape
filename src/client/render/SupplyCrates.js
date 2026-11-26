@@ -8,6 +8,14 @@ import { canvasTex } from './DungeonKit.js';
 const SIZE = 1.1;
 
 let shared = null;
+let iconTex = null;
+const iconTexture = () => {
+  if (!iconTex) {
+    iconTex = new THREE.CanvasTexture(crateIcon());
+    iconTex.colorSpace = THREE.SRGBColorSpace;
+  }
+  return iconTex;
+};
 function parts() {
   if (shared) return shared;
   const wood = canvasTex(128, (g, S) => {
@@ -85,9 +93,14 @@ export class SupplyCrates {
     const ring = new THREE.Mesh(new THREE.RingGeometry(1.0, 1.25, 32), new THREE.MeshBasicMaterial({ color: 0xffd27a, transparent: true, opacity: 0.7, side: THREE.DoubleSide, depthWrite: false }));
     ring.rotation.x = -Math.PI / 2;
     ring.position.y = 0.04;
-    group.add(crate, beam, ring);
+    // 술래 탑뷰용 큰 상자 표시: 천장(7m) 위에 띄워서 플레이어 1인칭에서는 천장에 가려 안 보인다
+    const marker = new THREE.Sprite(new THREE.SpriteMaterial({ map: iconTexture(), transparent: true })); // 깊이 검사 켬: 플레이어는 천장에 가려짐
+    marker.scale.set(3.2, 3.2, 1);
+    marker.position.y = WALL_H + 2.2;
+    marker.renderOrder = 30;
+    group.add(crate, beam, ring, marker);
     this.scene.add(group);
-    return { group, crate, beam, ring, born: time, landed: false };
+    return { group, crate, beam, ring, marker, born: time, landed: false };
   }
 
   update(time) {
@@ -111,6 +124,7 @@ export class SupplyCrates {
       it.beam.material.opacity = 0.4 + Math.sin(time * 3 + id) * 0.15;
       it.ring.scale.setScalar(1 + ((time * 0.8 + id) % 1) * 0.6);
       it.ring.material.opacity = 0.7 * (1 - ((time * 0.8 + id) % 1));
+      it.marker.position.y = WALL_H + 2.2 + Math.sin(time * 2.4 + id) * 0.35;
     }
   }
 
@@ -118,4 +132,40 @@ export class SupplyCrates {
     for (const it of this.items.values()) this.scene.remove(it.group);
     this.items.clear();
   }
+}
+
+// 보급 상자 그림 (위에서 본 나무 상자 + 빨간 잉크 느낌표) — 술래 2D 지도·3D 탑뷰 표시. 한 번만 그린다.
+let _crate = null;
+export function crateIcon() {
+  if (_crate) return _crate;
+  const c = document.createElement('canvas');
+  c.width = c.height = 96;
+  const g = c.getContext('2d');
+  g.fillStyle = 'rgba(0,0,0,0.45)';
+  g.fillRect(12, 14, 78, 78);
+  g.fillStyle = '#8a5a2e';
+  g.fillRect(8, 8, 78, 78);
+  for (let i = 0; i < 4; i++) {
+    g.fillStyle = i % 2 ? '#7c4f27' : '#9a6838';
+    g.fillRect(8, 8 + i * 19.5 + 1, 78, 17.5);
+  }
+  g.strokeStyle = '#2e1b0c';
+  g.lineWidth = 7;
+  g.strokeRect(11, 11, 72, 72);
+  g.beginPath();
+  g.moveTo(14, 80);
+  g.lineTo(80, 14);
+  g.stroke();
+  g.fillStyle = '#d8283f';
+  g.beginPath();
+  g.arc(47, 47, 19, 0, Math.PI * 2);
+  g.fill();
+  g.strokeStyle = '#1a0a0e';
+  g.lineWidth = 3;
+  g.stroke();
+  g.fillStyle = '#fff3e0';
+  g.fillRect(43, 34, 8, 16);
+  g.fillRect(43, 54, 8, 6);
+  _crate = c;
+  return _crate;
 }

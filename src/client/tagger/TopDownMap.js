@@ -6,6 +6,7 @@ import { buildCutout } from '../render/PaperCutout.js';
 import { drawAnimalFace, ANIMAL_LOOK } from '../render/AnimalModels.js';
 import { planProps, hash2, rand } from '../render/DungeonKit.js';
 import { validSpawnSpot } from './spawnSpot.js';
+import { crateIcon } from '../render/SupplyCrates.js';
 
 // 술래 왼쪽 화면: 맵 탑뷰 실시간 관전 + 소환 위치 고르기.
 // 몬스터는 작은 미니 그림(정면)으로 보인다.
@@ -540,7 +541,7 @@ export class TopDownMap extends Emitter {
       g.arc(c.x, c.z, 1.6 + ph * 3, 0, Math.PI * 2);
       g.stroke();
       const icon = crateIcon();
-      const sz = 3.2;
+      const sz = this.mini ? 6 : 3.6; // 미니맵은 작게 그려지므로 크게
       g.drawImage(icon, c.x - sz / 2, c.z - sz / 2, sz, sz);
       const fs = 12 * u * dpr;
       g.font = `${fs}px Jua, "Malgun Gothic", sans-serif`;
@@ -682,38 +683,3 @@ export class TopDownMap extends Emitter {
   }
 }
 
-// 술래 지도용 보급 상자 그림 (위에서 본 나무 상자 + 빨간 잉크 느낌표). 한 번만 그린다.
-let _crate = null;
-function crateIcon() {
-  if (_crate) return _crate;
-  const c = document.createElement('canvas');
-  c.width = c.height = 96;
-  const g = c.getContext('2d');
-  g.fillStyle = 'rgba(0,0,0,0.45)';
-  g.fillRect(12, 14, 78, 78);
-  g.fillStyle = '#8a5a2e';
-  g.fillRect(8, 8, 78, 78);
-  for (let i = 0; i < 4; i++) {
-    g.fillStyle = i % 2 ? '#7c4f27' : '#9a6838';
-    g.fillRect(8, 8 + i * 19.5 + 1, 78, 17.5);
-  }
-  g.strokeStyle = '#2e1b0c';
-  g.lineWidth = 7;
-  g.strokeRect(11, 11, 72, 72);
-  g.beginPath();
-  g.moveTo(14, 80);
-  g.lineTo(80, 14);
-  g.stroke();
-  g.fillStyle = '#d8283f';
-  g.beginPath();
-  g.arc(47, 47, 19, 0, Math.PI * 2);
-  g.fill();
-  g.strokeStyle = '#1a0a0e';
-  g.lineWidth = 3;
-  g.stroke();
-  g.fillStyle = '#fff3e0';
-  g.fillRect(43, 34, 8, 16);
-  g.fillRect(43, 54, 8, 6);
-  _crate = c;
-  return _crate;
-}
