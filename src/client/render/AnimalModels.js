@@ -18,7 +18,26 @@ function sphere(r, color, sx = 1, sy = 1, sz = 1) {
   return m;
 }
 
-export function createGunMesh() {
+// 진짜 3D 모델(ModelLibrary)이 있으면 그것을, 없으면 공·상자로 만든 임시 모델을 쓴다.
+let library = null;
+export function setModelLibrary(lib) {
+  library = lib;
+}
+
+// 총: 모델이 늦게 불러와지면 그 자리에서 바꿔 끼운다. decorate 는 바꿔 낄 때마다 다시 적용된다.
+export function createGunMesh(decorate = () => {}) {
+  const holder = new THREE.Group();
+  const put = (obj) => {
+    holder.clear();
+    holder.add(obj);
+    decorate(holder);
+  };
+  put(library?.get('gun') || primitiveGun());
+  if (library && !library.has('gun')) library.onReady('gun', () => put(library.get('gun')));
+  return holder;
+}
+
+function primitiveGun() {
   const g = new THREE.Group();
   const body = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.14, 0.5), mat(0x2c2b33));
   const barrel = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 0.3, 10), mat(0x1c1b20));
@@ -102,7 +121,8 @@ export function createAnimalModel(kind) {
   }
   // 총과 앞발
   const gun = createGunMesh();
-  gun.position.set(0.32, 0.55, -0.55);
+  gun.scale.setScalar(1.35);
+  gun.position.set(0.32, 0.55, -0.6);
   g.add(gun);
   for (const [x, z] of [[0.28, -0.45], [0.05, -0.7]]) {
     const paw = sphere(0.1, L.fur);
@@ -120,23 +140,29 @@ export function createAnimalModel(kind) {
 export function createViewModel(kind) {
   const L = ANIMAL_LOOK[kind] || ANIMAL_LOOK.shiba;
   const g = new THREE.Group();
-  const gun = createGunMesh();
+  const gun = createGunMesh(toViewModelMaterial);
   gun.scale.setScalar(0.7);
-  gun.rotation.y = 0.16; // 옆면이 살짝 보이게 + 조준점 쪽으로
+  gun.rotation.y = 0.05; // 총구가 조준점 쪽, 옆면이 살짝 보이게
   g.add(gun);
   const pawR = sphere(0.055, L.fur, 1.1, 1, 1.2);
   pawR.position.set(0.01, -0.085, 0.06);
   const pawL = sphere(0.05, L.fur, 1.1, 1, 1.2);
   pawL.position.set(-0.02, -0.07, -0.2);
   g.add(pawR, pawL);
-  g.traverse((o) => {
-    if (o.isMesh) {
-      o.material = new THREE.MeshBasicMaterial({ color: o.material.color.clone().multiplyScalar(0.8) });
-      o.renderOrder = 10;
-      o.material.depthTest = false;
-    }
-  });
+  toViewModelMaterial(g);
   return g;
+}
+
+// 1인칭 손·총은 벽에 파묻히지 않게 항상 맨 앞에, 조명 없이 그린다.
+function toViewModelMaterial(root) {
+  root.traverse((o) => {
+    if (!o.isMesh || o.userData.vm) return;
+    const src = o.material;
+    o.material = new THREE.MeshBasicMaterial({ color: src.color.clone().multiplyScalar(src.map ? 1 : 0.8), map: src.map || null });
+    o.material.depthTest = false;
+    o.renderOrder = 10;
+    o.userData.vm = true;
+  });
 }
 
 // 2D 초상화 (HUD·술래 패널)
