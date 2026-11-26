@@ -12,6 +12,8 @@ import { Sfx } from './client/render/Sfx.js';
 import { MODEL_DEFS } from './config/models.js';
 import { ModelLibrary } from './client/render/ModelLibrary.js';
 import { setModelLibrary } from './client/render/AnimalModels.js';
+import { IMAGE_DEFS } from './config/assets.js';
+import { loadImages } from './client/render/Images.js';
 
 // 3D 모델 파일(GLB): 기다리지 않고 불러오기 시작. 늦게 끝나면 임시 모델을 바꿔 끼운다.
 const models = new ModelLibrary(MODEL_DEFS);
@@ -37,5 +39,7 @@ const app = new App({
 });
 
 window.addEventListener('pointerdown', () => app.sfx.unlock(), { once: true });
+// 2D 이미지를 (최대 4초) 기다린 뒤 시작. 늦거나 없으면 코드 그리기로 대체된다.
+await Promise.race([loadImages(IMAGE_DEFS), new Promise((r) => setTimeout(r, 4000))]);
 app.start();
 window.__app = app; // 디버그·자동 테스트용

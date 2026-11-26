@@ -1,5 +1,7 @@
 import * as THREE from 'three';
 import { CELL, WALL_H, TILE } from '../../shared/map/GameMap.js';
+import { texture, textureFromUrl } from '../render/Images.js';
+import { DECALS } from '../../config/assets.js';
 
 // 맵 → 3D 장면. 어두운 낙서 던전 (돌벽 + 분필 낙서 + 횃불).
 
@@ -131,13 +133,20 @@ export function buildScene(map) {
   scene.background = new THREE.Color(0x0d0b12);
   scene.fog = new THREE.Fog(0x0d0b12, 18, 80);
 
+  // 사용자가 뽑은 텍스처가 있으면 그것, 없으면 코드로 그린 텍스처
   const tex = makeTextures();
+  const wallTex = texture('tex.wall', { repeat: [1, WALL_H / CELL] }) || tex.wall;
+  const pillarTex = texture('tex.pillar', { repeat: [1, WALL_H / CELL] });
+  const floorTex = texture('tex.floor', { repeat: [map.worldW / 3, map.worldH / 3] });
   scene.add(new THREE.HemisphereLight(0xa69cd0, 0x3a2c24, 2.4));
 
   // 바닥
-  const fTex = tex.floor.clone();
-  fTex.needsUpdate = true;
-  fTex.repeat.set(map.w, map.h);
+  let fTex = floorTex;
+  if (!fTex) {
+    fTex = tex.floor.clone();
+    fTex.needsUpdate = true;
+    fTex.repeat.set(map.w, map.h);
+  }
   const floor = new THREE.Mesh(new THREE.PlaneGeometry(map.worldW, map.worldH), new THREE.MeshLambertMaterial({ map: fTex }));
   floor.rotation.x = -Math.PI / 2;
   floor.position.set(map.worldW / 2, 0, map.worldH / 2);
@@ -160,13 +169,13 @@ export function buildScene(map) {
     }
   }
   const box = new THREE.BoxGeometry(CELL, WALL_H, CELL);
-  const wallMat = new THREE.MeshLambertMaterial({ map: tex.wall });
+  const wallMat = new THREE.MeshLambertMaterial({ map: wallTex });
   const walls = new THREE.InstancedMesh(box, wallMat, wallCells.length);
   const m4 = new THREE.Matrix4();
   wallCells.forEach(([x, y], i) => walls.setMatrixAt(i, m4.makeTranslation((x + 0.5) * CELL, WALL_H / 2, (y + 0.5) * CELL)));
   scene.add(walls);
 
-  const pillarMat = new THREE.MeshLambertMaterial({ map: tex.wall, color: 0xb9b0c8 });
+  const pillarMat = pillarTex ? new THREE.MeshLambertMaterial({ map: pillarTex }) : new THREE.MeshLambertMaterial({ map: tex.wall, color: 0xb9b0c8 });
   const pillars = new THREE.InstancedMesh(new THREE.BoxGeometry(CELL * 0.9, WALL_H, CELL * 0.9), pillarMat, pillarCells.length);
   pillarCells.forEach(([x, y], i) => pillars.setMatrixAt(i, m4.makeTranslation((x + 0.5) * CELL, WALL_H / 2, (y + 0.5) * CELL)));
   scene.add(pillars);
@@ -224,6 +233,8 @@ export function buildScene(map) {
     return { flame, light, phase: i * 1.7 };
   });
 
+  addDecals(scene, map);
+
   return {
     scene,
     update(time) {
@@ -250,4 +261,58 @@ export function buildScene(map) {
     },
     doors,
   };
+}
+
+// 벽(방 안쪽 면)과 바닥에 분필·빨간 낙서를 흩뿌린다. 같은 맵이면 모두에게 같은 자리 (고정 시드).
+function addDecals(scene, map) {
+  if (!map.rooms?.length) return;
+  const r = rand(23);
+  const pick = (list) => list[Math.floor(r() * list.length)];
+  const jobs = [];
+  for (const room of map.rooms) {
+    // 네 벽: [면 위치, 방향] — 면 바로 바깥 칸이 벽일 때만 붙인다 (통로 구멍엔 안 붙임)
+    const faces = [
+      { axis: 'z', at: room.z0, out: -1, from: room.x0, to: room.x1, rotY: 0 },
+      { axis: 'z', at: room.z1, out: 1, from: room.x0, to: room.x1, rotY: Math.PI },
+      { axis: 'x', at: room.x0, out: -1, from: room.z0, to: room.z1, rotY: Math.PI / 2 },
+      { axis: 'x', at: room.x1, out: 1, from: room.z0, to: room.z1, rotY: -Math.PI / 2 },
+    ];
+    for (const f of faces) {
+      const n = 1 + Math.floor(r() * 2);
+      for (let i = 0; i < n; i++) {
+        const t = f.from + 1.5 + r() * (f.to - f.from - 3);
+        const x = f.axis === 'z' ? t : f.at + f.out * 0.5;
+        const z = f.axis === 'z' ? f.at + f.out * 0.5 : t;
+        if (!map.solidAt(x, z)) continue;
+        const chalk = r() < 0.65;
+        const size = chalk ? 1.1 + r() * 0.9 : 0.9 + r() * 0.7;
+        const px = f.axis === 'z' ? t : f.at - f.out * 0.03;
+        const pz = f.axis === 'z' ? f.at - f.out * 0.03 : t;
+        jobs.push({ url: pick(chalk ? DECALS.chalk : DECALS.red), size, pos: [px, 1.4 + r() * 3, pz], rot: [0, f.rotY, (r() - 0.5) * 0.5] });
+      }
+    }
+    // 바닥 빨간 낙서
+    for (let i = 0; i < 2; i++) {
+      const x = room.x0 + 2 + r() * (room.x1 - room.x0 - 4);
+      const z = room.z0 + 2 + r() * (room.z1 - room.z0 - 4);
+      if (!map.isFloor(x, z)) continue;
+      jobs.push({ url: pick(DECALS.red), size: 1.2 + r() * 1.2, pos: [x, 0.02, z], rot: [-Math.PI / 2, 0, r() * Math.PI * 2], floor: true });
+    }
+  }
+  const geo = new THREE.PlaneGeometry(1, 1);
+  for (const j of jobs) {
+    textureFromUrl(j.url).then((tex) => {
+      if (!tex) return;
+      const aspect = tex.image.width / tex.image.height;
+      const m = new THREE.Mesh(
+        geo,
+        new THREE.MeshLambertMaterial({ map: tex, transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2, opacity: j.floor ? 0.75 : 0.9 }),
+      );
+      m.scale.set(j.size * Math.min(1, aspect), j.size / Math.max(1, aspect), 1);
+      m.position.set(...j.pos);
+      m.rotation.set(...j.rot, j.floor ? 'XYZ' : 'YXZ');
+      m.renderOrder = 1;
+      scene.add(m);
+    });
+  }
 }

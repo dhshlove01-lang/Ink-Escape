@@ -84,7 +84,7 @@ URL=https://dhshlove01-lang.github.io/Ink-Escape/ NODE_PATH=$(npm root -g) node 
 
 **작업: 사용자가 뽑은 맵·이펙트·UI 이미지 29장 적용** — 2026-11-26 시작 (원본 `assets/source/kit/`)
 - [x] 가공 스크립트 `tools/process_assets.py`: 초록 배경(#00FF00) 크로마키 → 투명, 여러 개 모인 시트는 조각별로 자르기, 검은 배경 이펙트는 그대로(가산 합성용), webp 로 저장
-- [ ] 맵: 벽·바닥·기둥 텍스처, 분필·빨간 낙서 데칼
+- [x] 맵: 벽·바닥·기둥 텍스처, 분필·빨간 낙서 데칼 (`SceneBuilder.addDecals`, 이미지 창구 `src/client/render/Images.js`, 목록 `src/config/assets.js`)
 - [ ] 이펙트: 총구 불꽃, 탄 궤적, 명중, 소환 원(일반·보스), 지우개 수류탄·폭발, 속성별 원거리 탄
 - [ ] UI: 로고, 시작 배경, 동물 얼굴, 속성·특성 아이콘, SPAWN 버튼, HP 바 틀, 연필 잉크, 조준점, 공책 종이
 - [ ] 제외: 탈출문·횃불·술통 상자(회색 배경 사물) → Stable Fast 3D 로 GLB 를 만들어 쓰는 게 맞음
