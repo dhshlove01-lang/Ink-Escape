@@ -1,0 +1,11 @@
+{
+  "name": "asymmetric-drawing-fps",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "술래가 그린 그림이 3D 몬스터가 되는 비대칭 멀티플레이 FPS (브라우저 프로토타입)",
+  "scripts": {
+    "test": "node --test tests/*.test.mjs",
+    "serve": "python3 -m http.server 8080"
+  }
+}
