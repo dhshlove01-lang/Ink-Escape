@@ -32,13 +32,20 @@ export function createPlayer({ id, name, animal }, spawn, index, balance, player
     kills: 0,
     deaths: 0,
     dmg: 0,
+    // 결과 화면 정산용 누적 기록
+    revives: 0,        // 내가 살린 팀원 수
+    grenadeKills: 0,   // 지우개 수류탄으로 잡은 몬스터
+    bossKills: 0,      // 보스 막타
+    survivedSec: 0,    // 살아 있던 시간
+    escapedAt: 0,      // 탈출한 시각 (0 = 못 나감)
   };
 }
 
-export function createTagger({ taggerId, taggerName }, inkProfile) {
+export function createTagger({ taggerId, taggerName, taggerAnimal }, inkProfile) {
   return {
     id: taggerId,
     name: taggerName,
+    animal: taggerAnimal || 'devil', // 결과 화면 단상에 세울 캐릭터
     ink: inkProfile.max,
     max: inkProfile.max,
     regen: inkProfile.regen,

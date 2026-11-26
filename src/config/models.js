@@ -2,8 +2,13 @@
 //   url        GLB 경로
 //   rotateY    모델 앞(총구·얼굴)이 -Z 를 보도록 돌리는 각도
 //   size       가장 긴 변을 이 길이(m)로 맞춤
+//   anchor     'center'(기본, 물체 중심이 원점) 또는 'bottom'(발이 바닥 y=0)
 //   material   재질 보정: metalness·roughness 덮어쓰기,
 //              darkenNeutral = 무채색(회색) 텍스처를 이 배율로 어둡게 (Stable Fast 3D 가 밝게 구워서)
+//
+// 파일이 아직 없으면 그 줄을 넣지 않는다 (없는 파일은 404 가 되고, 임시 모델로 대신 그린다).
+
+const CHARACTER = { rotateY: 0, size: 1.55, anchor: 'bottom', material: { metalness: 0, roughness: 0.88 } };
 
 export const MODEL_DEFS = {
   gun: {
@@ -12,5 +17,10 @@ export const MODEL_DEFS = {
     size: 0.62,
     material: { metalness: 0, roughness: 0.65, darkenNeutral: 0.3 },
   },
-  // shiba: { url: 'assets/models/shiba.glb', rotateY: 0, size: 1.25, material: { metalness: 0, roughness: 0.9 } },
+  // 캐릭터 (원본이 이미 -Z 를 보므로 돌리지 않는다 — 원단이 +Z 를 보면 여기만 고치면 된다)
+  shiba: { url: 'assets/models/shiba.glb', ...CHARACTER },
+  bear: { url: 'assets/models/bear.glb', ...CHARACTER },
+  rabbit: { url: 'assets/models/rabbit.glb', ...CHARACTER },
+  cat: { url: 'assets/models/cat.glb', ...CHARACTER },
+  devil: { url: 'assets/models/devil.glb', ...CHARACTER },
 };

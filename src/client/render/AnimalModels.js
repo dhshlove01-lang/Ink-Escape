@@ -9,6 +9,7 @@ export const ANIMAL_LOOK = {
   bear: { fur: 0x7a4f2e, belly: 0xd9b48a, inner: 0xd9b48a, hat: 0x5f6b3a, ear: 'round', label: '#8a6a3a' },
   rabbit: { fur: 0xf4f1ec, belly: 0xffffff, inner: 0xf5b8b8, hat: 0xe8b43a, ear: 'long', label: '#e8b43a' },
   cat: { fur: 0xf6efe4, belly: 0xffffff, inner: 0xf3b0a0, hat: 0x7b4fc9, ear: 'pointy', patch: [0xe08a3a, 0x2b2622], label: '#7b4fc9' },
+  devil: { fur: 0x241d29, belly: 0x8e1f2c, inner: 0xd0303f, hat: 0xc41f30, ear: 'horn', devil: true, label: '#e0384a' },
 };
 
 const mat = (color, extra = {}) => new THREE.MeshLambertMaterial({ color, ...extra });
@@ -57,7 +58,47 @@ function primitiveGun() {
   return g;
 }
 
-export function createAnimalModel(kind) {
+// 캐릭터(로비·결과 화면): GLB 가 있으면 그것, 없으면 임시 모델. 늦게 도착해도 바꿔 끼운다.
+export function createCharacterModel(kind, { gun = false } = {}) {
+  const holder = new THREE.Group();
+  const put = () => {
+    holder.clear();
+    holder.add(createAnimalModel(kind, { gun }));
+  };
+  put();
+  if (library && !library.has(kind)) library.onReady(kind, put);
+  holder.userData.kind = kind;
+  return holder;
+}
+
+// 인게임 동물 몸: GLB 가 있으면 GLB + 총, 없으면 공·상자 임시 모델. 늦게 도착하면 그 자리에서 바꿔 끼운다.
+export function createAnimalModel(kind, { gun = true } = {}) {
+  if (!gun) return library?.get(kind) || primitiveAnimal(kind, { gun: false });
+  const holder = new THREE.Group();
+  const put = (obj) => {
+    holder.clear();
+    holder.add(obj);
+    if (gun) holder.add(rifleMesh());
+  };
+  if (library?.has(kind)) put(library.get(kind));
+  else {
+    put(primitiveAnimal(kind, { gun: false }));
+    if (library) library.onReady(kind, () => put(library.get(kind)));
+  }
+  holder.userData.kind = kind;
+  return holder;
+}
+
+// 진짜 몸에 들려주는 총 (몸 앞쪽 오른발 근처, 총구가 앞)
+function rifleMesh() {
+  const g = createGunMesh();
+  g.scale.setScalar(1.15);
+  g.position.set(0.34, 0.62, -0.66);
+  g.rotation.set(0.06, -0.12, 0);
+  return g;
+}
+
+function primitiveAnimal(kind, { gun = true } = {}) {
   const L = ANIMAL_LOOK[kind] || ANIMAL_LOOK.shiba;
   const g = new THREE.Group();
   const body = sphere(0.58, L.fur, 1, 0.95, 0.95);
@@ -87,7 +128,19 @@ export function createAnimalModel(kind) {
   // 귀
   for (const side of [-1, 1]) {
     let ear;
-    if (L.ear === 'pointy') {
+    if (L.ear === 'horn') {
+      // 술래 악마: 검은 고양이 귀 + 빨간 뿔
+      ear = new THREE.Mesh(new THREE.ConeGeometry(0.16, 0.34, 12), mat(L.inner));
+      ear.position.set(side * 0.19, 1.2, -0.02);
+      ear.rotation.z = -side * 0.22;
+      const catEar = new THREE.Mesh(new THREE.ConeGeometry(0.19, 0.4, 12), mat(L.fur));
+      catEar.position.set(side * 0.34, 1.08, 0.02);
+      catEar.rotation.z = -side * 0.42;
+      const inner = new THREE.Mesh(new THREE.ConeGeometry(0.1, 0.26, 10), mat(L.inner));
+      inner.position.set(side * 0.36, 1.05, -0.05);
+      inner.rotation.z = -side * 0.42;
+      g.add(catEar, inner);
+    } else if (L.ear === 'pointy') {
       ear = new THREE.Mesh(new THREE.ConeGeometry(0.16, 0.3, 12), mat(L.fur));
       ear.position.set(side * 0.3, 1.18, -0.05);
       ear.rotation.z = -side * 0.35;
@@ -106,13 +159,32 @@ export function createAnimalModel(kind) {
     g.add(ear);
   }
   // 모자
-  const hat = sphere(0.36, L.hat, 1.1, kind === 'cat' ? 0.35 : 0.55, 1.1);
-  hat.position.set(kind === 'cat' ? 0.08 : 0, 1.08, 0.02);
-  if (kind !== 'rabbit') g.add(hat);
-  else {
-    const cap = sphere(0.33, L.hat, 1, 0.45, 1);
-    cap.position.set(0, 1.08, 0.05);
-    g.add(cap);
+  if (!L.devil) {
+    const hat = sphere(0.36, L.hat, 1.1, kind === 'cat' ? 0.35 : 0.55, 1.1);
+    hat.position.set(kind === 'cat' ? 0.08 : 0, 1.08, 0.02);
+    if (kind !== 'rabbit') g.add(hat);
+    else {
+      const cap = sphere(0.33, L.hat, 1, 0.45, 1);
+      cap.position.set(0, 1.08, 0.05);
+      g.add(cap);
+    }
+  }
+  if (L.devil) {
+    // 박쥐 날개 + 화살 꼬리
+    for (const side of [-1, 1]) {
+      const wing = new THREE.Mesh(new THREE.ConeGeometry(0.28, 0.7, 3), mat(L.inner));
+      wing.position.set(side * 0.62, 0.78, 0.22);
+      wing.rotation.set(0.3, side * 0.5, side * 1.9);
+      wing.scale.set(1, 1, 0.35);
+      g.add(wing);
+    }
+    const tail = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.05, 0.6, 8), mat(L.inner));
+    tail.position.set(0, 0.45, 0.62);
+    tail.rotation.x = 0.9;
+    const tip = new THREE.Mesh(new THREE.ConeGeometry(0.12, 0.22, 4), mat(L.inner));
+    tip.position.set(0, 0.78, 0.86);
+    tip.rotation.x = 0.5;
+    g.add(tail, tip);
   }
   // 발
   for (const sx of [-0.25, 0.25]) {
@@ -121,14 +193,16 @@ export function createAnimalModel(kind) {
     g.add(foot);
   }
   // 총과 앞발
-  const gun = createGunMesh();
-  gun.scale.setScalar(1.35);
-  gun.position.set(0.32, 0.55, -0.6);
-  g.add(gun);
-  for (const [x, z] of [[0.28, -0.45], [0.05, -0.7]]) {
-    const paw = sphere(0.1, L.fur);
-    paw.position.set(x, 0.5, z);
-    g.add(paw);
+  if (gun) {
+    const gunMesh = createGunMesh();
+    gunMesh.scale.setScalar(1.35);
+    gunMesh.position.set(0.32, 0.55, -0.6);
+    g.add(gunMesh);
+    for (const [x, z] of [[0.28, -0.45], [0.05, -0.7]]) {
+      const paw = sphere(0.1, L.fur);
+      paw.position.set(x, 0.5, z);
+      g.add(paw);
+    }
   }
   g.traverse((o) => {
     if (o.isMesh) o.castShadow = false;
@@ -184,11 +258,11 @@ export function drawAnimalFace(ctx, kind, cx, cy, r, { dead = false } = {}) {
   ctx.save();
   if (dead) ctx.filter = 'grayscale(1) brightness(0.6)';
   const fur = hex(L.fur);
-  ctx.fillStyle = fur;
-  // 귀
+  // 귀 / 뿔
   for (const s of [-1, 1]) {
+    ctx.fillStyle = fur;
     ctx.beginPath();
-    if (L.ear === 'pointy') {
+    if (L.ear === 'pointy' || L.ear === 'horn') {
       ctx.moveTo(cx + s * r * 0.3, cy - r * 0.6);
       ctx.lineTo(cx + s * r * 0.75, cy - r * 1.15);
       ctx.lineTo(cx + s * r * 0.85, cy - r * 0.35);
@@ -198,6 +272,15 @@ export function drawAnimalFace(ctx, kind, cx, cy, r, { dead = false } = {}) {
       ctx.ellipse(cx + s * r * 0.35, cy - r * 1.05, r * 0.2, r * 0.6, s * 0.15, 0, Math.PI * 2);
     }
     ctx.fill();
+    if (L.ear === 'horn') {
+      ctx.fillStyle = hex(L.inner);
+      ctx.beginPath();
+      ctx.moveTo(cx + s * r * 0.04, cy - r * 0.9);
+      ctx.lineTo(cx + s * r * 0.3, cy - r * 1.55);
+      ctx.lineTo(cx + s * r * 0.44, cy - r * 0.8);
+      ctx.closePath();
+      ctx.fill();
+    }
   }
   ctx.beginPath();
   ctx.arc(cx, cy, r, 0, Math.PI * 2);
@@ -216,7 +299,7 @@ export function drawAnimalFace(ctx, kind, cx, cy, r, { dead = false } = {}) {
   ctx.beginPath();
   ctx.ellipse(cx, cy + r * 0.35, r * 0.55, r * 0.4, 0, 0, Math.PI * 2);
   ctx.fill();
-  ctx.fillStyle = '#1a1414';
+  ctx.fillStyle = kind === 'devil' ? '#8e1f2c' : '#1a1414';
   for (const s of [-1, 1]) {
     ctx.beginPath();
     if (dead) {

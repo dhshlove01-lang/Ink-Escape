@@ -20,7 +20,7 @@ export class Lobby {
     if (this.full) return false;
     const used = new Set([...this.members.values()].map((m) => m.animal));
     const animal = ANIMALS.find((a) => !used.has(a)) || ANIMALS[0];
-    this.members.set(id, { id, name: cleanName(name), role: ROLE.RANDOM, animal, ping: 0 });
+    this.members.set(id, { id, name: cleanName(name), role: ROLE.RANDOM, animal, ready: false, ping: 0 });
     if (!this.ownerId) this.ownerId = id;
     return true;
   }
@@ -54,6 +54,18 @@ export class Lobby {
     return null;
   }
 
+  setReady(id, ready) {
+    const m = this.members.get(id);
+    if (!m) return '참가자를 찾을 수 없어요';
+    m.ready = !!ready;
+    return null;
+  }
+
+  // 방장을 뺀 모든 참가자가 READY 인가 (시작 버튼 안내용 — 시작은 막지 않는다)
+  allReady() {
+    return [...this.members.values()].every((m) => m.id === this.ownerId || m.ready);
+  }
+
   setSettings(id, s) {
     if (id !== this.ownerId) return '방 만든 사람만 바꿀 수 있어요';
     const sec = Number(s.matchSeconds);
@@ -77,6 +89,7 @@ export class Lobby {
     return {
       taggerId: tagger.id,
       taggerName: tagger.name,
+      taggerAnimal: tagger.animal,
       players: players.map((m) => ({ id: m.id, name: m.name, animal: m.animal })),
     };
   }
@@ -85,6 +98,7 @@ export class Lobby {
     return {
       ownerId: this.ownerId,
       settings: this.settings,
+      allReady: this.allReady(),
       members: [...this.members.values()],
     };
   }

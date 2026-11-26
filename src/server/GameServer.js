@@ -69,6 +69,8 @@ export class GameServer {
         return lobbyOnly(() => this.lobby.pickRole(id, msg.role));
       case MSG.PICK_ANIMAL:
         return lobbyOnly(() => this.lobby.pickAnimal(id, msg.animal));
+      case MSG.READY:
+        return lobbyOnly(() => this.lobby.setReady(id, msg.ready));
       case MSG.SETTINGS:
         return lobbyOnly(() => this.lobby.setSettings(id, msg));
       case MSG.START:
@@ -84,7 +86,7 @@ export class GameServer {
     let roster;
     if (this.solo) {
       const me = this.lobby.members.get(id);
-      roster = { taggerId: id, taggerName: me.name, players: [{ id, name: me.name, animal: me.animal }] };
+      roster = { taggerId: id, taggerName: me.name, taggerAnimal: me.animal, players: [{ id, name: me.name, animal: me.animal }] };
     } else {
       roster = this.lobby.resolveRoster();
       if (roster.error) return this.error(id, roster.error);

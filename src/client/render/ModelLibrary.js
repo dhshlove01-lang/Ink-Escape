@@ -29,7 +29,7 @@ export class ModelLibrary {
     }
   }
 
-  // 앞이 -Z, 가장 긴 변 = size, 바닥 중심이 아니라 물체 중심이 원점
+  // 앞이 -Z, 가장 긴 변 = size, anchor 'bottom' 이면 발이 y=0
   normalize(scene, def) {
     scene.rotation.y = def.rotateY || 0;
     const holder = new THREE.Group();
@@ -39,7 +39,9 @@ export class ModelLibrary {
     const dim = box.getSize(new THREE.Vector3());
     const k = (def.size || 1) / Math.max(dim.x, dim.y, dim.z);
     const center = box.getCenter(new THREE.Vector3());
-    scene.position.sub(center);
+    scene.position.x -= center.x;
+    scene.position.z -= center.z;
+    scene.position.y = def.anchor === 'bottom' ? -box.min.y : -center.y;
     holder.scale.setScalar(k);
     scene.traverse((o) => {
       if (!o.isMesh) return;

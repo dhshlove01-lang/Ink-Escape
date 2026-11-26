@@ -49,6 +49,10 @@ export class App {
 
   showTitle() {
     this.teardownNet();
+    // 로비 3D 화면(WebGL)까지 정리한 뒤 시작 화면으로
+    this.lobby?.destroy();
+    this.lobby = null;
+    this.lastLobby = null;
     this.setScreen(
       new TitleView(this.root, {
         onCreate: (name) => this.createRoom(name),
@@ -165,11 +169,13 @@ export class App {
       new ResultView(this.root, {
         result,
         me: this.me,
+        disconnected: this.disconnected,
         onBack: () => {
           if (this.disconnected) return this.showTitle();
           this.setScreen(this.lobby);
           this.root.append(this.lobby.root);
           if (this.lastLobby) this.lobby.render(this.lastLobby);
+          this.lobby.resume();
         },
       }),
     );

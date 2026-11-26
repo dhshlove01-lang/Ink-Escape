@@ -1,5 +1,6 @@
 import { EV, PSTATE, STATUS_BIT } from '../shared/protocol.js';
 import { createPlayer, createTagger } from './entities.js';
+import { buildResultStats } from '../shared/results.js';
 import { COMMANDS } from './commands.js';
 import { SpawnSystem } from './systems/SpawnSystem.js';
 import { NavigationSystem, MonsterSystem, ProjectileSystem, GrenadeSystem, PlayerLifeSystem } from './systems/MonsterSystem.js';
@@ -111,7 +112,7 @@ export class Match {
     this.emit(EV.PDEATH, { id: p.id, x: p.x, z: p.z });
   }
 
-  damageMonster(mon, amount, by) {
+  damageMonster(mon, amount, by, { grenade = false } = {}) {
     if (!this.monsters.has(mon.id)) return;
     mon.hp -= amount;
     if (mon.hp > 0) {
@@ -120,7 +121,11 @@ export class Match {
     }
     this.monsters.delete(mon.id);
     const killer = this.players.get(by);
-    if (killer) killer.kills++;
+    if (killer) {
+      killer.kills++;
+      if (mon.stats.kind === 'boss') killer.bossKills++;
+      if (grenade) killer.grenadeKills++;
+    }
     this.emit(EV.MDIE, { id: mon.id, by });
   }
 
@@ -145,15 +150,24 @@ export class Match {
 
   finish(winner, reason) {
     if (this.result) return;
+    const players = [...this.players.values()].map((p) => ({
+      id: p.id, name: p.name, animal: p.animal, kills: p.kills, deaths: p.deaths,
+      dmg: Math.round(p.dmg), escaped: p.state === PSTATE.ESCAPED,
+      alive: p.state === PSTATE.ALIVE || p.state === PSTATE.ESCAPED,
+      hp: Math.max(0, Math.round(p.hp)),
+      survivedSec: Math.round(p.survivedSec),
+      revives: p.revives, grenadeKills: p.grenadeKills, bossKills: p.bossKills,
+    }));
+    const tagger = { id: this.tagger.id, name: this.tagger.name, animal: this.tagger.animal, spawned: this.tagger.spawned, bosses: this.tagger.bosses };
+    const stats = buildResultStats(players, tagger, this.b.score);
     this.result = {
       winner,
       reason,
       time: this.time,
-      players: [...this.players.values()].map((p) => ({
-        id: p.id, name: p.name, animal: p.animal, kills: p.kills, deaths: p.deaths,
-        dmg: Math.round(p.dmg), escaped: p.state === PSTATE.ESCAPED,
-      })),
-      tagger: { id: this.tagger.id, name: this.tagger.name, spawned: this.tagger.spawned, bosses: this.tagger.bosses },
+      duration: this.duration,
+      players: stats.players,
+      tagger: stats.tagger,
+      badges: stats.badges,
     };
   }
 

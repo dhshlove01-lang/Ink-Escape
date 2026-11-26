@@ -177,17 +177,20 @@ export class GrenadeSystem {
       for (const mon of [...m.monsters.values()]) {
         if (Math.hypot(mon.x - gr.x, mon.z - gr.z) > g.radius + mon.stats.radius) continue;
         const k = mon.stats.kind;
-        if (k === 'normal') m.damageMonster(mon, mon.hp, gr.by);
-        else m.damageMonster(mon, mon.maxHp * (k === 'boss' ? g.bossPct : g.giantPct), gr.by);
+        if (k === 'normal') m.damageMonster(mon, mon.hp, gr.by, { grenade: true });
+        else m.damageMonster(mon, mon.maxHp * (k === 'boss' ? g.bossPct : g.giantPct), gr.by, { grenade: true });
       }
     }
   }
 }
 
 export class PlayerLifeSystem {
-  update(m) {
+  update(m, dt = 0) {
     const b = m.b;
-    for (const p of m.players.values()) p.reviveProg = 0;
+    for (const p of m.players.values()) {
+      p.reviveProg = 0;
+      if (p.state === PSTATE.ALIVE) p.survivedSec += dt; // 결과 화면 생존 시간 점수
+    }
 
     for (const p of m.players.values()) {
       // 2인전 목숨: 3초 뒤 안전한 곳에서 다시 시작
@@ -223,6 +226,7 @@ export class PlayerLifeSystem {
         Object.assign(t, { state: PSTATE.ALIVE, hp: Math.round(t.maxHp * b.match.reviveHpRatio), deadAt: 0 });
         t.invulnUntil = m.time + b.match.reviveInvulnSec;
         p.revivesLeft--;
+        p.revives++;
         p.reviving = null;
         m.emit(EV.PREVIVE, { id: t.id, by: p.id, x: t.x, z: t.z });
       }

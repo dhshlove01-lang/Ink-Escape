@@ -54,6 +54,7 @@ export class EscapeSystem {
     for (const p of m.players.values()) {
       if (p.state === PSTATE.ALIVE && !p.afk && m.map.inOpenDoor(p.x, p.z)) {
         p.state = PSTATE.ESCAPED;
+        p.escapedAt = m.time;
         m.emit(EV.PESCAPE, { id: p.id });
         m.finish('players', `${p.name} 탈출 성공!`);
         return;

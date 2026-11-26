@@ -6,6 +6,7 @@ export const MSG = {
   HELLO: 'hello',          // { name }
   PICK_ROLE: 'role',       // { role: 'tagger' | 'player' | 'random' }
   PICK_ANIMAL: 'animal',   // { animal }
+  READY: 'ready',          // { ready: bool }
   SETTINGS: 'settings',    // { matchSeconds }   (방 만든 사람만)
   START: 'start',          // {}                 (방 만든 사람만)
   PSTATE: 'ps',            // { x, y, z, yaw, moving }
@@ -52,8 +53,8 @@ export const EV = {
 };
 
 export const ROLE = { TAGGER: 'tagger', PLAYER: 'player', RANDOM: 'random', NONE: 'none' };
-export const ANIMALS = ['shiba', 'bear', 'rabbit', 'cat'];
-export const ANIMAL_NAMES = { shiba: '시바견', bear: '곰', rabbit: '토끼', cat: '삼색고양이' };
+export const ANIMALS = ['shiba', 'bear', 'rabbit', 'cat', 'devil'];
+export const ANIMAL_NAMES = { shiba: '시바견', bear: '곰', rabbit: '토끼', cat: '삼색고양이', devil: '술래 악마' };
 
 export const PSTATE = { ALIVE: 0, DEAD: 1, ESCAPED: 2, OUT: 3 };
 export const STATUS_BIT = { BURN: 1, SLOW: 2, POISON: 4, INVULN: 8, AFK: 16 };

@@ -108,4 +108,17 @@ export const BALANCE = {
     snapHz: 15,
     hitsPerSecMax: 13,
   },
+
+  // 결과 화면 점수 정산 (플레이어·술래 각각)
+  score: {
+    survivalPerSec: 10,   // 살아 있던 초당
+    kill: 60,             // 몬스터 처치 1마리
+    boss: 300,            // 보스 막타 1마리
+    revive: 120,          // 팀원 1명 부활
+    dmg: 0.5,             // 입힌 피해 1당
+    escape: 500,          // 탈출 성공
+    taggerSpawn: 20,      // 술래: 소환 1회
+    taggerBoss: 100,      // 술래: 보스 소환 1회
+    taggerDown: 40,       // 술래: 플레이어 1명 쓰러뜨림
+  },
 };

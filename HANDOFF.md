@@ -51,7 +51,7 @@ URL=https://dhshlove01-lang.github.io/Ink-Escape/ NODE_PATH=$(npm root -g) node 
 | `src/net/` | `Link` 인터페이스, MemoryLink, PeerJS |
 | `src/client/player/` | 플레이어 1인칭 3D |
 | `src/client/tagger/` | 술래 2분할 화면 |
-| `src/client/ui/` | 시작·로비·결과 화면 |
+| `src/client/ui/` | 시작·로비·결과 화면 (`CharacterStage.js` = 3D 대기실·결과 무대) |
 
 ## 사용자가 확정한 결정 (바꾸지 말 것)
 
@@ -79,11 +79,11 @@ URL=https://dhshlove01-lang.github.io/Ink-Escape/ NODE_PATH=$(npm root -g) node 
 - 명예(잘 그린 그림 투표)·그림 갤러리 원함 (미구현).
 - 맵은 3개로 시작 (지금 1개).
 - 술래 왼쪽 화면: 탑뷰 지도 + 양쪽 화살표로 **3D 구석 카메라**(실제 플레이 화면) 전환. 그림은 계속 그릴 수 있고 뷰만 바뀐다.
+- 대기실은 **폴가이즈 스타일 3D 무대**(단상 위 캐릭터·READY 이름표), 결과 화면은 **가운데 3D 캐릭터 + 왼쪽 뱃지 + 오른쪽 점수 정산 + 로비로 돌아가기**. (2026-11-26 사용자 요청)
 
 ## 지금 진행 중
 
 (없음 — 다음 작업을 시작하면 여기에 할 일과 체크 목록을 적고 바로 커밋·푸시)
-- 대기: 캐릭터 GLB(시바·곰·토끼·고양이·술래). 오면 `assets/models/<이름>.glb` + `src/config/models.js` 한 줄 → `createAnimalModel` 이 GLB 를 쓰도록.
 - 대기: 탈출문·횃불·술통/상자 이미지(`assets/source/kit/map_06~08`, 회색 배경)는 Stable Fast 3D 로 GLB 를 만들어 오면 맵 소품으로 배치.
 
 ## 다음 할 일 (우선순위)
@@ -95,15 +95,37 @@ URL=https://dhshlove01-lang.github.io/Ink-Escape/ NODE_PATH=$(npm root -g) node 
 5. 무기 레이어 (칼 휘두르기·총 쏘기)
 6. 맵 2·3 (한밤의 미술실, 한밤의 책상 위)
 7. 신고·다른 사람 그림 숨기기·스트리머 모드
-8. 진짜 3D 동물 모델·1인칭 앞발, 효과음 파일
+8. 1인칭 앞발 GLB · 효과음 파일 (동물 3D 모델은 2026-11-26 적용 완료)
 
 ## 알려진 문제
 
 - 방장 탭이 뒤로 가면 브라우저가 타이머를 늦춰 다른 사람 화면이 끊긴다.
 - PeerJS 공개 중개 서버(0.peerjs.com)는 AI 작업 환경에서 접속이 막혀 있어 실서버 접속은 사용자 PC 에서만 확인 가능.
-- 동물 모델·효과음은 임시.
+- 인게임 다른 플레이어 몸(진짜 GLB)에 든 총이 몸에 조금 파묻혀 있다(원거리에서는 티가 안 남). 몸에 맞춰 총 위치만 더 다듬으면 된다 — `AnimalModels.rifleMesh()`.
+- 효과음은 아직 임시.
 
 ## 작업 기록
+
+### 2026-11-26 · 폴가이즈 스타일 3D 대기실 · 결과 화면 + 캐릭터 5종 GLB
+- **무엇을**
+  - **3D 로비 대기실**: 던전 무대(돌바닥·벽 낙서·횃불 2개)에 캐릭터마다 단상 하나. 캐릭터가 숨쉬고(스쿼시·스트레치) 좌우로 흔들리고 가끔 깡총 뛴다. 머리 위 이름표(캔버스→스프라이트)에 이름·역할·READY, 내 캐릭터는 노란 링+이름표 테두리. 카메라는 인원수에 맞춰 자동 프레이밍(1~5명), 아주 느린 흔들림.
+  - **캐릭터 선택 5종**: `ANIMALS` 에 `devil`(술래 악마) 추가 → 시바·곰·토끼·삼색고양이·술래 악마. 임시(코드) 모델에도 악마(검은 털·빨간 뿔·날개·꼬리·빨간 눈)를 그린다. `drawAnimalFace` 도 뿔/빨간 눈 처리.
+  - **READY**: 로비에서 `READY` 버튼 → 서버 `Lobby.setReady` → 로비 상태(`ready`) → 3D 이름표에 `READY` 배지 + 참가자 카드 초록 표시 + 방장 화면에 `n/m READY`(전원이면 시작 버튼에 초록 글로우). **표시만** 하고 방장 시작을 막지는 않는다(기존 동작 유지).
+  - **결과 화면**: 화면 전체가 3D 무대 — 가운데 단상에 내 캐릭터가 서서 천천히 돌고 깡총 뛴다(스포트라이트·금색 링). 왼쪽 = 실제 판 기록 기반 뱃지(최다 처치·보스 막타·탈출 성공·팀원 부활·지우개 명중·끝까지 생존), 오른쪽 = 내 점수 정산(생존 시간·몬스터 처치·보스 처치·부활·기여·탈출 보너스·총점) + 전체 점수 순위, 아래 = `로비로 돌아가기`(끊겼으면 `시작 화면으로`).
+  - **캐릭터 5종 GLB 적용**: `assets/models/{shiba,bear,rabbit,cat,devil}.glb` — 3D 대기실·결과 화면·인게임 다른 플레이어 몸에 모두 적용(몸에는 총도 함께 든다). GLB 가 없거나 늦게 오면 임시 모델로 그리고 도착하면 그 자리에서 바꿔 끼운다.
+- **왜**: 사용자 요청 — 폴가이즈 스타일 대기실/결과 화면, 캐릭터 5종 GLB 적용.
+- **어디**
+  - `src/client/ui/CharacterStage.js`(새로): 무대(바닥·벽·낙서·횃불·단상·스포트라이트) + 캐릭터 배치/애니메이션 + 이름표 스프라이트. `setCharacters(list, { me, ownerId, solo })`.
+  - `src/client/ui/screens.js`: `LobbyView` 를 "DOM 한 번 만들고 값만 갱신"으로 재작성(3D 화면이 매 렌더마다 새로 만들어지지 않게), `ResultView` 재작성. `pause/resume/destroy` 로 경기 중에는 3D 를 멈춘다.
+  - `src/client/App.js`: `showTitle` 에서 `lobby.destroy()`, 결과→로비 복귀 시 `lobby.resume()`.
+  - `src/shared/protocol.js`: `MSG.READY`, `ANIMALS`+`devil`, `ANIMAL_NAMES.devil`.
+  - `src/server/Lobby.js`(`setReady`·`allReady`·`taggerAnimal`), `GameServer.js`(READY 처리), `entities.js`(통계 필드·술래 animal), `Match.js`(`finish` 에 생존 시간·부활·지우개 처치·보스 막타·점수·뱃지 넣기, `damageMonster` 가 보스 막타/지우개 처치 기록), `systems/MonsterSystem.js`·`systems/core.js`(생존 시간·부활 횟수·탈출 시각·지우개 표시).
+  - `src/shared/results.js`(새로): 뱃지·점수 정산 — **서버가 한 번 계산**해서 모든 참가자가 같은 숫자를 본다. 가중치는 `src/config/balance.js` 의 `score`.
+  - `src/config/models.js`(캐릭터 5줄, `rotateY:0` — 원본이 이미 -Z 를 봄, `anchor:'bottom'`), `ModelLibrary.js`(`anchor:'bottom'` 지원), `AnimalModels.js`(`devil` 외형·`createCharacterModel`·인게임 몸에 GLB+총, `rifleMesh`).
+  - `style.css`: 로비 그리드(`.lobby-main`/`.lobby-stage`/`.stage-hint`/READY), 결과 오버레이(`.result-stage`/`.result-panel`/`.badges`/`.score-card`/`.rank-list`).
+- **주의**: 3D 캐릭터는 원본이 -Z 를 보므로 무대(카메라 +Z)에서는 `bodyHolder.rotation.y = Math.PI` 로 돌려 세운다. 모델 교체 시 `rotateY` 를 먼저 확인할 것(프로브: `.work/probe/glb.html` 방식 — 카메라를 +Z/−Z 에 두고 앞뒤 확인).
+- **검증**: 헤드리스 크로미엄으로 타이틀 → 로비(가짜 5인 상태로 5종 캐릭터·READY·이름표) → 혼자 테스트 경기(1인칭·술래 탑뷰·구석 카메라) → 결과(승리·내 점수·뱃지·순위) → 로비 복귀까지 확인. `pageerror 0`, 404 0. 스크린샷: `.work/probe/ink_shots/`. **이 작업 환경에는 node 가 없어 `npm test`·`tools/smoke.cjs` 는 못 돌렸다 — 다음 AI 는 반드시 먼저 돌릴 것.**
+- **남은 것**: 인게임 몸의 총이 살짝 파묻힘(원거리 무해), PeerJS 실서버 2~5인 로비는 사용자 PC 에서 확인 필요, 1인칭 앞발은 아직 임시.
 
 ### 2026-11-26 · 맵·이펙트·UI 이미지 29장 적용
 - **무엇을**: 사용자가 이미지 AI 로 뽑은 키트(원본 `assets/source/kit/`)를 게임에 적용.
