@@ -6,7 +6,7 @@ export const WALL_H = 7;
 export const TILE = { FLOOR: 0, WALL: 1, PILLAR: 2, DOOR: 3 };
 
 export class GameMap {
-  constructor({ id, name, w, h, cells, spawn, doors, torches, roomCenters }) {
+  constructor({ id, name, w, h, cells, spawn, doors, torches, roomCenters, rooms = [] }) {
     this.id = id;
     this.name = name;
     this.w = w;
@@ -16,6 +16,7 @@ export class GameMap {
     this.doors = doors;          // [{ name, cells:[[cx,cy]...], center:{x,z}, dir:{x,z} }]
     this.torches = torches;      // [{ x, z, nx, nz }]
     this.roomCenters = roomCenters;
+    this.rooms = rooms;          // [{ x0, z0, x1, z1 }] 월드 좌표 (카메라 위치 계산용)
     this.openDoor = -1;
     this._doorOf = new Map();
     doors.forEach((d, i) => d.cells.forEach(([cx, cy]) => this._doorOf.set(cy * w + cx, i)));
@@ -113,6 +114,20 @@ export class GameMap {
     const cx = Math.floor(x / CELL), cy = Math.floor(z / CELL);
     if (cx < 0 || cy < 0 || cx >= this.w || cy >= this.h) return true;
     return this._doorOf.get(cy * this.w + cx) === this.openDoor;
+  }
+
+  // 이 위치가 속한 방 (통로면 가장 가까운 방)
+  roomAt(x, z) {
+    let best = this.rooms[0], bestD = Infinity;
+    for (const r of this.rooms) {
+      if (x >= r.x0 && x <= r.x1 && z >= r.z0 && z <= r.z1) return r;
+      const d = Math.hypot(Math.max(r.x0 - x, 0, x - r.x1), Math.max(r.z0 - z, 0, z - r.z1));
+      if (d < bestD) {
+        bestD = d;
+        best = r;
+      }
+    }
+    return best;
   }
 
   isFloor(x, z) {

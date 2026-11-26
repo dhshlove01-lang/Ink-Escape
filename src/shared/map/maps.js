@@ -13,10 +13,12 @@ function buildDungeon() {
   const rowY = [2, 13, 24], rowH = 9;
 
   const roomCenters = [];
+  const rooms = [];
   for (let r = 0; r < 3; r++) {
     for (let c = 0; c < 3; c++) {
       carve(colX[c], rowY[r], colW[c], rowH);
       roomCenters.push({ x: (colX[c] + colW[c] / 2) * CELL, z: (rowY[r] + rowH / 2) * CELL });
+      rooms.push({ x0: colX[c] * CELL, z0: rowY[r] * CELL, x1: (colX[c] + colW[c]) * CELL, z1: (rowY[r] + rowH) * CELL });
     }
   }
   // 가로 연결 (모두)
@@ -80,6 +82,7 @@ function buildDungeon() {
     doors,
     torches,
     roomCenters,
+    rooms,
   });
 }
 

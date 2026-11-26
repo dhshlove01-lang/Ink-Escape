@@ -2,6 +2,7 @@ import { el, fmtTime, Banner, toast } from '../ui/dom.js';
 import { MSG, EV, PSTATE } from '../../shared/protocol.js';
 import { DrawingPad, BRUSHES } from './DrawingPad.js';
 import { TopDownMap } from './TopDownMap.js';
+import { CornerCam } from './CornerCam.js';
 import { buildCutout } from '../render/PaperCutout.js';
 import { faceCanvas } from '../render/AnimalModels.js';
 
@@ -26,6 +27,10 @@ export class TaggerView {
 
     this.pad = new DrawingPad({ palette });
     this.topdown = new TopDownMap({ session, palette, balance });
+    this.cam = new CornerCam({ session, palette, attributes, balance });
+    // 왼쪽 화면 목록: 탑뷰 지도 + 플레이어별 3D 구석 카메라 (◀ ▶ 로 넘김)
+    this.leftViews = ['map', ...session.roster.players.map((p) => p.id)];
+    this.viewIdx = 0;
     this.root = el('div', { class: 'view tagger-view' });
     parent.append(this.root);
     this.build();
@@ -34,6 +39,10 @@ export class TaggerView {
     this.pad.on('change', () => this.schedulePreview());
     this.pad.on('tool', () => this.refreshTools());
     this.topdown.on('pick', () => this.refreshPreview());
+    this.cam.on('pick', (w) => {
+      this.topdown.target = w;
+      this.refreshPreview();
+    });
     this._off = [
       session.on('spawnResult', (r) => this.onSpawnResult(r)),
       session.on('snap', () => this.onSnap()),
@@ -63,11 +72,13 @@ export class TaggerView {
       this.plist.append(row);
       this.prows.set(p.id, { row, hp, info });
     }
+    this.viewLabel = el('div', { class: 'view-label' });
+    const arrow = (dir, text) => el('button', { class: `view-arrow ${dir < 0 ? 'left' : 'right'}`, title: dir < 0 ? '이전 화면 (←)' : '다음 화면 (→)', onclick: () => this.setView(this.viewIdx + dir) }, text);
     const left = el(
       'section',
       { class: 'tg-left' },
-      el('header', { class: 'tg-head' }, el('span', { class: 'tg-badge' }, '👁 술래'), this.timer, el('span', { class: 'tg-hint' }, '지도를 클릭해 소환 위치를 고르세요')),
-      el('div', { class: 'tg-mapwrap' }, this.topdown.canvas),
+      el('header', { class: 'tg-head' }, el('span', { class: 'tg-badge' }, '👁 술래'), this.timer, el('span', { class: 'tg-hint' }, '바닥을 클릭해 소환 위치를 고르세요 · ◀ ▶ 화면 전환')),
+      el('div', { class: 'tg-mapwrap' }, this.topdown.canvas, this.cam.root, this.viewLabel, arrow(-1, '◀'), arrow(1, '▶')),
       this.plist,
     );
 
@@ -105,6 +116,20 @@ export class TaggerView {
     );
     this.root.append(left, right);
     this.renderSlots();
+    this.setView(0);
+  }
+
+  // 왼쪽 화면 전환. 오른쪽 도화지는 그대로라 그리던 그림은 계속 그릴 수 있다.
+  setView(i) {
+    const n = this.leftViews.length;
+    this.viewIdx = ((i % n) + n) % n;
+    const v = this.leftViews[this.viewIdx];
+    const isMap = v === 'map';
+    this.topdown.canvas.hidden = !isMap;
+    this.cam.root.hidden = isMap;
+    if (!isMap) this.cam.setFollow(v);
+    const label = isMap ? '🗺 탑뷰 지도' : `🎥 ${this.session.nameOf(v)} 근처 · 방 구석 카메라`;
+    this.viewLabel.textContent = `${label}  (${this.viewIdx + 1}/${n})`;
   }
 
   setActive(on) {
@@ -121,6 +146,8 @@ export class TaggerView {
     if (e.code === 'KeyE') this.pad.setEraser(!this.pad.eraser);
     if (e.code === 'KeyZ' && (e.ctrlKey || e.metaKey)) this.pad.undo();
     if (e.code === 'Enter') this.spawn(this.pad.getStrokes(), true);
+    if (e.code === 'ArrowLeft') this.setView(this.viewIdx - 1);
+    if (e.code === 'ArrowRight') this.setView(this.viewIdx + 1);
   }
 
   toggle(k) {
@@ -273,13 +300,19 @@ export class TaggerView {
   }
 
   update(dt, time) {
-    if (this.active) this.topdown.render(time);
+    if (!this.active) return;
+    if (this.leftViews[this.viewIdx] === 'map') this.topdown.render(time);
+    else {
+      const t = this.topdown.target;
+      this.cam.render(dt, time, t, t && this.topdown.validSpot(t));
+    }
   }
 
   dispose() {
     this._off.forEach((f) => f());
     window.removeEventListener('keydown', this._key);
     this.topdown.dispose();
+    this.cam.dispose();
     this.root.remove();
   }
 }

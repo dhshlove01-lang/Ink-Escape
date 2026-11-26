@@ -25,12 +25,13 @@ function nameSprite(text, color) {
 }
 
 export class RemotePlayers {
-  constructor({ scene, session }) {
+  // skipId: 그리지 않을 플레이어 (1인칭의 내 몸). 술래 카메라는 null → 모두 그림
+  constructor({ scene, session, skipId = null }) {
     this.scene = scene;
     this.session = session;
     this.items = new Map();
     for (const p of session.roster.players) {
-      if (p.id === session.me) continue;
+      if (p.id === skipId) continue;
       const model = createAnimalModel(p.animal);
       const tag = nameSprite(p.name, ANIMAL_LOOK[p.animal]?.label || '#fff');
       tag.position.y = 1.85;

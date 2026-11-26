@@ -20,8 +20,9 @@
 
 - **게임**: 비대칭 드로잉 FPS. 술래 1명이 도화지에 그린 그림이 3D 전장의 몬스터(종이 인형 빌보드)가 되고, 플레이어 1~4명(동글동글 동물)이 10분을 버티고 탈출한다.
 - **지금 형태**: 브라우저 프로토타입 v0.1 (three.js + PeerJS/WebRTC P2P, 빌드 도구 없음). PC 전용.
-- **배포**: GitHub Pages (main 브랜치 루트) → `https://dhshlove01-lang.github.io/asymmetric-drawing-fps/`
-  - 저장소 공개 전환·Pages 켜기는 사용자가 GitHub 설정에서 직접 해야 한다 (AI 쪽 권한으로는 막혀 있음).
+- **저장소**: `dhshlove01-lang/Ink-Escape` (2026-11-26 사용자가 asymmetric-drawing-fps 에서 이름 변경, 공개 전환 완료)
+- **배포**: GitHub Pages (main 브랜치 루트) → `https://dhshlove01-lang.github.io/Ink-Escape/` (Pages 켜기는 사용자가 설정에서)
+  - 저장소 설정(Pages 켜기 등)은 사용자가 GitHub 설정에서 직접 해야 한다 (AI 쪽 권한으로는 막혀 있음).
 - **최종 목표**: Steam 출시. 통신은 `Link` 인터페이스 뒤에 있어서 Steam P2P 로 갈아 끼울 수 있게 설계했다.
 - **기획안**: `docs/gdd_v1.1.md` · **구조 설명**: `docs/ARCHITECTURE.md`
 
@@ -81,11 +82,12 @@ NODE_PATH=$(npm root -g) node tools/smoke.cjs   # 헤드리스 혼자 테스트:
 ## 지금 진행 중
 
 **작업: 술래 화면 3D 구석 카메라 (◀ ▶ 로 탑뷰 ↔ 플레이어별 3D 화면)** — 2026-11-26 시작
-- [ ] 3D 세계 그리기 부품을 PlayerView 에서 떼어 재사용 가능하게 (`WorldRenderer`)
-- [ ] 맵에 방 영역 정보 추가 (카메라 구석 위치 계산용)
-- [ ] 술래 왼쪽 화면에 ◀ ▶ 화살표 + 3D 캔버스 + 구석 카메라(플레이어가 있는 방의 먼 구석 위에서 내려다봄)
-- [ ] 3D 화면에서도 바닥 클릭으로 소환 위치 고르기
-- [ ] 테스트 (npm test, 스모크, 스크린샷) → 커밋·푸시 → 작업 기록
+- [x] 3D 세계 그리기 부품을 PlayerView 에서 떼어 재사용 가능하게 (`src/client/render/WorldRenderer.js`)
+- [x] 맵에 방 영역 정보 추가 (`GameMap.rooms`, `roomAt()`)
+- [x] 술래 왼쪽 화면에 ◀ ▶ 화살표 + 3D 구석 카메라 (`src/client/tagger/CornerCam.js`, `TaggerView.setView`)
+- [x] 3D 화면에서도 바닥 클릭으로 소환 위치 고르기 (`CornerCam.pickFloor` → 'pick')
+- [x] npm test 11/11
+- [ ] 브라우저 스모크 + 스크린샷 확인 → 작업 기록
 
 ## 다음 할 일 (우선순위)
 

@@ -1,12 +1,9 @@
 import * as THREE from 'three';
 import { EV, MSG, PSTATE } from '../../shared/protocol.js';
 import { el, Banner } from '../ui/dom.js';
-import { buildScene } from './SceneBuilder.js';
+import { WorldRenderer } from '../render/WorldRenderer.js';
 import { FpsController } from './FpsController.js';
 import { Weapon } from './Weapon.js';
-import { MonsterRenderer } from './MonsterRenderer.js';
-import { RemotePlayers } from './RemotePlayers.js';
-import { Effects } from './Effects.js';
 import { Hud } from './Hud.js';
 
 // 플레이어 1인칭 화면. 하위 부품을 조립하고 입력·네트워크를 잇는다.
@@ -25,8 +22,11 @@ export class PlayerView {
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.root.append(this.renderer.domElement);
 
-    this.world = buildScene(session.map);
-    this.scene = this.world.scene;
+    this.view3d = new WorldRenderer({ session, palette, attributes, sfx, skipPlayerId: session.me });
+    this.scene = this.view3d.scene;
+    this.effects = this.view3d.effects;
+    this.monsters = this.view3d.monsters;
+    this.remotes = this.view3d.remotes;
     this.camera = new THREE.PerspectiveCamera(75, 1, 0.05, 200);
     this.scene.add(this.camera);
 
@@ -36,9 +36,6 @@ export class PlayerView {
     const ang = (Math.max(0, me0) / Math.max(1, session.playerCount)) * Math.PI * 2;
     this.ctrl.setPosition(session.map.spawn.x + Math.cos(ang) * 2, session.map.spawn.z + Math.sin(ang) * 2);
 
-    this.effects = new Effects(this.scene);
-    this.monsters = new MonsterRenderer({ scene: this.scene, session, palette, attributes, sfx, effects: this.effects });
-    this.remotes = new RemotePlayers({ scene: this.scene, session });
     this.weapon = new Weapon({
       balance,
       camera: this.camera,
@@ -92,16 +89,7 @@ export class PlayerView {
     const s = this.session;
     const name = (id) => s.nameOf(id);
     this._off = [
-      s.on(EV.SHOT, (e) => {
-        if (e.from === s.me) return;
-        this.effects.tracer(new THREE.Vector3(...e.a), new THREE.Vector3(...e.b), 0xffc46b);
-      }),
       s.on(EV.MDIE, (e) => e.by === s.me && this.hud.hit(true)),
-      s.on(EV.GREN_THROW, (e) => this.effects.grenade(e.sx, e.sz, e.x, e.z, e.fuse)),
-      s.on(EV.GREN_BOOM, (e) => {
-        this.effects.boom(e.x, e.z, e.r);
-        this.sfx.play('boom');
-      }),
       s.on(EV.BOSS, (e) => {
         this.banner.show(`⚠ ${e.kind === 'giant' ? '초대형 괴물' : '보스'} 등장! ${e.icons}`, { kind: 'boss', ms: 3000 });
         this.sfx.play('siren');
@@ -109,11 +97,9 @@ export class PlayerView {
       }),
       s.on(EV.ONE_MIN, () => this.banner.show('1분 남음!', { kind: 'warn' })),
       s.on(EV.DOOR_REVEAL, (e) => {
-        this.world.revealDoor(e.door);
         this.banner.show(`탈출 문 위치: ${s.map.doors[e.door].name} (빛기둥)`, { kind: 'info', ms: 3500 });
       }),
-      s.on(EV.DOOR_OPEN, (e) => {
-        this.world.openDoor(e.door);
+      s.on(EV.DOOR_OPEN, () => {
         this.sfx.play('door');
         this.banner.show('문이 열렸다! 탈출하세요 · 술래 폭주!', { kind: 'boss', ms: 3500 });
       }),
@@ -267,10 +253,7 @@ export class PlayerView {
       this.session.send({ t: MSG.PSTATE, x: r(this.ctrl.x), y: r(this.ctrl.y), z: r(this.ctrl.z), yaw: r(this.ctrl.yaw) });
     }
 
-    this.world.update(this.time);
-    this.monsters.update(dt, this.camera, this.time);
-    this.remotes.update(dt, this.time);
-    this.effects.update(dt);
+    this.view3d.update(dt, this.time, this.camera);
     this.hud.update({ weapon: this.weapon, me, prompt: rev.prompt, center, revive: rev.ring, boss: this.monsters.bossInfo() });
     if (this.active) this.renderer.render(this.scene, this.camera);
   }
@@ -300,7 +283,7 @@ export class PlayerView {
     window.removeEventListener('mouseup', this._up);
     window.removeEventListener('keydown', this._key);
     this.ctrl.dispose();
-    this.monsters.dispose();
+    this.view3d.dispose();
     this.hud.dispose();
     this.renderer.dispose();
     this.root.remove();
