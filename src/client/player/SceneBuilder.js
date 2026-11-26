@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { themeFor } from '../../config/themes.js';
 import { CELL, WALL_H, TILE } from '../../shared/map/GameMap.js';
 import { texture, textureFromUrl } from '../render/Images.js';
 import { DECALS } from '../../config/assets.js';
@@ -100,7 +101,7 @@ export function makeTextures() {
   return { wall, floor };
 }
 
-function flameTexture() {
+export function flameTexture() {
   const c = document.createElement('canvas');
   c.width = c.height = 64;
   const g = c.getContext('2d');
@@ -118,19 +119,20 @@ function flameTexture() {
 export const CEILING_LAYER = 1;
 
 export function buildScene(map) {
+  const theme = themeFor(map.id); // 맵 겉모습 (config/themes.js — 로비 배경도 같은 테마)
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x08060d);
-  scene.fog = new THREE.Fog(0x0a0712, 11, 64);
+  scene.background = new THREE.Color(theme.background);
+  scene.fog = new THREE.Fog(theme.fog.color, theme.fog.near, theme.fog.far);
 
   // 사용자가 뽑은 텍스처가 있으면 그것, 없으면 코드로 그린 텍스처
   const tex = makeTextures();
-  const wallTex = texture('tex.wall', { repeat: [1, WALL_H / CELL] }) || tex.wall;
-  const pillarTex = texture('tex.pillar', { repeat: [1, WALL_H / CELL] });
-  const floorTex = texture('tex.floor', { repeat: [map.worldW / 3, map.worldH / 3] }) || tex.floor;
+  const wallTex = texture(theme.tex.wall, { repeat: [1, WALL_H / CELL] }) || tex.wall;
+  const pillarTex = texture(theme.tex.pillar, { repeat: [1, WALL_H / CELL] });
+  const floorTex = texture(theme.tex.floor, { repeat: [map.worldW / 3, map.worldH / 3] }) || tex.floor;
   const kit = createDungeonKit({ wallTex, floorTex, pillarTex });
 
   // 은은한 기본광 + 위에서 내리쬐는 차가운 림 라이트 (횃불이 주인공)
-  scene.add(new THREE.HemisphereLight(0x7a68a8, 0x2a1c18, 1.05));
+  scene.add(new THREE.HemisphereLight(theme.hemi.sky, theme.hemi.ground, theme.hemi.intensity));
   const rim = new THREE.DirectionalLight(0x8e7ae0, 0.55);
   rim.position.set(-0.4, 1, 0.55);
   scene.add(rim);
@@ -251,7 +253,7 @@ export function buildScene(map) {
   });
   const TORCH_LIGHTS = 4;
   const pool = Array.from({ length: TORCH_LIGHTS }, () => {
-    const l = new THREE.PointLight(0xff9a4a, 0, 30, 1.5);
+    const l = new THREE.PointLight(theme.torch, 0, 30, 1.5);
     scene.add(l);
     return l;
   });
