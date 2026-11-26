@@ -2,7 +2,7 @@
 
 > 다른 AI 가 이어서 작업한다면: **[`HANDOFF.md`](HANDOFF.md) 를 먼저 읽고, 작업하는 동안 실시간으로 갱신하세요.**
 
-플레이: https://dhshlove01-lang.github.io/Ink-Escape/ (GitHub Pages 를 켠 뒤)
+플레이: **https://dhshlove01-lang.github.io/Ink-Escape/**
 
 술래 1명이 도화지에 그린 그림이 3D 전장의 몬스터가 되고, 플레이어 1~4명이 10분을 버텨 탈출하는 비대칭 멀티플레이 FPS입니다.
 기획안: [`docs/gdd_v1.1.md`](docs/gdd_v1.1.md)

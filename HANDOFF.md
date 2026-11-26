@@ -21,7 +21,7 @@
 - **게임**: 비대칭 드로잉 FPS. 술래 1명이 도화지에 그린 그림이 3D 전장의 몬스터(종이 인형 빌보드)가 되고, 플레이어 1~4명(동글동글 동물)이 10분을 버티고 탈출한다.
 - **지금 형태**: 브라우저 프로토타입 v0.1 (three.js + PeerJS/WebRTC P2P, 빌드 도구 없음). PC 전용.
 - **저장소**: `dhshlove01-lang/Ink-Escape` (2026-11-26 사용자가 asymmetric-drawing-fps 에서 이름 변경, 공개 전환 완료)
-- **배포**: GitHub Pages (main 브랜치 루트) → `https://dhshlove01-lang.github.io/Ink-Escape/` (Pages 켜기는 사용자가 설정에서)
+- **배포**: GitHub Pages (main 브랜치 루트) → **https://dhshlove01-lang.github.io/Ink-Escape/** (2026-11-26 켜짐, 푸시하면 1~2분 뒤 반영)
   - 저장소 설정(Pages 켜기 등)은 사용자가 GitHub 설정에서 직접 해야 한다 (AI 쪽 권한으로는 막혀 있음).
 - **최종 목표**: Steam 출시. 통신은 `Link` 인터페이스 뒤에 있어서 Steam P2P 로 갈아 끼울 수 있게 설계했다.
 - **기획안**: `docs/gdd_v1.1.md` · **구조 설명**: `docs/ARCHITECTURE.md`
@@ -32,6 +32,7 @@
 npm test                                   # 판정·서버 로직 (node --test, 설치 없음)
 python3 -m http.server 8765 &              # http://localhost:8765
 NODE_PATH=$(npm root -g) node tools/smoke.cjs   # 헤드리스 혼자 테스트: {"monsters":1,"errors":[]} 이어야 함
+URL=https://dhshlove01-lang.github.io/Ink-Escape/ NODE_PATH=$(npm root -g) node tools/smoke.cjs   # 배포된 사이트 확인
 ```
 
 - 멀티플레이 시험: 로컬 PeerJS 서버(`npm i peer` 후 `ExpressPeerServer` 를 127.0.0.1:9000 에)를 띄우고
