@@ -83,8 +83,11 @@ URL=https://dhshlove01-lang.github.io/Ink-Escape/ NODE_PATH=$(npm root -g) node 
 
 ## 지금 진행 중
 
-(없음 — 다음 작업을 시작하면 여기에 할 일과 체크 목록을 적고 바로 커밋·푸시)
-- 대기: 탈출문·횃불·술통/상자 이미지(`assets/source/kit/map_06~08`, 회색 배경)는 Stable Fast 3D 로 GLB 를 만들어 오면 맵 소품으로 배치.
+**작업: 상업용 폰트를 저장소에 넣고 게임 전체 적용** — 2026-11-26 시작
+- [ ] 폰트 파일 저장 `assets/fonts/` (주아 Jua·Luckiest Guy·Pretendard·개구 Gaegu) + 라이선스 파일
+- [ ] 구글 폰트 서버 대신 저장소 폰트 사용 (Steam·오프라인 대비)
+- [ ] CSS 토큰 정리: 한글 제목=주아, 영문·숫자=Luckiest Guy, 본문=Pretendard, 낙서 포인트=개구
+- [ ] CLAUDE.md·HANDOFF 에 "새 글씨는 이 폰트 토큰만" 규칙 → 검증 → 커밋·푸시
 
 ## 다음 할 일 (우선순위)
 
