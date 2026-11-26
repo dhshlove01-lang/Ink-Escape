@@ -7,6 +7,7 @@ import { PlayerView } from './player/PlayerView.js';
 import { TaggerView } from './tagger/TaggerView.js';
 import { toast, el } from './ui/dom.js';
 import { t, tr } from './i18n.js';
+import { gfx } from './render/GraphicsSettings.js';
 
 // 화면 흐름: 시작 → 로비 → 경기 → 결과 → 로비.
 // 필요한 것은 모두 생성자로 주입받는다 (main.js 가 조립).
@@ -35,12 +36,11 @@ export class App {
     this.loop();
   }
 
-  // 화면 갱신은 초당 최대 60번 (고주사율 모니터에서 쉬지 않고 그려 팬이 도는 것 방지)
+  // 화면 갱신 빈도는 그래픽 설정이 정한다 (최대 60번, 창이 다른 창 뒤면 15번 — 팬이 도는 것 방지)
   loop() {
-    const MIN_FRAME = 1000 / 60 - 0.5;
     const frame = (t) => {
       this._raf = requestAnimationFrame(frame);
-      if (this._last && t - this._last < MIN_FRAME) return;
+      if (this._last && t - this._last < gfx.frameInterval()) return;
       const dt = Math.min(0.05, (t - (this._last || t)) / 1000);
       this._last = t;
       if (!this.views) return;

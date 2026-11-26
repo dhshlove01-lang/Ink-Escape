@@ -452,7 +452,7 @@ h1.logo img { display: block; width: min(340px, 78%); height: auto; margin: 0 au
 .art-crosshair .crosshair i { display: none; }
 
 /* 언어 고르기 (한국어 | English) */
-.title-top { display: flex; justify-content: flex-end; margin: -10px -10px -6px 0; }
+.title-top { display: flex; justify-content: flex-end; gap: 8px; flex-wrap: wrap; margin: -10px -10px -6px 0; }
 .lang-picker { display: inline-flex; border: 1.5px solid var(--line); border-radius: 999px; overflow: hidden; flex: none; }
 .lang-btn { background: transparent; border: 0; padding: 5px 12px; font-family: var(--font-body); font-size: 13px; color: var(--muted); }
 .lang-btn.on { background: var(--chalk); color: var(--ink); font-weight: 600; }
@@ -532,3 +532,6 @@ h1.logo img { display: block; width: min(340px, 78%); height: auto; margin: 0 au
 /* 방장 왕관·READY 체크 아이콘 */
 .m-crown img, .m-ready img { width: 18px; height: 18px; object-fit: contain; vertical-align: -4px; }
 .m-ready img { margin-right: 3px; }
+
+/* 그래픽 품질 고르기 (언어 고르기와 같은 모양 + 앞 글씨) */
+.gfx-label { align-self: center; padding: 0 4px 0 10px; font-size: 12px; color: var(--muted); font-family: var(--font-body); }

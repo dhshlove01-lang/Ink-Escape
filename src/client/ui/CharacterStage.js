@@ -9,6 +9,8 @@ import { texture, textureFromUrl } from '../render/Images.js';
 import { DECALS } from '../../config/assets.js';
 import { ROLE } from '../../shared/protocol.js';
 import { t, getLang } from '../i18n.js';
+import { gfx } from '../render/GraphicsSettings.js';
+import { MENU_FPS } from '../../config/graphics.js';
 
 // 로비·결과 화면 뒤에 깔리는 3D 무대. 던전 단상 위에 캐릭터들이 서서 숨쉬고 깡총거린다.
 // 폴가이즈 스타일: 캐릭터마다 단상 하나, 머리 위 이름표(+READY), 내 캐릭터는 노란 링.
@@ -24,8 +26,7 @@ export class CharacterStage {
     this.root = el('div', { class: 'stage-canvas' });
     parent.append(this.root);
 
-    this.renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
-    this.renderer.setPixelRatio(1) // 고해상도 모니터에서 픽셀 수가 2배 넘게 늘지 않게;
+    this.renderer = new THREE.WebGLRenderer({ antialias: gfx.preset.antialias });
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.root.append(this.renderer.domElement);
 
@@ -47,6 +48,7 @@ export class CharacterStage {
     this.setTheme(mapId);
     this.onResize = () => this.resize();
     window.addEventListener('resize', this.onResize);
+    this._offGfx = gfx.onChange(this.onResize);
     this.resize();
     this.play();
   }
@@ -255,7 +257,7 @@ export class CharacterStage {
     const tick = (t) => {
       this._raf = requestAnimationFrame(tick);
       if (this.paused) return;
-      if (this._last && t - this._last < 1000 / 60 - 0.5) return; // 최대 60fps
+      if (this._last && t - this._last < gfx.frameInterval(MENU_FPS)) return; // 로비 무대는 초당 30번이면 충분
       const dt = Math.min(0.05, ((t - (this._last || t)) / 1000) || 0.016);
       this._last = t;
       this.update(dt);
@@ -346,6 +348,7 @@ export class CharacterStage {
   resize() {
     const w = this.root.clientWidth || 320;
     const h = this.root.clientHeight || 240;
+    this.renderer.setPixelRatio(gfx.pixelRatio(w));
     this.renderer.setSize(w, h, false);
     this.aspect = w / Math.max(1, h);
     this.camera.aspect = this.aspect;
@@ -356,6 +359,7 @@ export class CharacterStage {
   dispose() {
     this.pause();
     window.removeEventListener('resize', this.onResize);
+    this._offGfx?.();
     for (const f of this.figures) this.removeFigure(f);
     this.figures = [];
     this.scene.traverse((o) => {

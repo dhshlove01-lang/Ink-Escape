@@ -3,6 +3,7 @@ import { Emitter } from '../Emitter.js';
 import { WALL_H } from '../../shared/map/GameMap.js';
 import { PSTATE, STATUS_BIT } from '../../shared/protocol.js';
 import { WorldRenderer, SILENT } from '../render/WorldRenderer.js';
+import { gfx } from '../render/GraphicsSettings.js';
 
 // 술래 왼쪽 화면의 3D 따라가기 카메라: 고른 플레이어의 머리 위·뒤에서 실제 전장을 내려다보며 따라간다.
 // 바닥을 클릭하면 소환 위치를 고른다 ('pick' 이벤트, 탑뷰와 같은 형식).
@@ -27,8 +28,7 @@ export class CornerCam extends Emitter {
   init() {
     if (this.ready) return;
     this.ready = true;
-    this.renderer = new THREE.WebGLRenderer({ antialias: true });
-    this.renderer.setPixelRatio(1) // 고해상도 모니터에서 픽셀 수가 2배 넘게 늘지 않게;
+    this.renderer = new THREE.WebGLRenderer({ antialias: gfx.preset.antialias });
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.root.append(this.renderer.domElement);
     this.view3d = new WorldRenderer({ session: this.session, palette: this.palette, attributes: this.attributes, balance: this.b, sfx: SILENT, skipPlayerId: null });
@@ -86,9 +86,11 @@ export class CornerCam extends Emitter {
   resize() {
     const w = this.root.clientWidth, h = this.root.clientHeight;
     if (!w || !h) return;
-    if (w !== this._cw || h !== this._ch) {
+    if (w !== this._cw || h !== this._ch || gfx.level !== this._lv) {
       this._cw = w;
       this._ch = h;
+      this._lv = gfx.level;
+      this.renderer.setPixelRatio(gfx.pixelRatio(w));
       this.renderer.setSize(w, h);
       this.camera.aspect = w / h;
       this.camera.updateProjectionMatrix();

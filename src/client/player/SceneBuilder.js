@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { themeFor } from '../../config/themes.js';
+import { gfx } from '../render/GraphicsSettings.js';
 import { CELL, WALL_H, TILE } from '../../shared/map/GameMap.js';
 import { texture, textureFromUrl } from '../render/Images.js';
 import { DECALS } from '../../config/assets.js';
@@ -251,7 +252,7 @@ export function buildScene(map) {
     scene.add(tor.group);
     return tor;
   });
-  const TORCH_LIGHTS = 4;
+  const TORCH_LIGHTS = gfx.preset.torchLights; // 실제 빛을 주는 횃불 수 (그래픽 설정, 판마다 고정 — 바뀌면 셰이더를 다시 만들어 끊김)
   const pool = Array.from({ length: TORCH_LIGHTS }, () => {
     const l = new THREE.PointLight(theme.torch, 0, 30, 1.5);
     scene.add(l);

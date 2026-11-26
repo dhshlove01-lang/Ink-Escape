@@ -9,6 +9,7 @@ import { Weapon } from './Weapon.js';
 import { Hud } from './Hud.js';
 import { surfaceAt } from './surface.js';
 import { t } from '../i18n.js';
+import { gfx } from '../render/GraphicsSettings.js';
 
 // 플레이어 1인칭 화면. 하위 부품을 조립하고 입력·네트워크를 잇는다.
 
@@ -21,8 +22,7 @@ export class PlayerView {
     this.root = el('div', { class: 'view player-view' });
     parent.append(this.root);
 
-    this.renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
-    this.renderer.setPixelRatio(1) // 고해상도 모니터에서 픽셀 수가 2배 넘게 늘지 않게;
+    this.renderer = new THREE.WebGLRenderer({ antialias: gfx.preset.antialias });
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.root.append(this.renderer.domElement);
 
@@ -62,6 +62,7 @@ export class PlayerView {
     this.bindEvents();
     this.onResize = () => this.resize();
     window.addEventListener('resize', this.onResize);
+    this._offGfx = gfx.onChange(this.onResize);
     this.resize();
   }
 
@@ -145,6 +146,7 @@ export class PlayerView {
   resize() {
     const w = this.root.clientWidth || window.innerWidth;
     const h = this.root.clientHeight || window.innerHeight;
+    this.renderer.setPixelRatio(gfx.pixelRatio(w)); // 큰 화면은 덜 촘촘히 그려 늘려 보여 줌 (GPU 부담 = 픽셀 수)
     this.renderer.setSize(w, h);
     this.camera.aspect = w / h;
     this.camera.updateProjectionMatrix();
@@ -301,6 +303,7 @@ export class PlayerView {
   dispose() {
     this._off.forEach((f) => f());
     window.removeEventListener('resize', this.onResize);
+    this._offGfx?.();
     window.removeEventListener('mouseup', this._up);
     window.removeEventListener('keydown', this._key);
     this.ctrl.dispose();

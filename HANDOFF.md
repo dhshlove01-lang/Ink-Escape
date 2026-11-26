@@ -110,6 +110,13 @@ URL=https://dhshlove01-lang.github.io/Ink-Escape/ NODE_PATH=$(npm root -g) node 
 
 ## 작업 기록
 
+### 2026-11-26 · 그래픽카드 팬 소리 줄이기 (그래픽 품질 설정)
+- **원인(측정)**: 그리기 호출은 프레임당 ~16번으로 적음. 부담은 픽셀 수 — 1920×1080 을 4배 안티에일리어싱 + 조명 9개를 모든 픽셀에서 계산 + 큰 빛무리 스프라이트 겹침. 게다가 창이 뒤에 있어도 60번, 로비도 60번, "고성능 GPU 우선".
+- **해결**: `src/config/graphics.js` (낮음/보통/높음: 그리는 최대 가로 px 1100/1600/전체, fps 45/60/60, 실제 빛 주는 횃불 2/3/4, 안티에일리어싱 끔/켬/켬), `src/client/render/GraphicsSettings.js` (`gfx` — 저장·변경 알림·`pixelRatio(w)`·`frameInterval(cap)`). 기본 보통. 창이 포커스를 잃으면 초당 15번, 로비·결과 3D 무대는 초당 30번(`MENU_FPS`). `powerPreference: high-performance` 제거. 시작 화면·로비 위 "그래픽 낮음|보통|높음" (`gfxPicker`). 해상도는 바로, 안티에일리어싱·횃불 빛 수는 다음 판부터.
+- **어디**: PlayerView·CornerCam·CharacterStage(resize 에서 setPixelRatio, 렌더러 옵션), App.loop·CharacterStage tick(빈도), SceneBuilder(TORCH_LIGHTS).
+- **검증**: 1920×1080 에서 플레이어 캔버스 낮음 1100×618 / 보통 1600×900 / 높음 1920×1080, 로비 무대 정상, pageerror 0, `npm test` 12/12, smoke 통과.
+
+
 ### 2026-11-26 · 로비 개선 · UI 키트 14종 적용 · 총 궤적/총알 자국 · 탈출문 다듬기
 - **UI 키트** (`inkescape9ui14.zip` → 원본 `assets/source/ui14/`): `tools/process_ui_kit.py` 로 #00FF00 배경 제거(가장자리에서 이어진 초록만 지움 → 12번 초록 체크는 남음), 상태 스트립은 README 좌표로 잘라 `assets/ui/kit/*.webp`. `config/assets.js` 의 `kit.*` 가 모두 불러와지면 `main.js` 가 `--kit-*` 변수 + body `art-kit` → `style.css` 맨 끝 블록이 9-slice(border-image)로 버튼(빨강/검정/누름·올림)·비활성·나가기(X)·역할/시간 칩(고른 것 노랑)·큰 판(시작/로비)·캐릭터 카드·입력칸(공책)·팝업(빨간 띠)·경고 알림에 씌움. 방장 왕관·READY 체크도 키트 그림(`icon()`), 없으면 이모지. 토글·슬라이더·탭바·리본은 만들어 두기만 함(아직 쓰는 곳 없음).
 - **로비 배치**: 참가자 한 줄(얼굴·이름·왕관·역할 칩·READY·핑), 역할 3개·시간 3개 한 줄, 노란 테두리 outline→border(잘림 해결), 오른쪽 스크롤 없음(5명도 1366×768 에 들어감). 혼자 테스트는 역할 칩이 "술래 + 플레이어".
