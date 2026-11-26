@@ -114,6 +114,13 @@ URL=https://dhshlove01-lang.github.io/Ink-Escape/ NODE_PATH=$(npm root -g) node 
 
 ## 작업 기록
 
+### 2026-11-26 · img2threejs 스킬 설치
+- **무엇을**: 사용자 요청으로 https://github.com/img2threejs/img2threejs (v2.0.1, 커밋 0c0c49b, Apache-2.0) 를 프로젝트 스킬로 설치 → `.claude/skills/img2threejs/`. 참고 이미지를 보고 Three.js 코드로 모델을 다시 만드는 단계형 파이프라인(intake → spec → build → review, 스크린샷 비교 반복).
+- **왜 저장소에**: 클라우드 세션은 매번 새 컴퓨터라 `~/.claude/skills` 설치가 사라짐. 저장소에 두면 이 프로젝트의 모든 Claude Code 세션이 자동으로 불러옴. (`npx --yes img2threejs@latest install --host claude` 도 이 세션에 실행함.)
+- **검토**: 핵심 스크립트는 파이썬 표준 라이브러리만, 외부 통신 없음, 외부 명령은 macOS `sips` 뿐. `integrations/vision` 은 선택 기능(Google 얼굴·자세 모델 다운로드).
+- **검증**: 스킬 자체 테스트 `python3 -m unittest discover -s forge/tests` → 1416개 통과(64개 건너뜀), 이 세션 스킬 목록에 img2threejs 표시됨.
+
+
 ### 2026-11-26 · 보급·증강 (플레이어 = 상자 줍기, 술래 = 자동 카드) + 술래 지도 닉네임
 - **규칙**: 3·6·9분(`balance.supply.times`)에 맵에 보급 상자가 떨어지고(플레이어에게서 12m 이상, 문에서 8m 이상), 플레이어가 닿으면 그 사람에게 카드 3장(사람마다 1번). 술래는 같은 때 카드 3장이 바로. 10초 안에 고르기(플레이어 1·2·3 키/클릭, 술래 클릭), 안 고르면 방장이 무작위. 수치형 최대 2번, 효과형 1번. 새 보급이 오면 이전 상자는 사라짐.
 - **데이터**: 수치 `balance.supply`·`balance.aug`(20개), 목록·아이콘·설명값 `src/config/augments.js`, 문구 `aug.<key>.name/desc`·`supply.*` (ko·en), 실제 수치 계산 `src/shared/augmentMath.js`(서버·화면 공용).

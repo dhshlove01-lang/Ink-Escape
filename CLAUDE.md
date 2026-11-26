@@ -15,6 +15,9 @@
 - 통신은 `Link` 인터페이스 뒤에 둔다. 나중에 Steam 으로 바꿀 수 있어야 한다. 실시간 동기화에 Firebase 를 쓰지 않는다 (저장 기능에만 고려).
 - 몬스터·보스에는 이름이 없다. 속성은 색과 무관하게 술래가 고른다 (C안). 술래는 3D 전장에 보이지 않는다. 모바일은 지원하지 않는다.
 
+## 스킬
+- `img2threejs` (`.claude/skills/img2threejs/`, v2.0.1): 참고 이미지 → 코드로 만든 Three.js 모델(소품·캐릭터). 2026-11-26 사용자가 설치. 결과물은 게임 규칙대로 `assets/models/` GLB + `config/models.js` 한 줄, 또는 코드 모델로 넣는다. 설치 기록·업데이트 방법은 그 폴더의 `INSTALLED_FROM.md`.
+
 ## 검증
 1. `npm test` (판정·서버 로직)
 2. `python3 -m http.server 8765 &` 후 `NODE_PATH=$(npm root -g) node tools/smoke.cjs` → `errors: []`, `monsters: 1`
