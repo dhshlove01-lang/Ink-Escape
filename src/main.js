@@ -13,7 +13,7 @@ import { MODEL_DEFS } from './config/models.js';
 import { ModelLibrary } from './client/render/ModelLibrary.js';
 import { setModelLibrary } from './client/render/AnimalModels.js';
 import { IMAGE_DEFS } from './config/assets.js';
-import { loadImages } from './client/render/Images.js';
+import { loadImages, url } from './client/render/Images.js';
 
 // 3D 모델 파일(GLB): 기다리지 않고 불러오기 시작. 늦게 끝나면 임시 모델을 바꿔 끼운다.
 const models = new ModelLibrary(MODEL_DEFS);
@@ -41,5 +41,12 @@ const app = new App({
 window.addEventListener('pointerdown', () => app.sfx.unlock(), { once: true });
 // 2D 이미지를 (최대 4초) 기다린 뒤 시작. 늦거나 없으면 코드 그리기로 대체된다.
 await Promise.race([loadImages(IMAGE_DEFS), new Promise((r) => setTimeout(r, 4000))]);
+// CSS 가 쓰는 UI 이미지: 불러온 것만 변수 + art-* 클래스로 켠다 (없으면 기존 CSS 모양)
+for (const [key, name] of [['ui.title_bg', 'title-bg'], ['ui.spawn_btn', 'spawn-btn'], ['ui.bar_hp', 'bar-hp'], ['ui.bar_boss', 'bar-boss'], ['ui.pencil', 'pencil'], ['ui.crosshair', 'crosshair']]) {
+  const u = url(key);
+  if (!u) continue;
+  document.documentElement.style.setProperty(`--img-${name}`, `url("${u}")`);
+  document.body.classList.add(`art-${name}`);
+}
 app.start();
 window.__app = app; // 디버그·자동 테스트용

@@ -1,4 +1,4 @@
-import { el, fmtTime, Banner, toast } from '../ui/dom.js';
+import { el, fmtTime, Banner, toast, icon } from '../ui/dom.js';
 import { MSG, EV, PSTATE } from '../../shared/protocol.js';
 import { DrawingPad, BRUSHES } from './DrawingPad.js';
 import { TopDownMap } from './TopDownMap.js';
@@ -196,12 +196,12 @@ export class TaggerView {
     if (r.attrs?.length) {
       for (const a of r.attrs) {
         const A = this.attributes[a.key];
-        parts.push(el('span', { class: 'chip', style: { '--c': A.aura } }, `${A.icon} ${A.name}${a.w < 1 ? ' 50%' : ''}`));
+        parts.push(el('span', { class: 'chip', style: { '--c': A.aura } }, icon('icon.' + a.key, A.icon), ` ${A.name}${a.w < 1 ? ' 50%' : ''}`));
       }
     }
-    if (r.traits?.fly) parts.push(el('span', { class: 'chip' }, '🪽 비행'));
-    if (r.traits?.dash) parts.push(el('span', { class: 'chip' }, '💨 돌진'));
-    if (r.stats?.ranged) parts.push(el('span', { class: 'chip' }, `🎯 원거리 ${r.stats.ranged}m`));
+    if (r.traits?.fly) parts.push(el('span', { class: 'chip' }, icon('icon.fly', '🪽'), ' 비행'));
+    if (r.traits?.dash) parts.push(el('span', { class: 'chip' }, icon('icon.dash', '💨'), ' 돌진'));
+    if (r.stats?.ranged) parts.push(el('span', { class: 'chip' }, icon('icon.ranged', '🎯'), ` 원거리 ${r.stats.ranged}m`));
     const info = [];
     if (r.stats) info.push(`HP ${r.stats.hp}`, `키 ${r.stats.height}m`, `속도 ${r.stats.speed}`);
     if (strokes.length) info.push(`잉크 ${r.cost}`);
@@ -225,7 +225,7 @@ export class TaggerView {
     if (this.inkBar.childElementCount !== n) this.inkBar.replaceChildren(...Array.from({ length: n }, () => el('div', { class: 'pencil' }, el('i'))));
     [...this.inkBar.children].forEach((c, i) => {
       const v = Math.max(0, Math.min(per, s.ink - i * per));
-      c.firstChild.style.width = `${v}%`;
+      c.firstChild.style.clipPath = `inset(0 ${100 - v}% 0 0)`;
     });
     this.inkText.textContent = s.open ? '∞' : `${Math.floor(s.ink)} / ${s.inkMax}`;
     this.bossBtn.title = s.bossIn > 0 ? `보스 대기 ${Math.ceil(s.bossIn)}초` : '';

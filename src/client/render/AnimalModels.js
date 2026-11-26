@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { img } from './Images.js';
 
 // 동글동글 동물 4종을 공·원기둥으로 만든다 (임시 모델 — 나중에 진짜 3D 모델 파일로 교체).
 // 모든 모델은 -Z 쪽을 바라본다 (카메라와 같은 방향).
@@ -167,6 +168,17 @@ function toViewModelMaterial(root) {
 
 // 2D 초상화 (HUD·술래 패널)
 export function drawAnimalFace(ctx, kind, cx, cy, r, { dead = false } = {}) {
+  const face = img('face.' + kind);
+  if (face) {
+    // 사용자 초상화 (머리 모양 그대로, 원 안에 맞춤)
+    const k = (r * 2.5) / Math.max(face.width, face.height);
+    const w = face.width * k, h = face.height * k;
+    ctx.save();
+    if (dead) ctx.filter = 'grayscale(1) brightness(0.55)';
+    ctx.drawImage(face, cx - w / 2, cy - h * 0.55, w, h);
+    ctx.restore();
+    return;
+  }
   const L = ANIMAL_LOOK[kind] || ANIMAL_LOOK.shiba;
   const hex = (n) => '#' + n.toString(16).padStart(6, '0');
   ctx.save();

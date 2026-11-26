@@ -82,14 +82,9 @@ URL=https://dhshlove01-lang.github.io/Ink-Escape/ NODE_PATH=$(npm root -g) node 
 
 ## 지금 진행 중
 
-**작업: 사용자가 뽑은 맵·이펙트·UI 이미지 29장 적용** — 2026-11-26 시작 (원본 `assets/source/kit/`)
-- [x] 가공 스크립트 `tools/process_assets.py`: 초록 배경(#00FF00) 크로마키 → 투명, 여러 개 모인 시트는 조각별로 자르기, 검은 배경 이펙트는 그대로(가산 합성용), webp 로 저장
-- [x] 맵: 벽·바닥·기둥 텍스처, 분필·빨간 낙서 데칼 (`SceneBuilder.addDecals`, 이미지 창구 `src/client/render/Images.js`, 목록 `src/config/assets.js`)
-- [ ] 이펙트: 총구 불꽃, 탄 궤적, 명중, 소환 원(일반·보스), 지우개 수류탄·폭발, 속성별 원거리 탄
-- [ ] UI: 로고, 시작 배경, 동물 얼굴, 속성·특성 아이콘, SPAWN 버튼, HP 바 틀, 연필 잉크, 조준점, 공책 종이
-- [ ] 제외: 탈출문·횃불·술통 상자(회색 배경 사물) → Stable Fast 3D 로 GLB 를 만들어 쓰는 게 맞음
-- [ ] 검증 → 커밋·푸시 → 작업 기록
-- 이미지를 못 불러오면 기존 코드 그리기로 대체되어야 한다 (모델과 같은 원칙)
+(없음 — 다음 작업을 시작하면 여기에 할 일과 체크 목록을 적고 바로 커밋·푸시)
+- 대기: 캐릭터 GLB(시바·곰·토끼·고양이·술래). 오면 `assets/models/<이름>.glb` + `src/config/models.js` 한 줄 → `createAnimalModel` 이 GLB 를 쓰도록.
+- 대기: 탈출문·횃불·술통/상자 이미지(`assets/source/kit/map_06~08`, 회색 배경)는 Stable Fast 3D 로 GLB 를 만들어 오면 맵 소품으로 배치.
 
 ## 다음 할 일 (우선순위)
 
@@ -109,6 +104,17 @@ URL=https://dhshlove01-lang.github.io/Ink-Escape/ NODE_PATH=$(npm root -g) node 
 - 동물 모델·효과음은 임시.
 
 ## 작업 기록
+
+### 2026-11-26 · 맵·이펙트·UI 이미지 29장 적용
+- **무엇을**: 사용자가 이미지 AI 로 뽑은 키트(원본 `assets/source/kit/`)를 게임에 적용.
+  - 맵: 벽·바닥·기둥 텍스처, 방마다 벽(통로 구멍 제외)·바닥에 분필/빨간 낙서 데칼 (고정 시드라 모두 같은 자리).
+  - 이펙트: 명중 불꽃·지우개 수류탄(날아가는 그림)·지우개 폭발·총구 불꽃·소환 원(일반=투명, 보스=검은 배경 가산 합성)+반투명 빨간 바닥·속성별 원거리 탄 스프라이트.
+  - UI: 로고·던전 시작 배경, 동물 얼굴(로비·HUD·술래 패널·탑뷰), 속성·특성 아이콘(미리보기 칩·보스 바·몬스터 머리 위), SPAWN 버튼, HP·보스 바 틀, 연필 잉크(심 쪽부터 줄어듦), 조준점, 공책 종이 도화지.
+- **어디**: `tools/process_assets.py`(초록 배경 크로마키·번짐 제거·시트 자르기, 검은 배경은 그대로), `src/config/assets.js`(이미지 목록), `src/client/render/Images.js`(불러오기 창구: img/url/texture), `main.js`(시작 전 최대 4초 대기, CSS 는 `--img-*` 변수 + `art-*` 클래스), `SceneBuilder.addDecals`, `Effects.vfxSprite`, `MonsterRenderer`(소환 원·탄·아이콘), `Weapon`(총구), `AnimalModels.drawAnimalFace`, `ui/dom.icon()`, `DrawingPad.render`, `style.css` 맨 아래 art 블록.
+- **원칙**: 이미지를 못 불러오면 전부 예전 코드 그리기로 대체된다.
+- **주의**: CSS 토큰 `--pencil`(연필 노란색)과 이름이 겹치지 않게 이미지 변수는 `--img-` 접두어.
+- **제외**: 탈출문·횃불·술통 상자 이미지(회색 배경 사물) — 3D 로 만들어 쓸 예정.
+- **검증**: `npm test` 11/11, `tools/smoke.cjs` 통과, 헤드리스 스크린샷(시작·로비·술래·플레이어·보스·소환 원) pageerror 0.
 
 ### 2026-11-26 · 총 3D 모델(GLB) 적용
 - **무엇을**: 사용자가 Stable Fast 3D(Hugging Face, 설정 Triangle·정점 5000·텍스처 2048)로 뽑은 총을 1인칭 총과 다른 플레이어 손의 총에 적용.

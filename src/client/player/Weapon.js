@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { createViewModel } from '../render/AnimalModels.js';
+import { texture } from '../render/Images.js';
 
 // 공통 총 1종: 30발, 예비 탄약 무한, 재장전 1초. 발사 판정(히트스캔)은 주입된 raycast 가 한다.
 
@@ -21,7 +22,7 @@ export class Weapon {
     this.view.position.set(0.25, -0.23, -0.52);
     this.view.scale.setScalar(0.85);
     camera.add(this.view);
-    const flashTex = (() => {
+    const flashTex = texture('vfx.muzzle') || (() => {
       const c = document.createElement('canvas');
       c.width = c.height = 64;
       const g = c.getContext('2d');

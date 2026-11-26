@@ -1,4 +1,4 @@
-import { el, fmtTime } from '../ui/dom.js';
+import { el, fmtTime, icon } from '../ui/dom.js';
 import { faceCanvas } from '../render/AnimalModels.js';
 import { PSTATE, STATUS_BIT } from '../../shared/protocol.js';
 
@@ -108,7 +108,11 @@ export class Hud {
     if (revive) this.ring.style.setProperty('--p', `${Math.round(revive * 100)}%`);
     this.boss.hidden = !boss;
     if (boss) {
-      this.bossName.textContent = `${boss.kind === 'giant' ? '초대형' : '보스'} ${boss.attrs.map((a) => this.attributes[a.key].icon).join('')}`;
+      const label = `${boss.kind === 'giant' ? '초대형' : '보스'} ${boss.attrs.map((a) => a.key).join(',')}`;
+      if (this._bossLabel !== label) {
+        this._bossLabel = label;
+        this.bossName.replaceChildren(boss.kind === 'giant' ? '초대형 ' : '보스 ', ...boss.attrs.map((a) => icon('icon.' + a.key, this.attributes[a.key].icon)));
+      }
       this.bossFill.style.width = `${(boss.hp / boss.maxHp) * 100}%`;
     }
   }

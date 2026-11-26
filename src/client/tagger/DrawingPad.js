@@ -1,6 +1,7 @@
 import { Emitter } from '../Emitter.js';
 import { drawStrokes } from '../render/PaperCutout.js';
 import { CANVAS_SIZE } from '../../shared/judge/StrokeRasterizer.js';
+import { img } from '../render/Images.js';
 
 // 도화지 (마우스로 그리기). 획 데이터만 들고 있고, 판정은 모른다 (SRP).
 
@@ -101,16 +102,20 @@ export class DrawingPad extends Emitter {
   render() {
     const g = this.ctx;
     const S = CANVAS_SIZE;
-    g.fillStyle = '#f6f1e6';
-    g.fillRect(0, 0, S, S);
-    // 공책 줄
-    g.strokeStyle = 'rgba(80,110,170,0.13)';
-    g.lineWidth = 1;
-    for (let y = 32; y < S; y += 32) {
-      g.beginPath();
-      g.moveTo(0, y);
-      g.lineTo(S, y);
-      g.stroke();
+    const paper = img('ui.paper');
+    if (paper) g.drawImage(paper, 0, 0, S, S);
+    else {
+      g.fillStyle = '#f6f1e6';
+      g.fillRect(0, 0, S, S);
+      // 공책 줄
+      g.strokeStyle = 'rgba(80,110,170,0.13)';
+      g.lineWidth = 1;
+      for (let y = 32; y < S; y += 32) {
+        g.beginPath();
+        g.moveTo(0, y);
+        g.lineTo(S, y);
+        g.stroke();
+      }
     }
     const lg = this.layer.getContext('2d');
     lg.clearRect(0, 0, S, S);

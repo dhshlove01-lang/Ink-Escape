@@ -1,4 +1,5 @@
 import { el } from './dom.js';
+import { url } from '../render/Images.js';
 import { faceCanvas } from '../render/AnimalModels.js';
 import { ANIMALS, ANIMAL_NAMES, ROLE, MSG } from '../../shared/protocol.js';
 
@@ -47,8 +48,8 @@ export class TitleView {
         'div',
         { class: 'title-card' },
         faces,
-        el('h1', {}, '비대칭 드로잉 FPS'),
-        el('p', { class: 'title-sub' }, '술래가 그린 그림이 3D 전장의 몬스터가 된다 · 프로토타입 v0.1'),
+        url('ui.logo') ? el('h1', { class: 'logo' }, el('img', { src: url('ui.logo'), alt: 'INK ESCAPE' })) : el('h1', {}, 'INK ESCAPE'),
+        el('p', { class: 'title-sub' }, '술래가 그린 그림이 3D 전장의 몬스터가 된다 · 비대칭 드로잉 FPS 프로토타입'),
         el('label', { class: 'field' }, el('span', {}, '닉네임'), name),
         el('div', { class: 'title-actions' },
           el('button', { class: 'btn primary', onclick: () => run(() => onCreate(getName())) }, '방 만들기'),

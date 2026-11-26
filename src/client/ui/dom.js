@@ -1,4 +1,18 @@
+import { url } from '../render/Images.js';
+
 // 작은 DOM 도우미들.
+
+/** 아이콘 이미지(있으면) 또는 대체 글자(이모지) */
+export function icon(key, fallback = '') {
+  const u = url(key);
+  if (!u) return document.createTextNode(fallback);
+  const im = document.createElement('img');
+  im.src = u;
+  im.alt = fallback;
+  im.className = 'ico';
+  im.draggable = false;
+  return im;
+}
 
 export function el(tag, attrs = {}, ...children) {
   const e = document.createElement(tag);

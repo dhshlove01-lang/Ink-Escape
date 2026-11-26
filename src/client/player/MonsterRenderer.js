@@ -1,6 +1,8 @@
 import * as THREE from 'three';
 import { EV } from '../../shared/protocol.js';
 import { buildCutout } from '../render/PaperCutout.js';
+import { texture, img } from '../render/Images.js';
+import { vfxSprite } from './Effects.js';
 
 // 몬스터 = 술래 그림 빌보드. 보는 사람 쪽으로 세로축만 돌린다 (종이 인형처럼 서 있음).
 // 빨간 장판(소환 예고), 원거리 탄도 여기서 그린다.
@@ -41,11 +43,22 @@ function zoneTexture(boss) {
   return t;
 }
 
-function iconSprite(text) {
+function iconSprite(text, keys = []) {
   const c = document.createElement('canvas');
   c.width = 128;
   c.height = 64;
   const g = c.getContext('2d');
+  const ims = keys.map((k) => img('icon.' + k)).filter(Boolean);
+  if (ims.length && ims.length === keys.length) {
+    const sz = 58;
+    const x0 = 64 - (ims.length * sz) / 2;
+    ims.forEach((im, i) => g.drawImage(im, x0 + i * sz, 3, sz, sz));
+    const t = new THREE.CanvasTexture(c);
+    t.colorSpace = THREE.SRGBColorSpace;
+    const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: t, depthWrite: false, transparent: true }));
+    s.scale.set(0.9, 0.45, 1);
+    return s;
+  }
   g.font = '44px "Segoe UI Emoji","Apple Color Emoji","Noto Color Emoji",sans-serif';
   g.textAlign = 'center';
   g.textBaseline = 'middle';
@@ -68,7 +81,10 @@ export class MonsterRenderer {
     this.items = new Map();
     this.zones = new Map();
     this.projs = new Map();
-    this.zoneTex = { normal: zoneTexture(false), boss: zoneTexture(true) };
+    // 소환 원: 사용자 이미지(일반은 투명 배경, 보스는 검은 배경 → 가산 합성), 없으면 코드로 그린 원
+    const userBoss = texture('vfx.summon_boss');
+    this.zoneTex = { normal: texture('vfx.summon') || zoneTexture(false), boss: userBoss || zoneTexture(true) };
+    this.bossAdditive = !!userBoss;
     this.projGeo = new THREE.SphereGeometry(0.22, 12, 10);
     this.barBg = new THREE.SpriteMaterial({ color: 0x1a1414, depthWrite: false });
 
@@ -131,7 +147,7 @@ export class MonsterRenderer {
 
     // 머리 위: 속성 아이콘 + HP 막대
     const icons = st.attrs.map((a) => this.attributes[a.key].icon).join('');
-    const icon = iconSprite(icons);
+    const icon = iconSprite(icons, st.attrs.map((a) => a.key));
     icon.position.y = baseY + st.height + 0.55;
     group.add(icon);
     const barW = Math.max(0.9, Math.min(2.4, st.width));
@@ -174,10 +190,17 @@ export class MonsterRenderer {
     const r = e.kind === 'normal' ? e.r + 0.4 : e.r + 1.5;
     const mesh = new THREE.Mesh(
       new THREE.CircleGeometry(r, 40),
-      new THREE.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false, opacity: 0.9 }),
+      new THREE.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false, opacity: 0.9, blending: e.kind !== 'normal' && this.bossAdditive ? THREE.AdditiveBlending : THREE.NormalBlending }),
     );
     mesh.rotation.x = -Math.PI / 2;
     mesh.position.set(e.x, 0.04, e.z);
+    // 멀리서도 잘 보이게 반투명 빨간 바닥을 원 밑에 깐다
+    const fill = new THREE.Mesh(
+      new THREE.CircleGeometry(r * 0.92, 40),
+      new THREE.MeshBasicMaterial({ color: 0xd01828, transparent: true, opacity: 0.32, depthWrite: false }),
+    );
+    fill.position.z = -0.005; // 원 메시가 눕혀져 있어서 로컬 z 가 위쪽
+    mesh.add(fill);
     this.scene.add(mesh);
     const light = new THREE.PointLight(0xff2030, e.kind === 'normal' ? 12 : 40, r * 3, 1.5);
     light.position.set(e.x, 1.2, e.z);
@@ -299,7 +322,7 @@ export class MonsterRenderer {
       let m = this.projs.get(id);
       if (!m) {
         const color = this.attributes[p.color]?.aura || '#ffffff';
-        m = new THREE.Mesh(this.projGeo, new THREE.MeshBasicMaterial({ color }));
+        m = vfxSprite('vfx.proj_' + p.color, 1.0) || new THREE.Mesh(this.projGeo, new THREE.MeshBasicMaterial({ color }));
         this.scene.add(m);
         this.projs.set(id, m);
       }
@@ -309,6 +332,7 @@ export class MonsterRenderer {
         continue;
       }
       m.position.set(p.x + p.vx * age, p.y + p.vy * age, p.z + p.vz * age);
+      if (m.isSprite) m.material.rotation += dt * 6;
     }
   }
 
