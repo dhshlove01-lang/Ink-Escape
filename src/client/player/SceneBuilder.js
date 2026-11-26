@@ -213,42 +213,70 @@ export function buildScene(map) {
     );
     pillar.position.set(d.center.x, 20, d.center.z);
     scene.add(pillar);
-    const light = new THREE.PointLight(0xff3048, 0, 26, 1.4);
-    light.position.set(d.center.x - d.dir.x * 3, 3, d.center.z - d.dir.z * 3);
-    scene.add(light);
-    return { bars: g, pillar, light };
+    return { bars: g, pillar, lightPos: new THREE.Vector3(d.center.x - d.dir.x * 3, 3, d.center.z - d.dir.z * 3) };
   });
+  // 문 조명은 하나만 (예고된 문으로 옮긴다). 조명 개수가 바뀌면 셰이더를 다시 만들어 끊기므로 개수는 고정.
+  const doorLight = new THREE.PointLight(0xff3048, 0, 26, 1.4);
+  scene.add(doorLight);
 
-  // 횃불
+  // 횃불: 벽에 붙은 받침 + 비스듬한 손잡이 + 불꽃. 불꽃 그림은 모두, 실제 빛은 카메라에서 가까운 몇 개만.
   const flameTex = flameTexture();
+  const ironMat = new THREE.MeshLambertMaterial({ color: 0x2e2622 });
+  const woodMat = new THREE.MeshLambertMaterial({ color: 0x4a3020 });
+  const plateGeo = new THREE.BoxGeometry(0.32, 0.5, 0.06);
+  const armGeo = new THREE.CylinderGeometry(0.045, 0.035, 0.55, 8);
+  const cupGeo = new THREE.CylinderGeometry(0.13, 0.07, 0.16, 10);
   const torches = map.torches.map((t, i) => {
-    const holder = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.05, 0.6, 8), new THREE.MeshLambertMaterial({ color: 0x3a2a20 }));
-    holder.position.set(t.x, 3.2, t.z + 0.15);
+    const g = new THREE.Group();
+    g.position.set(t.x, 3.0, t.z);
+    g.rotation.y = Math.atan2(t.nx, t.nz); // 로컬 +Z 가 방 안쪽
+    const plate = new THREE.Mesh(plateGeo, ironMat);
+    plate.position.set(0, 0, 0.03);
+    const arm = new THREE.Mesh(armGeo, woodMat);
+    arm.rotation.x = 0.6; // 위로 비스듬히 벽에서 나옴
+    arm.position.set(0, 0.2, 0.2);
+    const cup = new THREE.Mesh(cupGeo, ironMat);
+    cup.position.set(0, 0.45, 0.36);
     const flame = new THREE.Sprite(new THREE.SpriteMaterial({ map: flameTex, blending: THREE.AdditiveBlending, depthWrite: false }));
     flame.scale.set(0.7, 0.9, 1);
-    flame.position.set(t.x, 3.7, t.z + 0.2);
-    const light = new THREE.PointLight(0xff9a4a, 70, 30, 1.5);
-    light.position.set(t.x, 3.6, t.z + 0.8);
-    scene.add(holder, flame, light);
-    return { flame, light, phase: i * 1.7 };
+    flame.position.set(0, 0.82, 0.38);
+    g.add(plate, arm, cup, flame);
+    scene.add(g);
+    const tip = new THREE.Vector3(t.x + t.nx * 0.9, 3.75, t.z + t.nz * 0.9);
+    return { flame, tip, phase: i * 1.7 };
+  });
+  const TORCH_LIGHTS = 4;
+  const pool = Array.from({ length: TORCH_LIGHTS }, () => {
+    const l = new THREE.PointLight(0xff9a4a, 0, 30, 1.5);
+    scene.add(l);
+    return l;
   });
 
   addDecals(scene, map);
 
   return {
     scene,
-    update(time) {
+    // camPos: 이 카메라에서 가까운 횃불 몇 개에만 실제 빛을 옮겨 단다
+    update(time, camPos) {
       for (const t of torches) {
-        const f = 0.85 + Math.sin(time * 9 + t.phase) * 0.08 + Math.sin(time * 23 + t.phase * 2) * 0.05;
-        t.light.intensity = 70 * f;
-        t.flame.scale.set(0.7 * f, 0.95 * f, 1);
+        t.f = 0.85 + Math.sin(time * 9 + t.phase) * 0.08 + Math.sin(time * 23 + t.phase * 2) * 0.05;
+        t.flame.scale.set(0.7 * t.f, 0.95 * t.f, 1);
+        t.d = camPos ? t.tip.distanceToSquared(camPos) : 0;
       }
+      const near = camPos ? [...torches].sort((a, b) => a.d - b.d) : torches;
+      pool.forEach((l, k) => {
+        const t = near[k];
+        if (!t) return (l.intensity = 0);
+        l.position.copy(t.tip);
+        l.intensity = 70 * t.f;
+      });
     },
     revealDoor(i) {
       const d = doors[i];
       if (!d) return;
       d.pillar.material.opacity = 0.18;
-      d.light.intensity = 60;
+      doorLight.position.copy(d.lightPos);
+      doorLight.intensity = 60;
     },
     openDoor(i) {
       const d = doors[i];
@@ -256,8 +284,9 @@ export function buildScene(map) {
       d.bars.visible = false;
       d.pillar.material.color.set(0x7dffb0);
       d.pillar.material.opacity = 0.25;
-      d.light.color.set(0x9dffc0);
-      d.light.intensity = 90;
+      doorLight.position.copy(d.lightPos);
+      doorLight.color.set(0x9dffc0);
+      doorLight.intensity = 90;
     },
     doors,
   };

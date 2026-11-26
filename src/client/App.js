@@ -31,9 +31,12 @@ export class App {
     this.loop();
   }
 
+  // 화면 갱신은 초당 최대 60번 (고주사율 모니터에서 쉬지 않고 그려 팬이 도는 것 방지)
   loop() {
+    const MIN_FRAME = 1000 / 60 - 0.5;
     const frame = (t) => {
       this._raf = requestAnimationFrame(frame);
+      if (this._last && t - this._last < MIN_FRAME) return;
       const dt = Math.min(0.05, (t - (this._last || t)) / 1000);
       this._last = t;
       if (!this.views) return;

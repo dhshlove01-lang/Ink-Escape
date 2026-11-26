@@ -44,7 +44,7 @@ export class WorldRenderer {
   }
 
   update(dt, time, camera) {
-    this.world.update(time);
+    this.world.update(time, camera.position);
     this.monsters.update(dt, camera, time);
     this.remotes.update(dt, time);
     this.effects.update(dt);

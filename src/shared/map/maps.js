@@ -64,11 +64,21 @@ function buildDungeon() {
   door('door.west', [[0, wy - 1], [0, wy], [0, wy + 1], [1, wy - 1], [1, wy], [1, wy + 1]], { x: -1, z: 0 });
   door('door.east', [[W - 1, wy - 1], [W - 1, wy], [W - 1, wy + 1], [W - 2, wy - 1], [W - 2, wy], [W - 2, wy + 1]], { x: 1, z: 0 });
 
-  // 횃불: 각 방 위쪽 벽 가운데
+  // 횃불: 각 방의 위·아래 벽에 하나씩. 벽 가운데가 통로 구멍이면 옆으로 옮겨 실제 벽 칸에 붙인다.
   const torches = [];
+  const isWall = (x, y) => x >= 0 && y >= 0 && x < W && y < H && cells[y * W + x] === TILE.WALL;
   for (let r = 0; r < 3; r++) {
     for (let c = 0; c < 3; c++) {
-      torches.push({ x: (colX[c] + colW[c] / 2) * CELL, z: rowY[r] * CELL + 0.25, nx: 0, nz: 1 });
+      const x0 = colX[c], w = colW[c], y0 = rowY[r];
+      const mid = x0 + Math.floor(w / 2);
+      for (const [wallY, zFace, nz] of [[y0 - 1, y0 * CELL, 1], [y0 + rowH, (y0 + rowH) * CELL, -1]]) {
+        for (let k = 0; k < w; k++) {
+          const x = mid + (k % 2 ? -1 : 1) * Math.ceil(k / 2);
+          if (x < x0 || x >= x0 + w || !isWall(x, wallY)) continue;
+          torches.push({ x: (x + 0.5) * CELL, z: zFace, nx: 0, nz });
+          break;
+        }
+      }
     }
   }
 

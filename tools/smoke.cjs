@@ -9,10 +9,10 @@ const URL = process.env.URL || 'http://localhost:8765/index.html';
   page.on('pageerror', (e) => errors.push(e.message));
   page.on('response', (r) => r.status() >= 400 && !r.url().includes('fonts.g') && errors.push(`${r.status()} ${r.url()}`));
   await page.goto(URL, { waitUntil: 'domcontentloaded' });
-  await page.waitForSelector('text=혼자 테스트', { timeout: 30000 });
-  await page.click('text=혼자 테스트');
+  await page.waitForSelector('.btn.ghost', { timeout: 30000 });
+  await page.click('.btn.ghost');
   await page.waitForTimeout(300);
-  await page.click('text=게임 시작');
+  await page.click('.btn.primary.big');
   await page.waitForTimeout(800);
   await page.keyboard.press('Tab');
   await page.evaluate(() => {

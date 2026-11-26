@@ -202,17 +202,15 @@ export class MonsterRenderer {
     fill.position.z = -0.005; // 원 메시가 눕혀져 있어서 로컬 z 가 위쪽
     mesh.add(fill);
     this.scene.add(mesh);
-    const light = new THREE.PointLight(0xff2030, e.kind === 'normal' ? 12 : 40, r * 3, 1.5);
-    light.position.set(e.x, 1.2, e.z);
-    this.scene.add(light);
-    this.zones.set(e.id, { mesh, light, until: performance.now() + e.delay * 1000 + 400 });
+    // 조명은 쓰지 않는다 (조명 개수가 바뀌면 화면이 끊김) — 빨간 바닥이 빛 역할
+    this.zones.set(e.id, { mesh, until: performance.now() + e.delay * 1000 + 400 });
     this.sfx.play('pending');
   }
 
   removeZone(id) {
     const z = this.zones.get(id);
     if (!z) return;
-    this.scene.remove(z.mesh, z.light);
+    this.scene.remove(z.mesh);
     z.mesh.geometry.dispose();
     this.zones.delete(id);
   }

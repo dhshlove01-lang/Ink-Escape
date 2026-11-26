@@ -22,7 +22,7 @@ export class CharacterStage {
     parent.append(this.root);
 
     this.renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+    this.renderer.setPixelRatio(1) // 고해상도 모니터에서 픽셀 수가 2배 넘게 늘지 않게;
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.root.append(this.renderer.domElement);
 
@@ -273,6 +273,7 @@ export class CharacterStage {
     const tick = (t) => {
       this._raf = requestAnimationFrame(tick);
       if (this.paused) return;
+      if (this._last && t - this._last < 1000 / 60 - 0.5) return; // 최대 60fps
       const dt = Math.min(0.05, ((t - (this._last || t)) / 1000) || 0.016);
       this._last = t;
       this.update(dt);
