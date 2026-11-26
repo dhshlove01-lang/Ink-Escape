@@ -75,7 +75,8 @@ export const BALANCE = {
     sizeSlow: 0.3,       // 클수록 최대 30% 느려짐
     meleeDps: 8,
     flyHeight: 3,
-    maxHeight: 6.4,      // 천장(벽 높이 7m) 아래로 — 보스·초대형도 이 키를 넘지 않는다 (비행이면 3m 위에서 시작하니 그만큼 뺀다)
+    maxHeight: 5.4,      // 몬스터 꼭대기 한계(m). 천장 7m 에서 종이 테두리·흔들림·머리 위 아이콘 여유를 뺀 값 — 보스·초대형도 넘지 않는다
+    minFlyY: 0.6,        // 큰 비행 몬스터는 천장에 닿지 않게 이만큼까지 낮게 난다
     dashCd: 6,
     dashMult: 3,
     dashSec: 0.6,

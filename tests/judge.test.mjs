@@ -35,16 +35,21 @@ test('빈 그림과 너무 작은 그림은 소환 불가', () => {
   assert.equal(judge.judge([circle(256, 256, 30, 1)], opt).ok, false);
 });
 
-test('빨강으로 채우면 화염 속성', () => {
-  const r = judge.judge(fill(256, 256, 120, 2), opt);
-  assert.ok(r.ok);
-  assert.deepEqual(r.attrs.map((a) => a.key), ['red']);
+test('속성은 색과 무관하게 술래가 고른 것 (C안), 안 고르면 기본', () => {
+  const red = fill(256, 256, 120, 2);
+  assert.deepEqual(judge.judge(red, { ...opt, attr: 'blue' }).attrs.map((a) => a.key), ['blue']);
+  const plain = judge.judge(red, opt);
+  assert.ok(plain.ok);
+  assert.deepEqual(plain.attrs, []);
+  assert.deepEqual(judge.judge(red, { ...opt, attr: 'nope' }).attrs, []);
 });
 
-test('검정 반 + 빨강 반 = 속성 2개 반반 (검정 외곽선 보정 포함)', () => {
-  const r = judge.judge([...fill(150, 256, 90, 1), ...fill(360, 256, 90, 2)], opt);
-  assert.equal(r.attrs.length, 2);
-  assert.ok(r.attrs.every((a) => a.w === 0.5));
+test('몬스터 키는 천장 아래 (보스·초대형·비행 포함)', () => {
+  const big = fill(256, 256, 250, 2);
+  for (const o of [{ boss: true }, { boss: true, allIn: true }]) {
+    const r = judge.judge(big, { ...opt, ...o });
+    assert.ok(r.stats.flyY + r.stats.height <= 5.4 + 1e-6, JSON.stringify(r.stats));
+  }
 });
 
 test('날개 → 비행, 날개 끝은 촉수로 치지 않음', () => {

@@ -63,7 +63,7 @@ export function createMonster(id, pending, balance) {
     id,
     x: pending.x,
     z: pending.z,
-    y: s.fly ? balance.monster.flyHeight : 0,
+    y: s.flyY ?? (s.fly ? balance.monster.flyHeight : 0),
     stats: s,
     hp: s.hp,
     maxHp: s.hp,

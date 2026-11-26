@@ -10,23 +10,9 @@ export class StatCalculator {
     this.attrs = attributes;
   }
 
-  // 칠한 면적 기준 주 색상. 검정은 외곽선 보정으로 0.6배.
-  attributesFrom(colorCounts) {
-    const j = this.b.judge;
-    const weighted = [];
-    for (let i = 1; i < colorCounts.length; i++) {
-      const p = this.palette[i];
-      if (!p) continue;
-      const v = colorCounts[i] * (p.key === 'black' ? j.blackWeight : 1);
-      if (v > 0) weighted.push({ key: p.key, v });
-    }
-    weighted.sort((a, b) => b.v - a.v);
-    if (!weighted.length) return [];
-    const [first, second] = weighted;
-    if (second && second.v >= first.v * j.dualRatio) {
-      return [{ key: first.key, w: 0.5 }, { key: second.key, w: 0.5 }];
-    }
-    return [{ key: first.key, w: 1 }];
+  // 속성은 색과 무관하게 술래가 고른 것 (opt.attr). 없으면 '기본' (속성 효과 없음).
+  attributesFrom(attr) {
+    return attr && this.attrs[attr] ? [{ key: attr, w: 1 }] : [];
   }
 
   mult(attrs, prop) {
@@ -58,8 +44,7 @@ export class StatCalculator {
     if (analysis.areaPct < b.ink.minAreaPct) return fail(msg('judge.smallArea', { n: b.ink.minAreaPct }), analysis);
     if (analysis.extent < b.ink.minExtent) return fail(msg('judge.smallSize'), analysis);
 
-    const attrs = this.attributesFrom(analysis.colorCounts);
-    if (!attrs.length) return fail(msg('judge.noColor'), analysis);
+    const attrs = this.attributesFrom(opt.attr);
 
     const kind = opt.boss && opt.allIn ? 'giant' : opt.boss ? 'boss' : 'normal';
     const baseInk = Math.ceil(analysis.areaPct);
@@ -112,13 +97,13 @@ export class StatCalculator {
       speed *= b.giant.speed;
     }
 
-    // 천장 아래로 키 제한 (비율 유지해서 줄임)
-    const maxH = m.maxHeight - (t.fly ? m.flyHeight : 0);
-    if (height > maxH) {
-      const k = maxH / height;
+    // 천장 아래로 키 제한 (비율 유지해서 줄임). 비행은 기본 3m 위, 크면 그만큼 낮게 난다.
+    if (height > m.maxHeight) {
+      const k = m.maxHeight / height;
       height *= k;
       width *= k;
     }
+    const flyY = t.fly ? Math.max(m.minFlyY, Math.min(m.flyHeight, m.maxHeight - height)) : 0;
 
     // 원거리: 촉수 길이 비례, 보라(독)는 15m, 둘 다면 1.3배
     const j = b.judge;
@@ -136,6 +121,7 @@ export class StatCalculator {
       kind,
       attrs,
       fly: !!t.fly,
+      flyY: round2(flyY),
       dash: !!t.dash,
       ranged: Math.round(ranged * 10) / 10,
       hp: Math.round(hp),

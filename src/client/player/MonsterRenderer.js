@@ -3,6 +3,9 @@ import { EV } from '../../shared/protocol.js';
 import { buildCutout } from '../render/PaperCutout.js';
 import { texture, img } from '../render/Images.js';
 import { vfxSprite } from './Effects.js';
+import { WALL_H } from '../../shared/map/GameMap.js';
+
+const CEIL = WALL_H - 0.05; // 몬스터 그림·아이콘은 천장을 넘지 않는다 (바닥처럼 막힘)
 
 // 몬스터 = 술래 그림 빌보드. 보는 사람 쪽으로 세로축만 돌린다 (종이 인형처럼 서 있음).
 // 빨간 장판(소환 예고), 원거리 탄도 여기서 그린다.
@@ -112,7 +115,7 @@ export class MonsterRenderer {
     const pw = cut.canvas.width * s, ph = cut.canvas.height * s;
     const mat = new THREE.MeshBasicMaterial({ map: tex, transparent: true, alphaTest: 0.4, side: THREE.DoubleSide });
     const plane = new THREE.Mesh(new THREE.PlaneGeometry(pw, ph), mat);
-    const baseY = st.fly ? 3 : 0;
+    const baseY = st.flyY ?? (st.fly ? 3 : 0);
     plane.position.y = baseY - cut.pad * s + ph / 2;
     const group = new THREE.Group();
     group.add(plane);
@@ -128,7 +131,7 @@ export class MonsterRenderer {
     group.add(shadow);
 
     // 속성 오라
-    const auraColor = new THREE.Color(this.attributes[st.attrs[0].key].aura);
+    const auraColor = new THREE.Color(st.attrs[0] ? this.attributes[st.attrs[0].key].aura : '#efe7d6'); // 기본(속성 없음)은 종이색
     const n = 16;
     const pos = new Float32Array(n * 3);
     const aura = new THREE.Points(
@@ -148,16 +151,16 @@ export class MonsterRenderer {
     // 머리 위: 속성 아이콘 + HP 막대
     const icons = st.attrs.map((a) => this.attributes[a.key].icon).join('');
     const icon = iconSprite(icons, st.attrs.map((a) => a.key));
-    icon.position.y = baseY + st.height + 0.55;
+    icon.position.y = Math.min(baseY + st.height + 0.55, CEIL - 0.3);
     group.add(icon);
     const barW = Math.max(0.9, Math.min(2.4, st.width));
     const bg = new THREE.Sprite(this.barBg);
     bg.scale.set(barW + 0.06, 0.13, 1);
-    bg.position.y = baseY + st.height + 0.2;
+    bg.position.y = Math.min(baseY + st.height + 0.2, CEIL - 0.65);
     const fg = new THREE.Sprite(new THREE.SpriteMaterial({ color: 0xe0303f, depthWrite: false }));
     fg.center.set(0, 0.5);
     fg.scale.set(barW, 0.09, 1);
-    fg.position.set(-barW / 2, baseY + st.height + 0.2, 0);
+    fg.position.set(-barW / 2, bg.position.y, 0);
     const bar = new THREE.Group();
     bar.add(bg, fg);
     bar.visible = false;
@@ -165,7 +168,7 @@ export class MonsterRenderer {
 
     this.scene.add(group);
     this.items.set(e.id, {
-      id: e.id, group, plane, mat, st, baseY, planeY: plane.position.y, aura, aura2, bar, fg, barW,
+      id: e.id, group, plane, mat, st, baseY, planeY: plane.position.y, ph, aura, aura2, bar, fg, barW,
       born: performance.now(), flashT: 0, dying: 0, phase: Math.random() * 10, lastX: e.x, lastZ: e.z,
     });
     this.removeZone(e.id);
@@ -275,6 +278,9 @@ export class MonsterRenderer {
       it.plane.scale.set(sx * pop, sy * pop, 1);
       it.plane.rotation.z = lean;
       it.plane.position.y = it.planeY + bob;
+      // 흔들림·등장 연출로 커져도 천장 위로 못 나간다
+      const top = it.plane.position.y + (it.ph * sy * pop) / 2;
+      if (top > CEIL) it.plane.position.y -= top - CEIL;
       // 맞으면 하얗게 번쩍
       it.flashT = Math.max(0, it.flashT - dt * 8);
       const f = 1 + it.flashT * 2.5;

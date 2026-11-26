@@ -31,6 +31,7 @@ export class TaggerView {
     this.pad = new DrawingPad({ palette, classify: nearestPaletteIndex });
     this.picker = new ColorPicker(this.pad.rgb);
     this.placing = null; // SPAWN 을 누른 뒤 지도 클릭을 기다리는 그림
+    this.attr = null; // 고른 속성 (null = 기본). 색과 무관 — 사용자 C안
     this.topdown = new TopDownMap({ session, palette, balance });
     this.cam = new CornerCam({ session, palette, attributes, balance });
     // 왼쪽 화면 목록: 탑뷰 지도 + 플레이어별 3D 구석 카메라 (◀ ▶ 로 넘김)
@@ -77,7 +78,8 @@ export class TaggerView {
       const hp = el('div', { class: 'mini-fill' });
       const info = el('span', { class: 'tg-pinfo' });
       const face = faceCanvas(p.animal, 36);
-      const row = el('div', { class: 'tg-prow' }, face, el('div', { class: 'tg-pbody' }, el('div', {}, el('b', {}, p.name), info), el('div', { class: 'mini-bar' }, hp)));
+      // 카드를 누르면 그 플레이어를 머리 위에서 따라가는 화면
+      const row = el('button', { class: 'tg-prow', title: t('tagger.followTitle', { name: p.name }), onclick: () => this.setView(this.leftViews.indexOf(p.id)) }, face, el('div', { class: 'tg-pbody' }, el('div', {}, el('b', {}, p.name), info), el('div', { class: 'mini-bar' }, hp)));
       this.plist.append(row);
       this.prows.set(p.id, { row, hp, info });
     }
@@ -96,14 +98,13 @@ export class TaggerView {
     this.inkText = el('span', { class: 'ink-text' });
     // 고른 색 + 그 색이 될 속성 (가장 가까운 기본 색)
     this.cpSwatch = el('span', { class: 'cp-swatch' });
-    this.cpAttr = el('span', { class: 'cp-attr' });
     this.brushBtns = BRUSHES.map((b) => el('button', { class: 'tool brush', title: t('brush.' + b.key), onclick: () => this.pad.setWidth(b.w) }, el('i', { style: { width: `${b.w / 2.4}px`, height: `${b.w / 2.4}px` } })));
     this.eraserBtn = el('button', { class: 'tool', title: t('tagger.eraser'), onclick: () => this.pad.setEraser(!this.pad.eraser) }, '⌫');
     const tools = el(
       'div',
       { class: 'tg-side' },
       this.picker.root,
-      el('div', { class: 'cp-info' }, this.cpSwatch, this.cpAttr),
+      el('div', { class: 'cp-info' }, this.cpSwatch, el('span', { class: 'cp-hex' })),
       el('div', { class: 'tg-tools' },
       ...this.brushBtns,
       this.eraserBtn,
@@ -112,6 +113,14 @@ export class TaggerView {
       ),
     );
     this.previewEl = el('div', { class: 'tg-preview' });
+    // 속성 고르기: 기본 + 5속성 (숫자키 0~5)
+    this.attrKeys = [null, ...this.palette.filter(Boolean).map((p) => p.key)];
+    this.attrBtns = this.attrKeys.map((k, i) =>
+      el('button', { class: 'attr-btn', title: `${k ? t('attr.' + k) : t('attr.none')} (${i})`, onclick: () => this.setAttr(k) },
+        k ? icon('icon.' + k, this.attributes[k].icon) : el('span', { class: 'attr-none' }, '—'),
+        el('span', { class: 'attr-name' }, k ? t('attr.' + k) : t('attr.none'))),
+    );
+    this.attrRow = el('div', { class: 'attr-row' }, el('span', { class: 'attr-label' }, t('tagger.attrTitle')), ...this.attrBtns);
     this.bossBtn = el('button', { class: 'toggle', onclick: () => this.toggle('boss') }, t('tagger.boss'));
     this.allInBtn = el('button', { class: 'toggle', onclick: () => this.toggle('allIn') }, t('tagger.allIn'));
     this.slots = el('div', { class: 'tg-slots' });
@@ -121,6 +130,7 @@ export class TaggerView {
       { class: 'tg-right' },
       el('header', { class: 'tg-ink' }, el('span', { class: 'ink-label' }, t('tagger.ink')), this.inkBar, this.inkText),
       el('div', { class: 'tg-padrow' }, el('div', { class: 'tg-padwrap' }, this.pad.canvas), tools),
+      this.attrRow,
       this.previewEl,
       el('div', { class: 'tg-actions' }, this.bossBtn, this.allInBtn, el('div', { class: 'grow' }), this.spawnBtn),
       el('div', { class: 'tg-slots-wrap' }, el('span', { class: 'slots-label' }, t('tagger.recall')), this.slots),
@@ -141,6 +151,7 @@ export class TaggerView {
     if (!isMap) this.cam.setFollow(v);
     const label = isMap ? t('tagger.mapView') : t('tagger.camView', { name: this.session.nameOf(v) });
     this.viewLabel.textContent = `${label}  (${this.viewIdx + 1}/${n})`;
+    for (const [id, r] of this.prows) r.row.classList.toggle('watching', id === v);
   }
 
   setActive(on) {
@@ -151,9 +162,9 @@ export class TaggerView {
   onKey(e) {
     if (!this.active || e.target instanceof HTMLInputElement) return;
     if (e.code.startsWith('Digit')) {
-      // 1~5: 기본 색 바로 고르기
+      // 0 = 기본, 1~5 = 속성 고르기
       const n = Number(e.code.slice(5));
-      if (n >= 1 && n < this.palette.length) this.picker.set(parseInt(this.palette[n].hex.slice(1), 16));
+      if (n >= 0 && n < this.attrKeys.length) this.setAttr(this.attrKeys[n]);
     }
     if (e.code === 'Escape') this.cancelPlace();
     if (e.code === 'KeyE') this.pad.setEraser(!this.pad.eraser);
@@ -161,6 +172,12 @@ export class TaggerView {
     if (e.code === 'Enter') this.beginPlace(this.pad.getStrokes(), true);
     if (e.code === 'ArrowLeft') this.setView(this.viewIdx - 1);
     if (e.code === 'ArrowRight') this.setView(this.viewIdx + 1);
+  }
+
+  setAttr(k) {
+    this.attr = k;
+    this.refreshTools();
+    this.refreshPreview();
   }
 
   toggle(k) {
@@ -172,11 +189,11 @@ export class TaggerView {
   }
 
   refreshTools() {
-    const ai = nearestPaletteIndex(this.pad.rgb);
-    const key = this.palette[ai].key;
-    this.cpSwatch.style.background = '#' + this.pad.rgb.toString(16).padStart(6, '0');
-    this.cpAttr.replaceChildren(t('picker.attr'), ' → ', icon('icon.' + key, this.attributes[key].icon), ' ' + t('attr.' + key));
+    const hex = '#' + this.pad.rgb.toString(16).padStart(6, '0');
+    this.cpSwatch.style.background = hex;
+    this.cpSwatch.nextSibling.textContent = hex.toUpperCase();
     this.picker.root.classList.toggle('dim', this.pad.eraser);
+    this.attrBtns.forEach((b, i) => b.classList.toggle('on', this.attrKeys[i] === this.attr));
     this.brushBtns.forEach((b, i) => b.classList.toggle('on', this.pad.width === BRUSHES[i].w));
     this.eraserBtn.classList.toggle('on', this.pad.eraser);
     this.bossBtn.classList.toggle('on', this.boss);
@@ -188,6 +205,7 @@ export class TaggerView {
     return {
       boss: this.boss,
       allIn: this.allIn,
+      attr: this.attr,
       ink: s ? s.ink : 0,
       frenzy: !!s?.open,
       inkProfile: { bossHp: this.bossHpMult() },
@@ -291,7 +309,7 @@ export class TaggerView {
     this.showPlacing(false);
     this.waiting = true;
     this.lastSent = { strokes, fromPad };
-    this.session.send({ t: MSG.SPAWN, strokes, x: w.x, z: w.z, boss: this.boss, allIn: this.allIn });
+    this.session.send({ t: MSG.SPAWN, strokes, x: w.x, z: w.z, boss: this.boss, allIn: this.allIn, attr: this.attr });
     this.refreshPreview();
   }
 

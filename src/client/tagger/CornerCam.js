@@ -4,12 +4,12 @@ import { WALL_H } from '../../shared/map/GameMap.js';
 import { PSTATE, STATUS_BIT } from '../../shared/protocol.js';
 import { WorldRenderer, SILENT } from '../render/WorldRenderer.js';
 
-// 술래 왼쪽 화면의 3D 구석 카메라: 따라갈 플레이어가 있는 방의 "가장 먼 구석 위"에서 실제 전장을 내려다본다.
+// 술래 왼쪽 화면의 3D 따라가기 카메라: 고른 플레이어의 머리 위·뒤에서 실제 전장을 내려다보며 따라간다.
 // 바닥을 클릭하면 소환 위치를 고른다 ('pick' 이벤트, 탑뷰와 같은 형식).
 // 처음 켤 때 만든다 (술래가 탑뷰만 쓰면 3D 를 그리지 않음).
 
-const CAM_HEIGHT = WALL_H + 11; // 기둥에 덜 가리도록 높이서 내려다본다
-const CORNER_INSET = 0.5;
+const CAM_HEIGHT = WALL_H + 6; // 벽 위에서 내려다본다 (천장은 플레이어 화면에만 있어서 안 가림)
+const FOLLOW_BACK = 5; // 플레이어 뒤로 이만큼
 
 export class CornerCam extends Emitter {
   constructor({ session, palette, attributes, balance }) {
@@ -77,20 +77,10 @@ export class CornerCam extends Emitter {
     return { x: hit.x, z: hit.z };
   }
 
-  // 따라갈 플레이어가 있는 방에서, 그 플레이어와 가장 먼 구석 위
-  cornerFor(p) {
-    const room = this.session.map.roomAt(p.x, p.z);
-    const xs = [room.x0 + CORNER_INSET, room.x1 - CORNER_INSET];
-    const zs = [room.z0 + CORNER_INSET, room.z1 - CORNER_INSET];
-    let best = null, bd = -1;
-    for (const x of xs) for (const z of zs) {
-      const d = Math.hypot(x - p.x, z - p.z);
-      if (d > bd) {
-        bd = d;
-        best = new THREE.Vector3(x, CAM_HEIGHT, z);
-      }
-    }
-    return best;
+  // 따라가는 플레이어의 머리 위·약간 뒤에서 내려다본다 (플레이어가 보는 방향 기준)
+  followSpot(p) {
+    const bx = Math.sin(p.yaw) * FOLLOW_BACK, bz = Math.cos(p.yaw) * FOLLOW_BACK; // 앞이 (-sin, -cos) 이므로 뒤는 (+sin, +cos)
+    return new THREE.Vector3(p.x + bx, CAM_HEIGHT, p.z + bz);
   }
 
   resize() {
@@ -133,7 +123,7 @@ export class CornerCam extends Emitter {
     this.resize();
     const p = this.followId && this.session.playerPos(this.followId);
     if (p) {
-      const want = this.cornerFor(p);
+      const want = this.followSpot(p);
       const look = new THREE.Vector3(p.x, 0.8, p.z);
       if (this.snap) {
         this.camPos.copy(want);

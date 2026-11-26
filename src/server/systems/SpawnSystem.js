@@ -28,6 +28,7 @@ export class SpawnSystem {
 
     const res = this.judge.judge(strokes, {
       boss: !!msg.boss,
+      attr: typeof msg.attr === 'string' ? msg.attr : null,
       allIn: !!msg.allIn,
       ink: t.ink,
       frenzy: m.doorOpen,
@@ -75,7 +76,7 @@ export class SpawnSystem {
         x: mon.x,
         z: mon.z,
         strokes: p.strokes,
-        st: { kind: s.kind, height: s.height, width: s.width, fly: s.fly, dash: s.dash, ranged: s.ranged, attrs: s.attrs, hp: s.hp },
+        st: { kind: s.kind, height: s.height, width: s.width, fly: s.fly, flyY: s.flyY, dash: s.dash, ranged: s.ranged, attrs: s.attrs, hp: s.hp },
       });
     }
   }

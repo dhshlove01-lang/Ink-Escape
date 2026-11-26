@@ -331,7 +331,9 @@ th { color: var(--muted); font-weight: 500; font-size: 13px; }
 .view-arrow.left { left: 8px; }
 .view-arrow.right { right: 8px; }
 .tg-players { display: flex; flex-wrap: wrap; gap: 8px; padding: 10px 14px; }
-.tg-prow { display: flex; align-items: center; gap: 6px; background: var(--ink-3); border-radius: 10px; padding: 4px 10px 4px 4px; min-width: 150px; }
+.tg-prow { display: flex; align-items: center; gap: 6px; background: var(--ink-3); border: 2px solid transparent; border-radius: 10px; padding: 4px 10px 4px 4px; min-width: 150px; text-align: left; cursor: pointer; }
+.tg-prow:hover { border-color: var(--line); }
+.tg-prow.watching { border-color: var(--pencil); box-shadow: 0 0 0 2px rgba(240,189,30,0.25); }
 .tg-prow.dead { opacity: 0.5; }
 .tg-pbody { display: grid; gap: 3px; flex: 1; }
 .tg-pinfo { color: var(--red-2); font-size: 12px; }
@@ -440,3 +442,12 @@ h1.logo img { display: block; width: min(340px, 78%); height: auto; margin: 0 au
 .lang-btn { background: transparent; border: 0; padding: 5px 12px; font-family: var(--font-body); font-size: 13px; color: var(--muted); }
 .lang-btn.on { background: var(--chalk); color: var(--ink); font-weight: 600; }
 .lang-btn:hover:not(.on) { color: var(--chalk); }
+
+/* 속성 고르기 (색과 별개) */
+.attr-row { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.attr-label { font-family: var(--font-display); font-size: 16px; color: var(--paper-2); margin-right: 2px; }
+.attr-btn { display: inline-flex; align-items: center; gap: 4px; background: var(--ink-3); border: 2px solid var(--line); border-radius: 999px; padding: 3px 10px 3px 4px; font-family: var(--font-display); font-size: 14px; }
+.attr-btn .ico { width: 1.6em; height: 1.6em; }
+.attr-btn.on { border-color: var(--pencil); background: rgba(240,189,30,0.16); }
+.attr-none { display: inline-grid; place-items: center; width: 1.6em; height: 1.6em; border-radius: 50%; background: var(--ink-2); color: var(--muted); }
+.cp-hex { font-family: var(--font-body); font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
