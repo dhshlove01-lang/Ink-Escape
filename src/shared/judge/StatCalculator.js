@@ -112,6 +112,14 @@ export class StatCalculator {
       speed *= b.giant.speed;
     }
 
+    // 천장 아래로 키 제한 (비율 유지해서 줄임)
+    const maxH = m.maxHeight - (t.fly ? m.flyHeight : 0);
+    if (height > maxH) {
+      const k = maxH / height;
+      height *= k;
+      width *= k;
+    }
+
     // 원거리: 촉수 길이 비례, 보라(독)는 15m, 둘 다면 1.3배
     const j = b.judge;
     let ranged = 0;

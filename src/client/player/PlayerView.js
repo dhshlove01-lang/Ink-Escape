@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { EV, MSG, PSTATE } from '../../shared/protocol.js';
 import { el, Banner } from '../ui/dom.js';
 import { WorldRenderer } from '../render/WorldRenderer.js';
+import { CEILING_LAYER } from './SceneBuilder.js';
 import { FpsController } from './FpsController.js';
 import { Weapon } from './Weapon.js';
 import { Hud } from './Hud.js';
@@ -30,6 +31,7 @@ export class PlayerView {
     this.remotes = this.view3d.remotes;
     this.camera = new THREE.PerspectiveCamera(75, 1, 0.05, 200);
     this.scene.add(this.camera);
+    this.camera.layers.enable(CEILING_LAYER); // 플레이어만 천장을 본다
 
     const animal = session.animalOf(session.me);
     this.ctrl = new FpsController({ camera: this.camera, dom: this.renderer.domElement, map: session.map, balance });
@@ -144,6 +146,7 @@ export class PlayerView {
     this.renderer.setSize(w, h);
     this.camera.aspect = w / h;
     this.camera.updateProjectionMatrix();
+    this.weapon?.resize(w / h);
   }
 
   raycast(origin, dir, range) {
@@ -256,7 +259,17 @@ export class PlayerView {
 
     this.view3d.update(dt, this.time, this.camera);
     this.hud.update({ weapon: this.weapon, me, prompt: rev.prompt, center, revive: rev.ring, boss: this.monsters.bossInfo() });
-    if (this.active) this.renderer.render(this.scene, this.camera);
+    if (this.active) {
+      // 전장 → 깊이 지우고 → 손·총 (낙서·이펙트가 손 위에 덮이지 않게)
+      const r = this.renderer;
+      r.autoClear = false;
+      r.clear();
+      r.render(this.scene, this.camera);
+      if (this.weapon.view.visible) {
+        r.clearDepth();
+        r.render(this.weapon.vmScene, this.weapon.vmCam);
+      }
+    }
   }
 
   // 죽었을 때: 살아 있는 팀원 시점으로 관전

@@ -41,6 +41,7 @@ export function createGunMesh(decorate = () => {}) {
 
 function primitiveGun() {
   const g = new THREE.Group();
+  g.userData.tip = { x: 0, y: 0.02, z: -0.53 }; // 총구 끝
   const body = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.14, 0.5), mat(0x2c2b33));
   const barrel = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 0.3, 10), mat(0x1c1b20));
   barrel.rotation.x = Math.PI / 2;
@@ -216,6 +217,7 @@ export function createViewModel(kind) {
   const L = ANIMAL_LOOK[kind] || ANIMAL_LOOK.shiba;
   const g = new THREE.Group();
   const gun = createGunMesh(toViewModelMaterial);
+  g.userData.gun = gun;
   gun.scale.setScalar(0.7);
   gun.rotation.y = 0.05; // 총구가 조준점 쪽, 옆면이 살짝 보이게
   g.add(gun);
@@ -228,14 +230,12 @@ export function createViewModel(kind) {
   return g;
 }
 
-// 1인칭 손·총은 벽에 파묻히지 않게 항상 맨 앞에, 조명 없이 그린다.
+// 1인칭 손·총은 조명 없이 그린다. 벽·낙서에 가려지지 않는 것은 Weapon 이 따로 마지막에 그리기 때문 (뷰모델 층).
 function toViewModelMaterial(root) {
   root.traverse((o) => {
     if (!o.isMesh || o.userData.vm) return;
     const src = o.material;
     o.material = new THREE.MeshBasicMaterial({ color: src.color.clone().multiplyScalar(src.map ? 1 : 0.8), map: src.map || null });
-    o.material.depthTest = false;
-    o.renderOrder = 10;
     o.userData.vm = true;
   });
 }

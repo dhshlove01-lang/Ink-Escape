@@ -128,6 +128,8 @@ function flameTexture() {
   return t;
 }
 
+export const CEILING_LAYER = 1;
+
 export function buildScene(map) {
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(0x0d0b12);
@@ -151,6 +153,17 @@ export function buildScene(map) {
   floor.rotation.x = -Math.PI / 2;
   floor.position.set(map.worldW / 2, 0, map.worldH / 2);
   scene.add(floor);
+
+  // 천장: 플레이어 화면에만 (레이어 1). 술래 구석 카메라는 벽 위에서 내려다보므로 레이어 0 만 본다.
+  const ceilTex = texture('tex.pillar', { repeat: [map.worldW / 4, map.worldH / 4] }) || texture('tex.wall', { repeat: [map.worldW / 4, map.worldH / 4] });
+  const ceiling = new THREE.Mesh(
+    new THREE.PlaneGeometry(map.worldW, map.worldH),
+    new THREE.MeshLambertMaterial({ map: ceilTex, color: ceilTex ? 0x7a7088 : 0x2a2630 }),
+  );
+  ceiling.rotation.x = Math.PI / 2; // 아래를 바라봄
+  ceiling.position.set(map.worldW / 2, WALL_H, map.worldH / 2);
+  ceiling.layers.set(CEILING_LAYER);
+  scene.add(ceiling);
 
   // 벽 (바닥과 닿은 벽만)
   const wallCells = [];
@@ -309,12 +322,18 @@ function addDecals(scene, map) {
     for (const f of faces) {
       const n = 1 + Math.floor(r() * 2);
       for (let i = 0; i < n; i++) {
-        const t = f.from + 1.5 + r() * (f.to - f.from - 3);
-        const x = f.axis === 'z' ? t : f.at + f.out * 0.5;
-        const z = f.axis === 'z' ? f.at + f.out * 0.5 : t;
-        if (!map.solidAt(x, z)) continue;
         const chalk = r() < 0.65;
         const size = chalk ? 1.1 + r() * 0.9 : 0.9 + r() * 0.7;
+        const half = size / 2 + 0.3; // 낙서 반폭 + 여유 (기울기 포함)
+        const t = f.from + half + r() * Math.max(0, f.to - f.from - half * 2);
+        // 낙서 폭 전체 뒤가 "진짜 벽"이어야 붙인다: 통로 구멍·모서리 밖·탈출 문(닫혀 있어도 벽 아님) 제외
+        let ok = true;
+        for (let u = t - half; u <= t + half + 1e-6 && ok; u += 0.25) {
+          const wx = f.axis === 'z' ? u : f.at + f.out * 0.5;
+          const wz = f.axis === 'z' ? f.at + f.out * 0.5 : u;
+          ok = map.tile(Math.floor(wx / CELL), Math.floor(wz / CELL)) === TILE.WALL;
+        }
+        if (!ok) continue;
         const px = f.axis === 'z' ? t : f.at - f.out * 0.03;
         const pz = f.axis === 'z' ? f.at - f.out * 0.03 : t;
         jobs.push({ url: pick(chalk ? DECALS.chalk : DECALS.red), size, pos: [px, 1.4 + r() * 3, pz], rot: [0, f.rotY, (r() - 0.5) * 0.5] });
@@ -324,8 +343,10 @@ function addDecals(scene, map) {
     for (let i = 0; i < 2; i++) {
       const x = room.x0 + 2 + r() * (room.x1 - room.x0 - 4);
       const z = room.z0 + 2 + r() * (room.z1 - room.z0 - 4);
-      if (!map.isFloor(x, z)) continue;
-      jobs.push({ url: pick(DECALS.red), size: 1.2 + r() * 1.2, pos: [x, 0.02, z], rot: [-Math.PI / 2, 0, r() * Math.PI * 2], floor: true });
+      const fs = 1.2 + r() * 1.2;
+      const h = fs * 0.75; // 회전해도 들어가게 대각선 반쯤
+      if (![[-h, -h], [h, -h], [-h, h], [h, h], [0, 0]].every(([dx, dz]) => map.isFloor(x + dx, z + dz))) continue;
+      jobs.push({ url: pick(DECALS.red), size: fs, pos: [x, 0.02, z], rot: [-Math.PI / 2, 0, r() * Math.PI * 2], floor: true });
     }
   }
   const geo = new THREE.PlaneGeometry(1, 1);

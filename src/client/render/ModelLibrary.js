@@ -52,6 +52,7 @@ export class ModelLibrary {
     });
     const outer = new THREE.Group();
     outer.add(holder);
+    if (def.tip === '-z') outer.userData.tip = findFrontTip(outer);
     return outer;
   }
 
@@ -99,4 +100,26 @@ function darkenNeutral(tex, factor) {
   out.wrapT = tex.wrapT;
   out.anisotropy = 4;
   return out;
+}
+
+// 모델에서 가장 앞쪽(-Z) 끝 점들의 평균 = 총구 위치 (모델 좌표)
+function findFrontTip(root) {
+  root.updateMatrixWorld(true);
+  const pts = [];
+  const v = new THREE.Vector3();
+  root.traverse((o) => {
+    if (!o.isMesh) return;
+    const pos = o.geometry.attributes.position;
+    for (let i = 0; i < pos.count; i++) pts.push(v.fromBufferAttribute(pos, i).applyMatrix4(o.matrixWorld).clone());
+  });
+  if (!pts.length) return null;
+  let minZ = Infinity, maxZ = -Infinity;
+  for (const p of pts) {
+    minZ = Math.min(minZ, p.z);
+    maxZ = Math.max(maxZ, p.z);
+  }
+  const near = pts.filter((p) => p.z < minZ + (maxZ - minZ) * 0.03);
+  const x = near.reduce((a, p) => a + p.x, 0) / near.length;
+  const y = near.reduce((a, p) => a + p.y, 0) / near.length;
+  return { x, y, z: minZ };
 }

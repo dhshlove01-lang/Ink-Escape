@@ -75,6 +75,7 @@ export const BALANCE = {
     sizeSlow: 0.3,       // 클수록 최대 30% 느려짐
     meleeDps: 8,
     flyHeight: 3,
+    maxHeight: 6.4,      // 천장(벽 높이 7m) 아래로 — 보스·초대형도 이 키를 넘지 않는다 (비행이면 3m 위에서 시작하니 그만큼 뺀다)
     dashCd: 6,
     dashMult: 3,
     dashSec: 0.6,
