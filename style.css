@@ -480,3 +480,55 @@ h1.logo img { display: block; width: min(340px, 78%); height: auto; margin: 0 au
 .modal-card .title-status { margin: 0; min-height: 18px; text-align: center; }
 .modal-card.wide { width: min(560px, 100%); max-height: calc(100vh - 32px); overflow: auto; }
 .modal-card > .btn:last-child { justify-self: center; min-width: 160px; }
+
+/* ── 공용 UI 키트 (assets/ui/kit, body.art-kit 일 때만. 없으면 위의 기본 모양) ──
+   9-slice(border-image): 이미지 모서리는 그대로, 가운데만 늘린다. 잘라 쓰는 값 = 원본 px, / 뒤 = 화면 px */
+.art-kit .btn {
+  border: 2px solid transparent; border-radius: 0; background: none; color: var(--paper);
+  border-image: var(--kit-btn-secondary) 64 fill / 15px stretch;
+  text-shadow: 0 2px 0 rgba(0,0,0,0.55);
+}
+.art-kit .btn:hover:not(:disabled) { background: none; border-image-source: var(--kit-btn-secondary-hover); transform: translateY(-1px); }
+.art-kit .btn:active:not(:disabled) { border-image-source: var(--kit-btn-secondary-down); transform: translateY(1px); }
+.art-kit .btn.primary { border-image: var(--kit-btn-primary) 66 fill / 15px stretch; color: #fff; }
+.art-kit .btn.primary:hover:not(:disabled) { background: none; border-image-source: var(--kit-btn-primary-hover); }
+.art-kit .btn.primary:active:not(:disabled) { border-image-source: var(--kit-btn-primary-down); }
+.art-kit .btn.ghost { color: #cfc6dd; }
+.art-kit .btn:disabled { border-image: var(--kit-btn-disabled) 60 fill / 13px stretch; color: #4c4654; text-shadow: none; opacity: 1; }
+/* 나가기: 왼쪽에 X 가 그려진 빨간 버튼 (X 자리만큼 글씨를 오른쪽으로) */
+.art-kit .lobby-head .btn.ghost {
+  border-image: var(--kit-btn-danger) 70 70 70 120 fill / 12px 12px 12px 26px stretch;
+  padding-left: 32px; color: #fff;
+}
+.art-kit .lobby-head .btn.ghost:hover:not(:disabled) { border-image-source: var(--kit-btn-danger-hover); }
+.art-kit .lobby-head .btn.ghost:active:not(:disabled) { border-image-source: var(--kit-btn-danger-down); }
+/* 고르는 버튼(역할·시간): 알약 칩. 고른 것은 노란 테 */
+.art-kit .role-btns .btn { border-image: var(--kit-chip-gray) 70 fill / 18px stretch; }
+.art-kit .role-btns .btn:hover:not(:disabled) { border-image-source: var(--kit-chip-gray); filter: brightness(1.25); }
+.art-kit .role-btns .btn.on, .art-kit .role-btns .btn.on:hover:not(:disabled) { border-image-source: var(--kit-chip-yellow); color: var(--pencil); filter: none; }
+.art-kit .role-btns .btn:disabled { border-image: var(--kit-chip-gray) 70 fill / 18px stretch; color: #5a5464; filter: grayscale(1) brightness(0.7); }
+.art-kit .btn.ready-btn.on { border-image: none; border: 2px solid var(--good); border-radius: 14px; background: var(--good); color: #08210f; text-shadow: none; }
+/* 큰 판 (시작 화면·로비) */
+.art-kit .title-card, .art-kit .lobby-card {
+  border: 2px solid transparent; border-radius: 0; background: none; box-shadow: none;
+  border-image: var(--kit-panel-large) 140 fill / 42px stretch;
+  filter: drop-shadow(0 26px 40px rgba(0,0,0,0.55));
+}
+.art-kit .title-card { padding: 34px 38px 30px; }
+.art-kit .lobby-card { padding: 30px 32px; }
+/* 캐릭터 고르기 칸: 왼쪽 위 빨간 귀퉁이 카드 */
+.art-kit .animal { border: 2px solid transparent; border-radius: 0; background: none; border-image: var(--kit-card-small) 96 fill / 14px stretch; }
+.art-kit .animal.on { background: none; box-shadow: 0 0 0 2px var(--pencil), 0 0 14px rgba(240,189,30,0.35); border-radius: 6px; }
+/* 입력칸: 공책 종이 */
+.art-kit .title-input { border: 2px solid transparent; border-radius: 0; background: none; border-image: var(--kit-input) 44 90 fill / 9px 18px stretch; color: var(--ink); }
+/* 가운데 팝업: 위쪽 빨간 띠 */
+.art-kit .modal-card {
+  border: 2px solid transparent; border-radius: 0; background: none; box-shadow: none;
+  border-image: var(--kit-popup) 100 fill / 30px stretch;
+  padding-top: 38px; filter: drop-shadow(0 30px 60px rgba(0,0,0,0.6));
+}
+/* 알림(경고): 찢긴 빨간 띠 */
+.art-kit .toast-warn { border: 2px solid transparent; border-radius: 0; background: none; border-image: var(--kit-banner-alert) 60 150 fill / 10px 24px stretch; color: #fff; padding: 10px 30px; }
+/* 방장 왕관·READY 체크 아이콘 */
+.m-crown img, .m-ready img { width: 18px; height: 18px; object-fit: contain; vertical-align: -4px; }
+.m-ready img { margin-right: 3px; }

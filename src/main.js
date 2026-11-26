@@ -57,5 +57,11 @@ for (const [key, name] of [['ui.title_bg', 'title-bg'], ['ui.spawn_btn', 'spawn-
   document.documentElement.style.setProperty(`--img-${name}`, `url("${u}")`);
   document.body.classList.add(`art-${name}`);
 }
+// 공용 UI 키트: 하나라도 없으면 통째로 끄고 기존 CSS 모양 (반쯤 섞인 화면 방지)
+const kitKeys = Object.keys(IMAGE_DEFS).filter((k) => k.startsWith('kit.'));
+if (kitKeys.every((k) => url(k))) {
+  for (const k of kitKeys) document.documentElement.style.setProperty(`--kit-${k.slice(4).replace(/_/g, '-')}`, `url("${url(k)}")`);
+  document.body.classList.add('art-kit');
+}
 app.start();
 window.__app = app; // 디버그·자동 테스트용

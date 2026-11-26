@@ -41,6 +41,26 @@ export const IMAGE_DEFS = {
   'icon.fly': A + 'ui/icons/trait_fly.webp',
   'icon.dash': A + 'ui/icons/trait_dash.webp',
   'icon.ranged': A + 'ui/icons/trait_ranged.webp',
+  // 공용 UI 키트 (tools/process_ui_kit.py → assets/ui/kit). 모두 불러와지면 body 에 art-kit (style.css)
+  'kit.btn_primary': A + 'ui/kit/btn_primary.webp',
+  'kit.btn_primary_hover': A + 'ui/kit/btn_primary_hover.webp',
+  'kit.btn_primary_down': A + 'ui/kit/btn_primary_down.webp',
+  'kit.btn_secondary': A + 'ui/kit/btn_secondary.webp',
+  'kit.btn_secondary_hover': A + 'ui/kit/btn_secondary_hover.webp',
+  'kit.btn_secondary_down': A + 'ui/kit/btn_secondary_down.webp',
+  'kit.btn_danger': A + 'ui/kit/btn_danger.webp',
+  'kit.btn_danger_hover': A + 'ui/kit/btn_danger_hover.webp',
+  'kit.btn_danger_down': A + 'ui/kit/btn_danger_down.webp',
+  'kit.btn_disabled': A + 'ui/kit/btn_disabled.webp',
+  'kit.panel_large': A + 'ui/kit/panel_large.webp',
+  'kit.card_small': A + 'ui/kit/card_small.webp',
+  'kit.input': A + 'ui/kit/input.webp',
+  'kit.chip_gray': A + 'ui/kit/chip_gray.webp',
+  'kit.chip_yellow': A + 'ui/kit/chip_yellow.webp',
+  'kit.popup': A + 'ui/kit/popup.webp',
+  'kit.banner_alert': A + 'ui/kit/banner_alert.webp',
+  'kit.badge_crown': A + 'ui/kit/badge_crown.webp',
+  'kit.badge_check': A + 'ui/kit/badge_check.webp',
 };
 
 // 벽·바닥에 흩뿌릴 낙서 데칼

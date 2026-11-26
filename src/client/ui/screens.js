@@ -1,4 +1,4 @@
-import { el } from './dom.js';
+import { el, icon } from './dom.js';
 import { url } from '../render/Images.js';
 import { faceCanvas } from '../render/AnimalModels.js';
 import { CharacterStage } from './CharacterStage.js';
@@ -257,9 +257,9 @@ export class LobbyView {
         faceCanvas(m.animal, 34),
         el('div', { class: 'm-body' },
           el('b', { class: 'm-name' }, m.name),
-          m.id === state.ownerId ? el('span', { class: 'm-crown', title: t('lobby.host') }, '👑') : null,
+          m.id === state.ownerId ? el('span', { class: 'm-crown', title: t('lobby.host') }, icon('kit.badge_crown', '👑')) : null,
           el('span', { class: 'm-role' }, this.solo ? t('role.both') : roleLabel(m.role))),
-        m.ready ? el('span', { class: 'm-ready' }, 'READY') : null,
+        m.ready ? el('span', { class: 'm-ready' }, icon('kit.badge_check', ''), 'READY') : null,
         el('span', { class: 'm-ping' }, m.id === state.ownerId ? t('lobby.host') : `${m.ping || 0}ms`),
       ),
     ));
