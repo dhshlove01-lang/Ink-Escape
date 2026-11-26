@@ -7,6 +7,7 @@
 ## 원칙 (사용자 지시)
 - **SOLID 로 개발한다.** 새 기능은 기존 파일을 크게 고치기보다 감지기·시스템·명령 처리기·표에 "추가"하는 방식으로 (구체 예는 ARCHITECTURE.md).
 - 밸런스 숫자는 `src/config/balance.js` 에만 둔다. 코드에 숫자를 박지 않는다.
+- **글씨는 `style.css` 의 폰트 토큰 4개만 쓴다**: `--font-display`(주아: 한글 제목·버튼·배너), `--font-num`(Luckiest Guy: 영문·숫자 강조), `--font-body`(Pretendard: 본문), `--font-hand`(개구: 낙서 포인트). 캔버스 글씨도 같은 폰트 이름. 파일·라이선스는 `assets/fonts/` (README.md). 구글 폰트 서버 링크를 다시 넣지 않는다.
 - 3D 모델(GLB)은 `assets/models/` + `src/config/models.js` 에 한 줄. 불러오기는 `ModelLibrary`, 실패하면 임시(공 조합) 모델로 대체되어야 한다.
 - 통신은 `Link` 인터페이스 뒤에 둔다. 나중에 Steam 으로 바꿀 수 있어야 한다. 실시간 동기화에 Firebase 를 쓰지 않는다 (저장 기능에만 고려).
 - 몬스터·보스에는 이름이 없다. 혼합 색은 속성 2개 반반. 술래는 3D 전장에 보이지 않는다. 모바일은 지원하지 않는다.

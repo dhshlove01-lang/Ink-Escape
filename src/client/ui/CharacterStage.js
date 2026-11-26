@@ -377,7 +377,7 @@ function makePlateTexture({ name, badge, role, mine, owner, solo }) {
   g.stroke();
 
   // 이름
-  g.font = '700 58px "Noto Sans CJK KR", system-ui, sans-serif';
+  g.font = '58px "Jua", "Malgun Gothic", sans-serif';
   g.fillStyle = '#f3ecdd';
   g.textBaseline = 'middle';
   g.textAlign = 'left';
@@ -386,7 +386,7 @@ function makePlateTexture({ name, badge, role, mine, owner, solo }) {
 
   // 역할
   const roleText = solo ? '술래 + 플레이어' : role === 'tagger' ? '술래' : role === 'player' ? '플레이어' : '랜덤';
-  g.font = '500 34px "Noto Sans CJK KR", system-ui, sans-serif';
+  g.font = '34px "Jua", "Malgun Gothic", sans-serif';
   g.fillStyle = '#9a92a6';
   g.fillText(`${ROLE_ICON[role] || '🎲'} ${roleText}`, 34, 112);
 

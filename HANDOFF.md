@@ -79,15 +79,17 @@ URL=https://dhshlove01-lang.github.io/Ink-Escape/ NODE_PATH=$(npm root -g) node 
 - 명예(잘 그린 그림 투표)·그림 갤러리 원함 (미구현).
 - 맵은 3개로 시작 (지금 1개).
 - 술래 왼쪽 화면: 탑뷰 지도 + 양쪽 화살표로 **3D 구석 카메라**(실제 플레이 화면) 전환. 그림은 계속 그릴 수 있고 뷰만 바뀐다.
+- 폰트: 주아(한글 제목·버튼) + Luckiest Guy(영문·숫자) + Pretendard(본문) + 개구(낙서 포인트). 모두 상업용 무료, 저장소에 파일로 (`assets/fonts/`).
+- 언어: 한국어·영어 둘 다, 고를 수 있게.
 - 대기실은 **폴가이즈 스타일 3D 무대**(단상 위 캐릭터·READY 이름표), 결과 화면은 **가운데 3D 캐릭터 + 왼쪽 뱃지 + 오른쪽 점수 정산 + 로비로 돌아가기**. (2026-11-26 사용자 요청)
 
 ## 지금 진행 중
 
-**작업: 상업용 폰트를 저장소에 넣고 게임 전체 적용** — 2026-11-26 시작
-- [ ] 폰트 파일 저장 `assets/fonts/` (주아 Jua·Luckiest Guy·Pretendard·개구 Gaegu) + 라이선스 파일
-- [ ] 구글 폰트 서버 대신 저장소 폰트 사용 (Steam·오프라인 대비)
-- [ ] CSS 토큰 정리: 한글 제목=주아, 영문·숫자=Luckiest Guy, 본문=Pretendard, 낙서 포인트=개구
-- [ ] CLAUDE.md·HANDOFF 에 "새 글씨는 이 폰트 토큰만" 규칙 → 검증 → 커밋·푸시
+**작업: 한국어/영어 언어 선택 기능** — 2026-11-26 시작 (사용자 요청)
+- [ ] 번역 사전(ko/en) + 언어 고르기·기억(브라우저 저장), 첫 실행은 브라우저 언어로
+- [ ] 화면 글씨 전부 사전으로 (시작·로비·결과·HUD·술래·배너·토스트)
+- [ ] 방장 서버가 보내던 한국어 문장(오류·소환 실패 사유·결과 사유)을 "키 + 값"으로 바꿔 각자 자기 언어로 표시
+- [ ] 시작 화면·로비에 언어 버튼 → 검증 → 커밋·푸시 → 작업 기록
 
 ## 다음 할 일 (우선순위)
 
@@ -108,6 +110,12 @@ URL=https://dhshlove01-lang.github.io/Ink-Escape/ NODE_PATH=$(npm root -g) node 
 - 효과음은 아직 임시.
 
 ## 작업 기록
+
+### 2026-11-26 · 상업용 폰트 저장·적용
+- **무엇을**: 주아·Luckiest Guy·Pretendard·개구 woff2 를 `assets/fonts/` 에 넣고(라이선스 포함, 5.5MB 이지만 글자 범위별 조각이라 필요한 것만 내려받음) 구글 폰트 서버 링크 제거. CSS 토큰 `--font-display/num/body/hand`, 버튼·토글은 주아, 타이머·HP·탄약·SPAWN·READY·점수는 Luckiest Guy, 캔버스 이름표도 주아. 시작 전에 `document.fonts.load` 로 준비.
+- **왜**: 사용자 요청 — 상업용 가능한 폰트, Steam(오프라인) 대비.
+- **어디**: `assets/fonts/`(fonts.css, README.md), `index.html`, `style.css` 토큰, `main.js`, `CharacterStage.js`·`RemotePlayers.js` 캔버스 글씨, `CLAUDE.md` 규칙.
+- **검증**: 헤드리스 스크린샷(시작·HUD) 폰트 적용 확인, pageerror·404 0.
 
 ### 2026-11-26 · 폴가이즈 스타일 3D 대기실 · 결과 화면 + 캐릭터 5종 GLB
 - **무엇을**

@@ -9,7 +9,7 @@ function nameSprite(text, color) {
   c.width = 256;
   c.height = 64;
   const g = c.getContext('2d');
-  g.font = 'bold 30px "Gaegu","Malgun Gothic",sans-serif';
+  g.font = '30px "Jua","Malgun Gothic",sans-serif';
   g.textAlign = 'center';
   g.textBaseline = 'middle';
   g.lineWidth = 6;

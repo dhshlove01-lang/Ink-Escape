@@ -40,7 +40,10 @@ const app = new App({
 
 window.addEventListener('pointerdown', () => app.sfx.unlock(), { once: true });
 // 2D 이미지를 (최대 4초) 기다린 뒤 시작. 늦거나 없으면 코드 그리기로 대체된다.
-await Promise.race([loadImages(IMAGE_DEFS), new Promise((r) => setTimeout(r, 4000))]);
+// 캔버스에 글씨를 그리기 전에 폰트도 준비 (이름표 등)
+const loadFonts = () =>
+  Promise.allSettled(['24px Jua', '24px "Luckiest Guy"', '16px Pretendard', '20px Gaegu'].map((f) => document.fonts.load(f, '가나다 ABC 123')));
+await Promise.race([Promise.all([loadImages(IMAGE_DEFS), loadFonts()]), new Promise((r) => setTimeout(r, 4000))]);
 // CSS 가 쓰는 UI 이미지: 불러온 것만 변수 + art-* 클래스로 켠다 (없으면 기존 CSS 모양)
 for (const [key, name] of [['ui.title_bg', 'title-bg'], ['ui.spawn_btn', 'spawn-btn'], ['ui.bar_hp', 'bar-hp'], ['ui.bar_boss', 'bar-boss'], ['ui.pencil', 'pencil'], ['ui.crosshair', 'crosshair']]) {
   const u = url(key);
