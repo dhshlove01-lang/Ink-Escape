@@ -2,25 +2,12 @@ import * as THREE from 'three';
 import { CELL, WALL_H, TILE } from '../../shared/map/GameMap.js';
 import { texture, textureFromUrl } from '../render/Images.js';
 import { DECALS } from '../../config/assets.js';
+import {
+  canvasTex, rand, createDungeonKit, buildProps, buildTorch, buildRuneCircle, glowTexture,
+} from '../render/DungeonKit.js';
+import { EscapeGate } from '../render/EscapeGate.js';
 
-// 맵 → 3D 장면. 어두운 낙서 던전 (돌벽 + 분필 낙서 + 횃불).
-
-function rand(seed) {
-  let s = seed >>> 0;
-  return () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296);
-}
-
-function canvasTex(size, draw, repeat = [1, 1]) {
-  const c = document.createElement('canvas');
-  c.width = c.height = size;
-  draw(c.getContext('2d'), size);
-  const t = new THREE.CanvasTexture(c);
-  t.wrapS = t.wrapT = THREE.RepeatWrapping;
-  t.repeat.set(repeat[0], repeat[1]);
-  t.colorSpace = THREE.SRGBColorSpace;
-  t.anisotropy = 4;
-  return t;
-}
+// 맵 → 3D 장면. 어두운 낙서 던전 (돌벽 + 분필 낙서 + 횃불 + 소품 + 탈출문).
 
 function doodle(g, r, x, y, s, color) {
   g.strokeStyle = color;
@@ -132,34 +119,36 @@ export const CEILING_LAYER = 1;
 
 export function buildScene(map) {
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x0d0b12);
-  scene.fog = new THREE.Fog(0x0d0b12, 18, 80);
+  scene.background = new THREE.Color(0x08060d);
+  scene.fog = new THREE.Fog(0x0a0712, 11, 64);
 
   // 사용자가 뽑은 텍스처가 있으면 그것, 없으면 코드로 그린 텍스처
   const tex = makeTextures();
   const wallTex = texture('tex.wall', { repeat: [1, WALL_H / CELL] }) || tex.wall;
   const pillarTex = texture('tex.pillar', { repeat: [1, WALL_H / CELL] });
-  const floorTex = texture('tex.floor', { repeat: [map.worldW / 3, map.worldH / 3] });
-  scene.add(new THREE.HemisphereLight(0xa69cd0, 0x3a2c24, 2.4));
+  const floorTex = texture('tex.floor', { repeat: [map.worldW / 3, map.worldH / 3] }) || tex.floor;
+  const kit = createDungeonKit({ wallTex, floorTex, pillarTex });
+
+  // 은은한 기본광 + 위에서 내리쬐는 차가운 림 라이트 (횃불이 주인공)
+  scene.add(new THREE.HemisphereLight(0x7a68a8, 0x2a1c18, 1.05));
+  const rim = new THREE.DirectionalLight(0x8e7ae0, 0.55);
+  rim.position.set(-0.4, 1, 0.55);
+  scene.add(rim);
+  const warmFill = new THREE.DirectionalLight(0xff8a4a, 0.18);
+  warmFill.position.set(0.5, 0.35, -0.8);
+  scene.add(warmFill);
 
   // 바닥
-  let fTex = floorTex;
-  if (!fTex) {
-    fTex = tex.floor.clone();
-    fTex.needsUpdate = true;
-    fTex.repeat.set(map.w, map.h);
-  }
-  const floor = new THREE.Mesh(new THREE.PlaneGeometry(map.worldW, map.worldH), new THREE.MeshLambertMaterial({ map: fTex }));
+  const floor = new THREE.Mesh(new THREE.PlaneGeometry(map.worldW, map.worldH), kit.mats.floor);
   floor.rotation.x = -Math.PI / 2;
   floor.position.set(map.worldW / 2, 0, map.worldH / 2);
   scene.add(floor);
 
   // 천장: 플레이어 화면에만 (레이어 1). 술래 구석 카메라는 벽 위에서 내려다보므로 레이어 0 만 본다.
-  const ceilTex = texture('tex.pillar', { repeat: [map.worldW / 4, map.worldH / 4] }) || texture('tex.wall', { repeat: [map.worldW / 4, map.worldH / 4] });
-  const ceiling = new THREE.Mesh(
-    new THREE.PlaneGeometry(map.worldW, map.worldH),
-    new THREE.MeshLambertMaterial({ map: ceilTex, color: ceilTex ? 0x7a7088 : 0x2a2630 }),
-  );
+  const ceilTex = kit.mats.ceiling.map;
+  ceilTex.repeat.set(map.worldW / 5, map.worldH / 5);
+  ceilTex.needsUpdate = true;
+  const ceiling = new THREE.Mesh(new THREE.PlaneGeometry(map.worldW, map.worldH), kit.mats.ceiling);
   ceiling.rotation.x = Math.PI / 2; // 아래를 바라봄
   ceiling.position.set(map.worldW / 2, WALL_H, map.worldH / 2);
   ceiling.layers.set(CEILING_LAYER);
@@ -182,81 +171,83 @@ export function buildScene(map) {
     }
   }
   const box = new THREE.BoxGeometry(CELL, WALL_H, CELL);
-  const wallMat = new THREE.MeshLambertMaterial({ map: wallTex });
-  const walls = new THREE.InstancedMesh(box, wallMat, wallCells.length);
+  const walls = new THREE.InstancedMesh(box, kit.mats.stone, wallCells.length);
   const m4 = new THREE.Matrix4();
   wallCells.forEach(([x, y], i) => walls.setMatrixAt(i, m4.makeTranslation((x + 0.5) * CELL, WALL_H / 2, (y + 0.5) * CELL)));
   scene.add(walls);
 
-  const pillarMat = pillarTex ? new THREE.MeshLambertMaterial({ map: pillarTex }) : new THREE.MeshLambertMaterial({ map: tex.wall, color: 0xb9b0c8 });
-  const pillars = new THREE.InstancedMesh(new THREE.BoxGeometry(CELL * 0.9, WALL_H, CELL * 0.9), pillarMat, pillarCells.length);
-  pillarCells.forEach(([x, y], i) => pillars.setMatrixAt(i, m4.makeTranslation((x + 0.5) * CELL, WALL_H / 2, (y + 0.5) * CELL)));
-  scene.add(pillars);
+  // 벽 윗면 캡 (탑뷰·구석 카메라에서 두께가 읽히게) + 걸레받이 + 굵은 검은 외곽선
+  const cap = new THREE.InstancedMesh(new THREE.BoxGeometry(CELL + 0.12, 0.34, CELL + 0.12), kit.mats.stoneTop, wallCells.length);
+  wallCells.forEach(([x, y], i) => cap.setMatrixAt(i, m4.makeTranslation((x + 0.5) * CELL, WALL_H, (y + 0.5) * CELL)));
+  scene.add(cap);
+  const skirt = new THREE.InstancedMesh(new THREE.BoxGeometry(CELL + 0.04, 0.85, CELL + 0.04), kit.mats.stoneDark, wallCells.length);
+  wallCells.forEach(([x, y], i) => skirt.setMatrixAt(i, m4.makeTranslation((x + 0.5) * CELL, 0.42, (y + 0.5) * CELL)));
+  scene.add(skirt);
+  const sc = new THREE.Vector3(1.035, 1.005, 1.035);
+  const om = new THREE.Matrix4();
+  const outline = new THREE.InstancedMesh(box, kit.mats.outline, wallCells.length);
+  wallCells.forEach(([x, y], i) => {
+    om.makeTranslation((x + 0.5) * CELL, WALL_H / 2, (y + 0.5) * CELL).scale(sc);
+    outline.setMatrixAt(i, om);
+  });
+  scene.add(outline);
 
-  // 탈출 문 (붉은 쇠창살)
-  const doors = map.doors.map((d) => {
-    const g = new THREE.Group();
-    const barMat = new THREE.MeshBasicMaterial({ color: 0xc8283a });
-    const xs = d.cells.map((c) => c[0]), ys = d.cells.map((c) => c[1]);
-    const minX = Math.min(...xs) * CELL, maxX = (Math.max(...xs) + 1) * CELL;
-    const minZ = Math.min(...ys) * CELL, maxZ = (Math.max(...ys) + 1) * CELL;
-    const horizontal = d.dir.z !== 0;
-    const len = horizontal ? maxX - minX : maxZ - minZ;
-    const n = Math.round(len / 0.6);
-    const along = horizontal ? 'x' : 'z';
-    const fixed = horizontal ? (d.dir.z < 0 ? maxZ - 0.3 : minZ + 0.3) : d.dir.x < 0 ? maxX - 0.3 : minX + 0.3;
-    for (let i = 0; i <= n; i++) {
-      const bar = new THREE.Mesh(new THREE.BoxGeometry(0.12, WALL_H * 0.8, 0.12), barMat);
-      const p = (horizontal ? minX : minZ) + (i / n) * len;
-      bar.position.set(along === 'x' ? p : fixed, WALL_H * 0.4, along === 'z' ? p : fixed);
-      g.add(bar);
-    }
-    const beam = new THREE.Mesh(new THREE.BoxGeometry(horizontal ? len : 0.3, 0.3, horizontal ? 0.3 : len), barMat);
-    beam.position.set(horizontal ? (minX + maxX) / 2 : fixed, WALL_H * 0.8, horizontal ? fixed : (minZ + maxZ) / 2);
-    g.add(beam);
-    // 문 바닥 (벽 대신 보이는 어두운 통로)
-    const gap = new THREE.Mesh(new THREE.PlaneGeometry(maxX - minX, maxZ - minZ), new THREE.MeshBasicMaterial({ color: 0x050407 }));
-    gap.rotation.x = -Math.PI / 2;
-    gap.position.set((minX + maxX) / 2, 0.01, (minZ + maxZ) / 2);
-    scene.add(gap);
-    scene.add(g);
-    const pillar = new THREE.Mesh(
-      new THREE.CylinderGeometry(1.4, 1.4, 40, 20, 1, true),
-      new THREE.MeshBasicMaterial({ color: 0xff3048, transparent: true, opacity: 0.0, depthWrite: false, side: THREE.DoubleSide, blending: THREE.AdditiveBlending }),
+  // 기둥 (머리·받침 포함)
+  const pillarGeo = new THREE.BoxGeometry(CELL * 0.84, WALL_H, CELL * 0.84);
+  const pillars = new THREE.InstancedMesh(pillarGeo, kit.mats.pillar, Math.max(1, pillarCells.length));
+  const pillarCap = new THREE.InstancedMesh(new THREE.BoxGeometry(CELL * 1.02, 0.5, CELL * 1.02), kit.mats.trim, Math.max(1, pillarCells.length));
+  const pillarBase = new THREE.InstancedMesh(new THREE.BoxGeometry(CELL * 0.98, 0.6, CELL * 0.98), kit.mats.trim, Math.max(1, pillarCells.length));
+  const pillarOutline = new THREE.InstancedMesh(pillarGeo, kit.mats.outline, Math.max(1, pillarCells.length));
+  pillarCells.forEach(([x, y], i) => {
+    const px = (x + 0.5) * CELL, pz = (y + 0.5) * CELL;
+    pillars.setMatrixAt(i, m4.makeTranslation(px, WALL_H / 2, pz));
+    pillarCap.setMatrixAt(i, m4.makeTranslation(px, WALL_H - 0.2, pz));
+    pillarBase.setMatrixAt(i, m4.makeTranslation(px, 0.3, pz));
+    om.makeTranslation(px, WALL_H / 2, pz).scale(sc);
+    pillarOutline.setMatrixAt(i, om);
+  });
+  scene.add(pillars, pillarCap, pillarBase, pillarOutline);
+
+  // 중앙 홀 바닥의 큰 빨간 크레용 원
+  const hall = map.roomCenters[Math.floor(map.roomCenters.length / 2)];
+  if (hall) {
+    const rune = buildRuneCircle(scene, hall.x, hall.z, Math.min(5.4, CELL * 2.6));
+    rune.material.opacity = 0.36;
+  }
+
+  // 소품 (통·상자·잔돌·배너·벽사슬)
+  buildProps(scene, kit, map);
+
+  // 탈출 문 (아치·철창·X사슬·자물쇠·열림 연출)
+  const gates = map.doors.map((door) => {
+    const gate = new EscapeGate({ door, kit });
+    scene.add(gate.group);
+    return gate;
+  });
+  // 문 위로 솟는 빛기둥 (멀리서 위치가 보이게). 천장 위로는 가리므로 문 안쪽까지만.
+  const beams = map.doors.map((d) => {
+    const beam = new THREE.Mesh(
+      new THREE.CylinderGeometry(1.6, 2.1, 14, 16, 1, true),
+      new THREE.MeshBasicMaterial({ color: 0xff3048, transparent: true, opacity: 0, depthWrite: false, side: THREE.DoubleSide, blending: THREE.AdditiveBlending }),
     );
-    pillar.position.set(d.center.x, 20, d.center.z);
-    scene.add(pillar);
-    return { bars: g, pillar, lightPos: new THREE.Vector3(d.center.x - d.dir.x * 3, 3, d.center.z - d.dir.z * 3) };
+    beam.position.set(d.center.x, 7, d.center.z);
+    scene.add(beam);
+    return beam;
   });
   // 문 조명은 하나만 (예고된 문으로 옮긴다). 조명 개수가 바뀌면 셰이더를 다시 만들어 끊기므로 개수는 고정.
   const doorLight = new THREE.PointLight(0xff3048, 0, 26, 1.4);
   scene.add(doorLight);
+  // 탈출구 빛도 하나만 (문이 열릴 때 그 통로로 옮긴다)
+  const exitLight = new THREE.PointLight(0xffe0a0, 0, 30, 1.6);
+  scene.add(exitLight);
 
-  // 횃불: 벽에 붙은 받침 + 비스듬한 손잡이 + 불꽃. 불꽃 그림은 모두, 실제 빛은 카메라에서 가까운 몇 개만.
+  // 횃불: 벽에 붙은 받침 + 불꽃 + 빛무리. 실제 빛은 카메라에서 가까운 몇 개만.
   const flameTex = flameTexture();
-  const ironMat = new THREE.MeshLambertMaterial({ color: 0x2e2622 });
-  const woodMat = new THREE.MeshLambertMaterial({ color: 0x4a3020 });
-  const plateGeo = new THREE.BoxGeometry(0.32, 0.5, 0.06);
-  const armGeo = new THREE.CylinderGeometry(0.045, 0.035, 0.55, 8);
-  const cupGeo = new THREE.CylinderGeometry(0.13, 0.07, 0.16, 10);
+  const glowTex = glowTexture();
   const torches = map.torches.map((t, i) => {
-    const g = new THREE.Group();
-    g.position.set(t.x, 3.0, t.z);
-    g.rotation.y = Math.atan2(t.nx, t.nz); // 로컬 +Z 가 방 안쪽
-    const plate = new THREE.Mesh(plateGeo, ironMat);
-    plate.position.set(0, 0, 0.03);
-    const arm = new THREE.Mesh(armGeo, woodMat);
-    arm.rotation.x = 0.6; // 위로 비스듬히 벽에서 나옴
-    arm.position.set(0, 0.2, 0.2);
-    const cup = new THREE.Mesh(cupGeo, ironMat);
-    cup.position.set(0, 0.45, 0.36);
-    const flame = new THREE.Sprite(new THREE.SpriteMaterial({ map: flameTex, blending: THREE.AdditiveBlending, depthWrite: false }));
-    flame.scale.set(0.7, 0.9, 1);
-    flame.position.set(0, 0.82, 0.38);
-    g.add(plate, arm, cup, flame);
-    scene.add(g);
-    const tip = new THREE.Vector3(t.x + t.nx * 0.9, 3.75, t.z + t.nz * 0.9);
-    return { flame, tip, phase: i * 1.7 };
+    const tor = buildTorch(kit, { flame: flameTex, glow: glowTex }, t, i);
+    scene.add(tor.group);
+    return tor;
   });
   const TORCH_LIGHTS = 4;
   const pool = Array.from({ length: TORCH_LIGHTS }, () => {
@@ -267,13 +258,22 @@ export function buildScene(map) {
 
   addDecals(scene, map);
 
+  const tmp = new THREE.Vector3();
+  let revealed = -1;
+  let last = -1;
   return {
     scene,
     // camPos: 이 카메라에서 가까운 횃불 몇 개에만 실제 빛을 옮겨 단다
     update(time, camPos) {
+      const dt = last < 0 ? 0 : Math.min(0.05, Math.max(0, time - last));
+      last = time;
       for (const t of torches) {
         t.f = 0.85 + Math.sin(time * 9 + t.phase) * 0.08 + Math.sin(time * 23 + t.phase * 2) * 0.05;
         t.flame.scale.set(0.7 * t.f, 0.95 * t.f, 1);
+        if (t.glow) {
+          t.glow.material.opacity = 0.34 + 0.16 * t.f;
+          t.glow.scale.setScalar(3.4 + t.f * 0.8);
+        }
         t.d = camPos ? t.tip.distanceToSquared(camPos) : 0;
       }
       const near = camPos ? [...torches].sort((a, b) => a.d - b.d) : torches;
@@ -281,27 +281,48 @@ export function buildScene(map) {
         const t = near[k];
         if (!t) return (l.intensity = 0);
         l.position.copy(t.tip);
-        l.intensity = 70 * t.f;
+        l.intensity = 46 * t.f;
       });
+      for (const g of gates) g.update(dt, time);
+      // 자물쇠·탈출구 빛: 예고/열린 문 하나에만
+      const g = revealed >= 0 ? gates[revealed] : null;
+      if (g) {
+        if (g.state === 'open') {
+          doorLight.intensity = 0;
+          exitLight.position.copy(g.exitPos(tmp));
+          exitLight.intensity = g.exitLevel;
+        } else {
+          doorLight.position.copy(g.lockPos(tmp));
+          doorLight.intensity = g.lockLevel;
+          exitLight.intensity = 0;
+        }
+      }
     },
     revealDoor(i) {
-      const d = doors[i];
-      if (!d) return;
-      d.pillar.material.opacity = 0.18;
-      doorLight.position.copy(d.lightPos);
-      doorLight.intensity = 60;
+      revealed = i;
+      gates[i]?.reveal();
+      if (beams[i]) beams[i].material.opacity = 0.13;
+      if (gates[i]) {
+        doorLight.position.copy(gates[i].lockPos(tmp));
+        doorLight.intensity = 24;
+      }
     },
-    openDoor(i) {
-      const d = doors[i];
-      if (!d) return;
-      d.bars.visible = false;
-      d.pillar.material.color.set(0x7dffb0);
-      d.pillar.material.opacity = 0.25;
-      doorLight.position.copy(d.lightPos);
-      doorLight.color.set(0x9dffc0);
-      doorLight.intensity = 90;
+    openDoor(i, instant = false) {
+      if (revealed < 0) revealed = i;
+      gates[i]?.open(instant);
+      if (beams[i]) {
+        beams[i].material.color.set(0x9dffc0);
+        beams[i].material.opacity = 0.13;
+      }
+      if (gates[i] && instant) {
+        // 이미 열린 뒤 만들어진 화면: 바로 열린 상태로
+        gates[i].update(0, 0);
+        doorLight.intensity = 0;
+        exitLight.position.copy(gates[i].exitPos(tmp));
+        exitLight.intensity = gates[i].exitLevel || 40;
+      }
     },
-    doors,
+    doors: gates,
   };
 }
 
@@ -334,8 +355,8 @@ function addDecals(scene, map) {
           ok = map.tile(Math.floor(wx / CELL), Math.floor(wz / CELL)) === TILE.WALL;
         }
         if (!ok) continue;
-        const px = f.axis === 'z' ? t : f.at - f.out * 0.03;
-        const pz = f.axis === 'z' ? f.at - f.out * 0.03 : t;
+        const px = f.axis === 'z' ? t : f.at - f.out * 0.05;
+        const pz = f.axis === 'z' ? f.at - f.out * 0.05 : t;
         jobs.push({ url: pick(chalk ? DECALS.chalk : DECALS.red), size, pos: [px, 1.4 + r() * 3, pz], rot: [0, f.rotY, (r() - 0.5) * 0.5] });
       }
     }
@@ -356,7 +377,7 @@ function addDecals(scene, map) {
       const aspect = tex.image.width / tex.image.height;
       const m = new THREE.Mesh(
         geo,
-        new THREE.MeshLambertMaterial({ map: tex, transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2, opacity: j.floor ? 0.75 : 0.9 }),
+        new THREE.MeshLambertMaterial({ map: tex, transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2, opacity: j.floor ? 0.8 : 0.92 }),
       );
       m.scale.set(j.size * Math.min(1, aspect), j.size / Math.max(1, aspect), 1);
       m.position.set(...j.pos);

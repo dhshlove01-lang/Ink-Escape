@@ -26,7 +26,8 @@ export class WorldRenderer {
     this.remotes = new RemotePlayers({ scene: this.scene, session, skipId: skipPlayerId });
 
     if (session.doorRevealed >= 0) this.world.revealDoor(session.doorRevealed);
-    if (session.doorOpen) this.world.openDoor(session.doorRevealed);
+    // 이미 열린 뒤에 화면이 만들어진 경우(늦게 접속·화면 전환)는 연출 없이 열린 모습으로
+    if (session.doorOpen) this.world.openDoor(session.doorRevealed, true);
 
     this._off = [
       session.on(EV.SHOT, (e) => {
