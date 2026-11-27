@@ -24,6 +24,9 @@
   4. 모양·색 숫자는 모델 파일 안에, 게임 수치(HP·속도 등)는 `balance.js` 에만.
   5. HANDOFF 작업 기록에 원본 이미지·결과 스크린샷·등록 위치를 남긴다.
 
+- `ponytail` (`.claude/skills/ponytail*`, v5.3.3): "게으른 시니어 개발자" 모드 — 요청을 다 해내는 가장 작은 변경, 안 한 것·위험은 답 끝에 한두 줄. 2026-11-27 사용자가 설치. `/ponytail lite|full|ultra`, 끄기 "stop ponytail". 함께 온 스킬: `/ponytail-review`(diff 검토), `/ponytail-audit`(저장소 전체), `/ponytail-debt`(`shortcut:` 주석 모으기), `/ponytail-gain`, `/ponytail-help`. 훅은 설치 안 함(`INSTALLED_FROM.md`).
+  **이 파일의 규칙이 우선한다**: SOLID 구조·`balance.js`·번역 사전·폰트 토큰·HANDOFF 갱신은 "작게 고치기"를 이유로 건너뛰지 않는다 (ponytail 도 "코드베이스의 구조·관례는 유지"가 규칙).
+
 ## 검증
 1. `npm test` (판정·서버 로직)
 2. `python3 -m http.server 8765 &` 후 `NODE_PATH=$(npm root -g) node tools/smoke.cjs` → `errors: []`, `monsters: 1`

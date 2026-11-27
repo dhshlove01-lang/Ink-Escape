@@ -114,6 +114,12 @@ URL=https://dhshlove01-lang.github.io/Ink-Escape/ NODE_PATH=$(npm root -g) node 
 
 ## 작업 기록
 
+### 2026-11-27 · ponytail 스킬 설치
+- **무엇을**: 사용자 요청으로 https://github.com/DietrichGebert/ponytail (v5.3.3, 커밋 ebd8654, MIT) 의 스킬 6개를 `.claude/skills/` 에 설치 — `ponytail`(가장 작은 완전한 변경 + 답 끝에 안 한 것·위험), `ponytail-review`, `ponytail-audit`, `ponytail-debt`, `ponytail-gain`, `ponytail-help`.
+- **왜 저장소에**: 클라우드 세션은 매번 새 컴퓨터 → 저장소에 둬야 다음 세션도 쓴다. 플러그인 훅(자동 켜기·작업 기록 CSV/웹훅·상태 표시줄)은 설치하지 않음 — 자세히는 `.claude/skills/ponytail/INSTALLED_FROM.md`.
+- **규칙 충돌**: CLAUDE.md "## 스킬" 에 "이 파일의 규칙(SOLID·balance.js·번역·폰트·HANDOFF)이 우선" 명시.
+- **검증**: 6개 SKILL.md 의 이름·설명 머리말 확인, 외부 접속·스크립트 실행 없음(글로 된 지침뿐).
+
 ### 2026-11-26 · 시바 3D 코드 모델 시험 제작 (img2threejs) + 게임 연결
 - **무엇을**: 사용자 요청 "원본 2D 로 캐릭터 하나만 만들어봐" → `assets/source/shiba.png` 를 기준으로 img2threejs 스킬 파이프라인을 돌려 **코드로 만든 시바**(파일 없이 Three.js 도형 ~45개 + 뼈대)를 만들고 게임에 연결. **기본은 기존 GLB 그대로**, 주소에 `?models=code` 를 붙이면 코드 시바로 바뀐다(비교용).
 - **결과/한계**: 패스 blockout → structural → proportion-lock → feature-placement → material 까지 리뷰 기록. 실루엣 일치(Tier 1 IoU) 0.87, 360° 구멍 검사 통과. 사용자에게 보여줄 비교: `art/models/shiba/compare-ingame.jpg`(원본 · 현재 GLB · 코드 모델, 로비 화면). 단점(정직하게): 털 질감·그라데이션 없음(단색 도형), 입이 U 미소가 아닌 타원, 반다나가 털색과 비슷해 로비 조명에서 묻힘, 등·꼬리·두께는 정면 한 장에서 추측. GLB(사진 기반)가 더 원본에 가깝고, 코드 모델은 가볍고(텍스처 0) 부위별로 움직일 수 있다는 장점.
