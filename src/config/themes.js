@@ -12,11 +12,27 @@ export const THEMES = {
     rune: true, // 바닥 빨간 크레용 원
     banner: true, // 벽에 거는 천
   },
+  // 대마왕의 궁전 (2026-11-27): 흑요석 대리석 바닥 + 금장 몰딩 석벽 + 진홍 카펫, Tripo 소품(왕좌·기둥·창·샹들리에)
+  palace: {
+    tex: { wall: 'tex.palace_wall', floor: 'tex.palace_floor', carpet: 'tex.palace_carpet' },
+    tile: { wall: [4.5, 7], floor: 4, carpet: 2.4 }, // 텍스처 한 장의 실제 크기(m): 벽 [가로, 세로], 바닥 한 변, 카펫 길이
+    background: 0x0b0710,
+    fog: { color: 0x120a16, near: 16, far: 78 },
+    hemi: { sky: 0xb8a4e0, ground: 0x5a3424, intensity: 2.6 },
+    torch: 0xffa35a,
+    decals: null,
+    rune: false,
+    banner: false,
+    // GLB 로 그릴 것 (없으면 코드 도형)
+    models: { pillar: 'palace_pillar', torch: 'prop_torch', door: { frame: 'door_frame', leaf: 'door_leaf', lock: 'door_lock' } },
+    lobby: { window: 'palace_window' }, // 대기실 뒷벽 가운데 (banner 자리)
+  },
 };
 
 // 맵 id → 테마 id
 export const MAP_THEME = {
   dungeon: 'dungeon',
+  palace: 'palace',
 };
 
 export function themeFor(mapId) {

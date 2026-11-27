@@ -34,7 +34,31 @@ export const MODEL_DEFS = {
   paw_bear: { url: 'assets/models/paw_bear.glb', size: 0.19, rotateY: 0, anchor: 'center', lazy: true },
   paw_rabbit: { url: 'assets/models/paw_rabbit.glb', size: 0.19, rotateY: 0, anchor: 'center', lazy: true },
   paw_cat: { url: 'assets/models/paw_cat.glb', size: 0.19, rotateY: 0, anchor: 'center', lazy: true },
+
+  // 맵·게임 소품 (Tripo, 2026-11-27). 원본 앞면이 +Z → 돌리지 않고, 놓는 쪽(MapModels·PalaceBuilder)이 ry 로 방향을 준다.
+  // lazy: 경기 화면을 만들 때 받는다. size = 가장 긴 변(m). 못 받으면 간단한 도형으로 대신 그린다.
+  ...prop('prop_barrel', 1.1),
+  ...prop('prop_crate', 1.05),
+  ...prop('prop_pad', 3.0),
+  ...prop('prop_inkbottle', 0.6),
+  ...prop('prop_chandelier', 3.2),
+  ...prop('prop_torch', 1.3, 'center'),
+  ...prop('palace_throne', 3.4),
+  ...prop('palace_window', 5.2),
+  ...prop('palace_pillar', 1), // 놓을 때 지름·천장 높이에 맞춰 늘림
+  ...prop('door_frame', 1), // 문 너비에 맞춰 키움 (EscapeGate)
+  ...prop('door_leaf', 1),
+  ...prop('door_lock', 2.3, 'center'),
+  ...prop('crate_supply', 1.15),
+  ...prop('crate_heal', 1.0),
+  ...prop('grenade_eraser', 0.42, 'center'),
+  ...prop('boss_inkbomb', 0.9, 'center'),
+  ...prop('boss_pencil', 1.6, 'center'),
 };
+
+function prop(name, size, anchor = 'bottom') {
+  return { [name]: { url: `assets/models/${name}.glb`, size, rotateY: 0, anchor, lazy: true } };
+}
 
 // 다른 모양 묶음: 주소에 ?models=<이름> 을 붙이면 그 묶음의 줄이 위 기본 줄을 대신한다 (비교·시험용).
 // 코드 모델을 기본으로 쓰기로 하면 그 줄을 MODEL_DEFS 로 옮기면 된다.

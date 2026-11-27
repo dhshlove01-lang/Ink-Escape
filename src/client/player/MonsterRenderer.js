@@ -1,11 +1,12 @@
 import * as THREE from 'three';
+import { placeModel } from '../render/MapModels.js';
 import { EV } from '../../shared/protocol.js';
 import { buildCutout } from '../render/PaperCutout.js';
 import { texture, img } from '../render/Images.js';
 import { vfxSprite } from './Effects.js';
-import { WALL_H } from '../../shared/map/GameMap.js';
+import { WALL_H, VIEW_H } from '../../shared/map/GameMap.js';
 
-const CEIL = WALL_H - 0.05; // 몬스터 그림·아이콘은 천장을 넘지 않는다 (바닥처럼 막힘)
+const CEIL = Math.min(WALL_H - 0.05, VIEW_H); // 몬스터 그림·아이콘은 이 높이를 넘지 않는다 (천장 2배여도 너무 높으면 안 보임)
 
 // 몬스터 = 술래 그림 빌보드. 보는 사람 쪽으로 세로축만 돌린다 (종이 인형처럼 서 있음).
 // 빨간 장판(소환 예고), 원거리 탄도 여기서 그린다.
@@ -326,7 +327,16 @@ export class MonsterRenderer {
       let m = this.projs.get(id);
       if (!m) {
         const color = this.attributes[p.color]?.aura || '#ffffff';
-        m = vfxSprite('vfx.proj_' + p.color, 1.0) || new THREE.Mesh(this.projGeo, new THREE.MeshBasicMaterial({ color }));
+        const flat = vfxSprite('vfx.proj_' + p.color, 1.0) || new THREE.Mesh(this.projGeo, new THREE.MeshBasicMaterial({ color }));
+        // 보스·거인 탄은 3D 모델: 번갈아 연필 창 / 잉크 폭탄 (못 받으면 원래 그림)
+        if (p.boss) {
+          const pencil = id % 2 === 0;
+          const model = placeModel(pencil ? 'boss_pencil' : 'boss_inkbomb', { fallback: flat });
+          m = new THREE.Group();
+          m.add(model);
+          m.userData = { model, pencil, vel: new THREE.Vector3(p.vx, p.vy, p.vz) };
+          if (pencil) model.rotation.y = Math.PI / 2; // 연필 끝(-X)이 날아가는 쪽(+Z)으로
+        } else m = flat;
         this.scene.add(m);
         this.projs.set(id, m);
       }
@@ -337,6 +347,10 @@ export class MonsterRenderer {
       }
       m.position.set(p.x + p.vx * age, p.y + p.vy * age, p.z + p.vz * age);
       if (m.isSprite) m.material.rotation += dt * 6;
+      else if (m.userData.vel) {
+        if (m.userData.pencil) m.lookAt(m.position.x + p.vx, m.position.y + p.vy, m.position.z + p.vz);
+        else m.userData.model.rotation.x += dt * 8;
+      }
     }
   }
 

@@ -8,6 +8,9 @@ export const IMAGE_DEFS = {
   'tex.wall': A + 'tex/wall.webp',
   'tex.floor': A + 'tex/floor.webp',
   'tex.pillar': A + 'tex/pillar.webp',
+  'tex.palace_wall': A + 'tex/palace_wall.webp', // 대마왕 궁전 (심리스 1024)
+  'tex.palace_floor': A + 'tex/palace_floor.webp',
+  'tex.palace_carpet': A + 'tex/palace_carpet.webp',
   // 이펙트 (vfx.* 중 검은 배경은 가산 합성으로 그린다)
   'vfx.muzzle': A + 'vfx/muzzle.webp',
   'vfx.spark': A + 'vfx/spark.webp',

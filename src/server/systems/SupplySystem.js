@@ -4,6 +4,7 @@ import { CELL } from '../../shared/map/GameMap.js';
 
 // 보급: 정해진 시각(balance.supply.times)에
 //  - 플레이어: 맵에 상자가 떨어진다. 가서 닿으면 그 사람에게 증강 카드 3장 (사람마다 한 번씩)
+//    healDrops 번째 보급은 회복 상자 — 줍는 사람 HP 도 healHp 만큼 (2026-11-27)
 //  - 술래: 카드 3장이 바로 온다
 // 카드는 pickSec 안에 고르고(MSG.AUG_PICK), 안 고르면 무작위. 고른 증강은 그 판 끝까지 유지.
 // 효과 대부분은 해당 시스템이 shared/augmentMath 로 읽고, 얻는 순간 한 번 적용할 것만 여기서(applyNow).
@@ -27,7 +28,9 @@ export class SupplySystem {
         if (Math.hypot(p.x - c.x, p.z - c.z) > sp.pickupRadius) continue;
         if (m.offers.has(key('player', p.id))) continue; // 앞 카드를 아직 고르는 중
         c.opened.add(p.id);
-        m.emit(EV.SUPPLY_TAKE, { id: c.id, by: p.id });
+        const heal = c.kind === 'heal' ? Math.min(sp.healHp, p.maxHp - p.hp) : 0; // 회복 상자
+        p.hp += heal;
+        m.emit(EV.SUPPLY_TAKE, { id: c.id, by: p.id, heal });
         this.offer(m, 'player', p.id);
       }
       const everyone = [...m.players.values()].filter((p) => p.state !== PSTATE.OUT && p.state !== PSTATE.ESCAPED);
@@ -48,9 +51,10 @@ export class SupplySystem {
     m.crates.clear();
     const spot = this.pickSpot(m);
     if (spot) {
-      const c = { id: m.nextId(), x: spot.x, z: spot.z, opened: new Set() };
+      const kind = (m.b.supply.healDrops || []).includes(this.next - 1) ? 'heal' : 'supply';
+      const c = { id: m.nextId(), x: spot.x, z: spot.z, kind, opened: new Set() };
       m.crates.set(c.id, c);
-      m.emit(EV.SUPPLY, { id: c.id, x: c.x, z: c.z });
+      m.emit(EV.SUPPLY, { id: c.id, x: c.x, z: c.z, kind });
     }
     this.offer(m, 'tagger', m.tagger.id);
   }

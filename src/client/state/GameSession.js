@@ -116,7 +116,7 @@ export class GameSession extends Emitter {
         this.projectiles.delete(ev.id);
         break;
       case EV.SUPPLY:
-        this.crates.set(ev.id, { x: ev.x, z: ev.z, opened: new Set(), born: now });
+        this.crates.set(ev.id, { x: ev.x, z: ev.z, kind: ev.kind || 'supply', opened: new Set(), born: now });
         break;
       case EV.SUPPLY_TAKE:
         this.crates.get(ev.id)?.opened.add(ev.by);

@@ -23,6 +23,9 @@ function sphere(r, color, sx = 1, sy = 1, sz = 1) {
 
 // 진짜 3D 모델(ModelLibrary)이 있으면 그것을, 없으면 공·상자로 만든 임시 모델을 쓴다.
 let library = null;
+export function getModelLibrary() {
+  return library;
+}
 export function setModelLibrary(lib) {
   library = lib;
 }

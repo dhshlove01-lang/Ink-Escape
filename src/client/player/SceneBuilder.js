@@ -8,6 +8,8 @@ import {
   canvasTex, rand, createDungeonKit, buildProps, buildTorch, buildRuneCircle, glowTexture,
 } from '../render/DungeonKit.js';
 import { EscapeGate } from '../render/EscapeGate.js';
+import { buildRoundHall, buildMapProps } from '../render/PalaceBuilder.js';
+import { placeModel } from '../render/MapModels.js';
 
 // 맵 → 3D 장면. 어두운 낙서 던전 (돌벽 + 분필 낙서 + 횃불 + 소품 + 탈출문).
 
@@ -141,8 +143,12 @@ export function buildScene(map) {
   warmFill.position.set(0.5, 0.35, -0.8);
   scene.add(warmFill);
 
+  // 둥근 맵(궁전): 바닥·천장·둥근 벽은 PalaceBuilder, 안쪽 벽만 아래 상자로
+  const round = map.bounds ? buildRoundHall(scene, map, theme, kit, CEILING_LAYER) : null;
+
   // 바닥
   const floor = new THREE.Mesh(new THREE.PlaneGeometry(map.worldW, map.worldH), kit.mats.floor);
+  floor.visible = !round;
   floor.rotation.x = -Math.PI / 2;
   floor.position.set(map.worldW / 2, 0, map.worldH / 2);
   scene.add(floor);
@@ -155,6 +161,7 @@ export function buildScene(map) {
   ceiling.rotation.x = Math.PI / 2; // 아래를 바라봄
   ceiling.position.set(map.worldW / 2, WALL_H, map.worldH / 2);
   ceiling.layers.set(CEILING_LAYER);
+  ceiling.visible = !round;
   scene.add(ceiling);
 
   // 벽 (바닥과 닿은 벽만)
@@ -170,11 +177,13 @@ export function buildScene(map) {
         const n = map.tile(x + dx, y + dy);
         if (n === TILE.FLOOR || n === TILE.PILLAR) near = true;
       }
-      if (near) wallCells.push([x, y]);
+      if (near && !round) wallCells.push([x, y]);
     }
   }
+  if (round) wallCells.push(...round.cells);
+  const wallMat = round?.wallMat || kit.mats.stone;
   const box = new THREE.BoxGeometry(CELL, WALL_H, CELL);
-  const walls = new THREE.InstancedMesh(box, kit.mats.stone, wallCells.length);
+  const walls = new THREE.InstancedMesh(box, wallMat, wallCells.length);
   const m4 = new THREE.Matrix4();
   wallCells.forEach(([x, y], i) => walls.setMatrixAt(i, m4.makeTranslation((x + 0.5) * CELL, WALL_H / 2, (y + 0.5) * CELL)));
   scene.add(walls);
@@ -195,7 +204,18 @@ export function buildScene(map) {
   });
   scene.add(outline);
 
-  // 기둥 (머리·받침 포함)
+  // 기둥: 테마가 GLB 기둥을 주면 그것(천장까지 늘림), 아니면 돌 상자 기둥
+  if (theme.models?.pillar) {
+    for (const [x, y] of pillarCells) {
+      const p = placeModel(theme.models.pillar, {
+        fit: { x: CELL * 0.95, y: WALL_H },
+        fallback: new THREE.Mesh(new THREE.CylinderGeometry(CELL * 0.4, CELL * 0.45, WALL_H, 12).translate(0, WALL_H / 2, 0), kit.mats.pillar),
+      });
+      p.position.set((x + 0.5) * CELL, 0, (y + 0.5) * CELL);
+      scene.add(p);
+    }
+    pillarCells.length = 0;
+  }
   const pillarGeo = new THREE.BoxGeometry(CELL * 0.84, WALL_H, CELL * 0.84);
   const pillars = new THREE.InstancedMesh(pillarGeo, kit.mats.pillar, Math.max(1, pillarCells.length));
   const pillarCap = new THREE.InstancedMesh(new THREE.BoxGeometry(CELL * 1.02, 0.5, CELL * 1.02), kit.mats.trim, Math.max(1, pillarCells.length));
@@ -213,17 +233,18 @@ export function buildScene(map) {
 
   // 중앙 홀 바닥의 큰 빨간 크레용 원
   const hall = map.roomCenters[Math.floor(map.roomCenters.length / 2)];
-  if (hall) {
+  if (hall && theme.rune !== false) {
     const rune = buildRuneCircle(scene, hall.x, hall.z, Math.min(5.4, CELL * 2.6));
     rune.material.opacity = 0.36;
   }
 
-  // 소품 (통·상자·잔돌·배너·벽사슬)
-  buildProps(scene, kit, map);
+  // 소품: 맵 데이터에 있으면 그것(궁전 — 충돌도 같은 데이터), 없으면 던전 소품 (통·상자·잔돌·배너·벽사슬)
+  if (map.props.length) buildMapProps(scene, map, theme);
+  else buildProps(scene, kit, map);
 
   // 탈출 문 (아치·철창·X사슬·자물쇠·열림 연출)
   const gates = map.doors.map((door) => {
-    const gate = new EscapeGate({ door, kit });
+    const gate = new EscapeGate({ door, kit, models: theme.models?.door });
     scene.add(gate.group);
     return gate;
   });
@@ -248,7 +269,7 @@ export function buildScene(map) {
   const flameTex = flameTexture();
   const glowTex = glowTexture();
   const torches = map.torches.map((t, i) => {
-    const tor = buildTorch(kit, { flame: flameTex, glow: glowTex }, t, i);
+    const tor = buildTorch(kit, { flame: flameTex, glow: glowTex }, t, i, theme.models?.torch);
     scene.add(tor.group);
     return tor;
   });
@@ -259,7 +280,7 @@ export function buildScene(map) {
     return l;
   });
 
-  addDecals(scene, map);
+  if (theme.decals) addDecals(scene, map);
 
   const tmp = new THREE.Vector3();
   let revealed = -1;

@@ -1,8 +1,11 @@
 import * as THREE from 'three';
-import { WALL_H } from '../../shared/map/GameMap.js';
+import { WALL_H, VIEW_H } from '../../shared/map/GameMap.js';
 import { canvasTex } from './DungeonKit.js';
+import { placeModel } from './MapModels.js';
 
-// 보급 상자 3D: 나무 상자 + 빨간 잉크 표시 + 위로 솟는 빛기둥. 떨어지면서 쿵.
+// 보급 상자 3D: GLB 보급 상자(회복 상자는 crate_heal) + 위로 솟는 빛기둥. 떨어지면서 쿵. GLB 가 없으면 나무 상자 도형.
+const MODEL = { supply: 'crate_supply', heal: 'crate_heal' };
+const BEAM_COLOR = { supply: 0xffd27a, heal: 0x8dffb0 };
 // 내가 이미 연 상자는 빛기둥을 끄고 어둡게 (남은 사람을 위해 상자는 그대로).
 
 const SIZE = 1.1;
@@ -54,7 +57,7 @@ function parts() {
   shared = {
     box: new THREE.BoxGeometry(SIZE, SIZE, SIZE),
     woodMat: new THREE.MeshLambertMaterial({ map: wood, emissive: 0x2a1406, emissiveIntensity: 0.6 }),
-    beamGeo: new THREE.CylinderGeometry(0.75, 0.75, WALL_H - 0.3, 20, 1, true),
+    beamGeo: new THREE.CylinderGeometry(0.75, 0.75, VIEW_H, 20, 1, true), // 빛기둥은 보이는 높이까지만
     beamTex,
   };
   return shared;
@@ -86,11 +89,14 @@ export class SupplyCrates {
     const p = parts();
     const group = new THREE.Group();
     group.position.set(c.x, 0, c.z);
-    const crate = new THREE.Mesh(p.box, p.woodMat);
-    crate.position.y = SIZE / 2;
-    const beam = new THREE.Mesh(p.beamGeo, new THREE.MeshBasicMaterial({ map: p.beamTex, color: 0xffd27a, transparent: true, opacity: 0.55, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide }));
-    beam.position.y = (WALL_H - 0.3) / 2;
-    const ring = new THREE.Mesh(new THREE.RingGeometry(1.0, 1.25, 32), new THREE.MeshBasicMaterial({ color: 0xffd27a, transparent: true, opacity: 0.7, side: THREE.DoubleSide, depthWrite: false }));
+    const box = new THREE.Mesh(p.box, p.woodMat);
+    box.position.y = SIZE / 2;
+    const kind = MODEL[c.kind] ? c.kind : 'supply';
+    const crate = placeModel(MODEL[kind], { fallback: box }); // 발이 y=0
+    const color = BEAM_COLOR[kind];
+    const beam = new THREE.Mesh(p.beamGeo, new THREE.MeshBasicMaterial({ map: p.beamTex, color, transparent: true, opacity: 0.55, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide }));
+    beam.position.y = VIEW_H / 2;
+    const ring = new THREE.Mesh(new THREE.RingGeometry(1.0, 1.25, 32), new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.7, side: THREE.DoubleSide, depthWrite: false }));
     ring.rotation.x = -Math.PI / 2;
     ring.position.y = 0.04;
     // 술래 탑뷰용 큰 상자 표시: 천장(7m) 위에 띄워서 플레이어 1인칭에서는 천장에 가려 안 보인다
@@ -110,7 +116,7 @@ export class SupplyCrates {
       const c = this.session.crates.get(id);
       const k = Math.min(1, (time - it.born) / 0.7); // 떨어지기 0.7초
       const fall = 1 - k * k;
-      it.crate.position.y = SIZE / 2 + fall * 6 + (k >= 1 ? Math.abs(Math.sin((time - it.born - 0.7) * 6)) * 0.15 * Math.max(0, 1 - (time - it.born - 0.7) * 2) : 0);
+      it.crate.position.y = fall * 6 + (k >= 1 ? Math.abs(Math.sin((time - it.born - 0.7) * 6)) * 0.15 * Math.max(0, 1 - (time - it.born - 0.7) * 2) : 0);
       it.crate.rotation.y = Math.sin(time * 0.6 + id) * 0.25;
       if (k >= 1 && !it.landed) {
         it.landed = true;
@@ -119,7 +125,6 @@ export class SupplyCrates {
       const mine = c?.opened.has(me);
       it.beam.visible = !mine;
       it.ring.visible = !mine;
-      it.crate.material = parts().woodMat;
       it.crate.scale.setScalar(mine ? 0.85 : 1);
       it.beam.material.opacity = 0.4 + Math.sin(time * 3 + id) * 0.15;
       it.ring.scale.setScalar(1 + ((time * 0.8 + id) % 1) * 0.6);

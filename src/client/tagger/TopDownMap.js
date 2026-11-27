@@ -28,7 +28,10 @@ export class TopDownMap extends Emitter {
     this.target = null;
     this.hover = null;
     this.minis = new Map();
-    this.props = planProps(this.map);
+    // 맵 데이터 소품(궁전)이 있으면 그것 — 통·상자는 3D 크기에 맞게 s 를 준다. 없으면 던전 소품
+    this.props = this.map.props?.length
+      ? this.map.props.map((p) => ({ ...p, s: p.s ?? (p.kind === 'barrel' ? 1.4 : 1.25) }))
+      : planProps(this.map);
     this.bg = this.renderBackground();
 
     if (!mini) {
@@ -348,6 +351,30 @@ export class TopDownMap extends Emitter {
         g.beginPath();
         g.arc(p.x, p.z + 0.3, 0.28, 0, Math.PI * 2);
         g.stroke();
+      } else if (p.kind === 'carpet') {
+        g.save();
+        g.translate(p.x, p.z);
+        g.rotate(p.ry || 0);
+        g.fillStyle = 'rgba(150,22,40,0.85)';
+        g.fillRect(-p.w / 2, -p.len / 2, p.w, p.len);
+        g.strokeStyle = 'rgba(214,170,70,0.9)';
+        g.lineWidth = 1.4 * u;
+        g.strokeRect(-p.w / 2 + 0.2, -p.len / 2, p.w - 0.4, p.len);
+        g.restore();
+      } else if (p.solid) {
+        // 그 밖의 부딪히는 소품(왕좌·발판·잉크병): 실제 충돌 모양 그대로
+        g.fillStyle = p.kind === 'throne' ? '#3a1622' : p.kind === 'inkbottle' ? '#3b2a5a' : '#2e2a34';
+        g.strokeStyle = p.kind === 'throne' ? 'rgba(214,170,70,0.95)' : 'rgba(170,160,190,0.8)';
+        g.lineWidth = 1.2 * u;
+        g.save();
+        g.translate(p.x, p.z);
+        g.rotate(-(p.ry || 0));
+        g.beginPath();
+        if (p.solid.r !== undefined) g.arc(0, 0, p.solid.r, 0, Math.PI * 2);
+        else g.rect(-p.solid.hx, -p.solid.hz, p.solid.hx * 2, p.solid.hz * 2);
+        g.fill();
+        g.stroke();
+        g.restore();
       }
     }
   }

@@ -92,14 +92,7 @@ URL=https://dhshlove01-lang.github.io/Ink-Escape/ NODE_PATH=$(npm root -g) node 
 
 ## 지금 진행 중
 
-2026-11-27 대마왕 궁전 맵 교체 + 게임 오브젝트 GLB 17종 (Claude 작업 중) — 사용자 요청·답변:
-- 지금 맵을 궁전으로 교체, 맵은 **큰 원통형**, 천장 높이 **2배**, 오브젝트·스폰 높이는 최대치 제한(너무 높으면 안 보임)
-- 보스 의자(왕좌) + 그 앞에 발판, 잉크병 여러 개 배치. 탈출 자물쇠를 문에 붙이고 문 열릴 때 자물쇠도 열림
-- 오브젝트에 **부딪히게**(지금은 통과). 교체: 던전 소품(오크통·상자·횃불·샹들리에), 탈출문, 보급·회복 상자, 던지는 것(지우개 수류탄·보스 잉크 폭탄·연필 공격)
-- 받은 파일: GLB 15개(`ad141dbf-____glb.zip`) + 궁전 GLB 3개(`7a009314-_______.zip`, 파일명 의자↔창문 서로 바뀜) + 텍스처 3장(바닥·벽·카펫 1024 심리스, 채팅 첨부)
-- [x] 1 GLB 정리: `assets/models/{prop_*,crate_*,boss_*,grenade_eraser,door_*,palace_*}.glb` (`tools/glb_shrink.py` 로 텍스처 1024/512 JPEG, 합계 9.9MB), 텍스처 `assets/tex/palace_{floor,wall,carpet}.webp`
-- [~] 2 원통형 궁전 맵: 공용 데이터 끝 (`maps.js buildPalace`, `GameMap` bounds·props 충돌·`VIEW_H`, `WALL_H` 14, `FlowField` → `map.blocked`, 테스트 `tests/map.test.mjs`). **화면(SceneBuilder) 아직 → 로비 기본 맵은 아직 dungeon** (`Lobby.js`, 다 되면 palace 로)
-- [ ]  - [ ] 3 소품 배치  - [ ] 4 탈출문+자물쇠  - [ ] 5 상자·던지는 것  - [ ] 6 충돌  - [ ] 7 검증·기록
+(없음)
 
 ## 다음 할 일 (우선순위)
 
@@ -122,6 +115,19 @@ URL=https://dhshlove01-lang.github.io/Ink-Escape/ NODE_PATH=$(npm root -g) node 
 - 효과음은 아직 임시.
 
 ## 작업 기록
+
+### 2026-11-27 · 대마왕 궁전 맵 (원통형·천장 2배) + 게임 오브젝트 GLB 17종 + 소품 충돌
+- **무엇을** (사용자 요청·답변): 지금 맵을 궁전으로 교체, **큰 원통형** 맵, 천장 **2배(7→14m)**, 오브젝트·표시 높이는 최대치(`VIEW_H` 7.5m), 보스 의자(왕좌) + 앞 발판 + 잉크병들, 탈출 자물쇠를 문에 붙여 **문 열릴 때 자물쇠도 열림**, 오브젝트 **통과 안 되게**, 던전 소품·탈출문·보급/회복 상자·던지는 것 GLB 교체.
+- **맵** `src/shared/map/maps.js buildPalace()` (map id `palace`, 이름 `map.palace` ko/en): 39×39 칸, 반지름 34m 원. 가운데 왕좌의 방(ㄱ자 벽 4개, 동서남북 10m 입구) + 바깥 둘레, 기둥 12개(둘레 8 + 방 안 4), 탈출문 북·서·동. 스폰은 홀 가운데. `Lobby.js` 기본 mapId `palace`. 예전 `dungeon` 빌더는 남겨 둠.
+  - 소품은 **맵 데이터**(`map.props`: kind·x·z·ry·solid{r | hx,hz}·tall) → 방장·클라이언트가 같은 데이터로 충돌. 왕좌(상자, tall=총알·시야도 막음)·발판·잉크병 6+3·통·상자·카펫·샹들리에 5·스테인드글라스 창 9.
+- **충돌** `GameMap`: `bounds`(둥근 벽, 문 입구 `inMouth` 만 예외), `collideCircle` 이 소품(원·돌린 상자)·둥근 벽에서 밀어냄, `raycast` 는 둥근 벽·키 큰 소품에서 멈춤, `isFloor` 는 원 밖·소품 위 false(소환·보급 자리), 몬스터 길찾기 `FlowField` 는 `map.blocked`(벽 + 소품 칸). `WALL_H` 14, `VIEW_H` 7.5 (몬스터 그림 `MonsterRenderer CEIL`, 보급 빛기둥, 창·샹들리에 위끝).
+- **화면** `render/PalaceBuilder.js`(둥근 벽 = 안쪽을 보는 원통 조각, 문 자리 비움 / 원형 바닥·천장 / 벽 윗테 / 소품 배치·카펫·샹들리에 사슬·빛), `render/MapModels.js placeModel()`(GLB 를 lazy 로 받고 그동안 간단 도형, 도착하면 교체, `fit` 으로 축별 크기). `SceneBuilder`: 둥근 맵이면 PalaceBuilder, 테마가 주면 GLB 기둥(천장까지 늘림)·GLB 횃불(`buildTorch(..., model)`)·GLB 탈출문, 낙서·크레용 원은 테마가 켤 때만. 테마 `config/themes.js palace`(텍스처 `assets/tex/palace_{floor,wall,carpet}.webp`, `tile` 실제 크기, 밝은 조명, `models`, `lobby.window`). 로비 방(`CharacterStage.buildThemeRoom`)도 궁전 텍스처·GLB 기둥·횃불·가운데 창.
+- **탈출문** `EscapeGate`: models 를 주면 `door_frame`(문 구멍 반폭=높이×0.235 로 크기 맞춤, 약 13m 아치)·`door_leaf` 두 짝(왼짝 거울=오른짝, 탈출구 쪽으로 열림)·`door_lock`(모델을 아래 70% 몸통 / 위 걸쇠로 **잘라** 열릴 때 걸쇠가 튀어 오르고 몸통이 떨어짐). 못 받으면 예전 석재 아치·철창·코드 자물쇠.
+- **보급·회복 상자** `SupplyCrates`: `crate_supply`/`crate_heal` GLB, 회복 상자는 초록 빛기둥. 서버 `SupplySystem`: `balance.supply.healDrops: [1]`(두 번째 보급)이 회복 상자 → 줍는 사람 HP `healHp: 35` 회복(최대 넘지 않음) + 카드는 똑같이. 이벤트 `SUPPLY.kind`, `SUPPLY_TAKE.heal`.
+- **던지는 것**: 지우개 수류탄 `Effects.grenade` → `grenade_eraser` 3D(빙글빙글). 보스·거인 원거리 탄 → `EV.PROJ.boss` 일 때 번갈아 `boss_pencil`(날아가는 쪽을 봄)·`boss_inkbomb`(회전). 일반 몬스터 탄은 그대로 그림.
+- **에셋**: `assets/models/{prop_barrel,prop_crate,prop_pad,prop_inkbottle,prop_chandelier,prop_torch,palace_throne,palace_window,palace_pillar,door_frame,door_leaf,door_lock,crate_supply,crate_heal,grenade_eraser,boss_inkbomb,boss_pencil}.glb` — 받은 zip 의 파일명 "마왕의자"↔"마왕창문"은 서로 바뀌어 있어 렌더로 확인해 바로잡음. 텍스처를 `tools/glb_shrink.py`(새 도구: 최대 1024/512, JPEG)로 줄여 합계 9.9MB(궁전 3개는 각 8~9MB → 1MB). `config/models.js` 에 `prop()` 한 줄씩, 모두 `lazy`(경기 화면 만들 때 받음). 총(`총.glb`)은 이미 같은 파일이라 그대로.
+- **검증**: `npm test` 18 통과(새 `tests/map.test.mjs` 둥근 벽·소품 충돌·문 입구·키 큰 소품 시야, `tests/supply.test.mjs` 회복 상자). smoke `errors: []`·`monsters: 1`(한 번은 헤드리스가 느려 0 → 다시 돌려 2번 연속 통과). 헤드리스 화면 확인: 로비(궁전 방), 1인칭 홀·카펫·왕좌·기둥·창·샹들리에·횃불, 탈출문 닫힘→자물쇠 번쩍·낙하→문짝 열림→탈출구 빛(애니메이션 시간을 직접 넘겨 확인), 술래 3D 탑뷰·따라가기·작은 지도(원형), 보급/회복 빛기둥·3D 수류탄·보스 탄.
+- **알려진 점**: 소품 모델이 개당 약 1만 삼각형이라 화면 전체 50만 정도 — 느리면 같은 소품을 InstancedMesh 로 묶거나 `glb_shrink` 처럼 메시 줄이기. 보급 상자(떨어지는 것)는 부딪힘 없음(가서 닿으면 줍는 물건). 문틀이 13m 로 큼(문 칸 너비 6m 에 문 구멍을 맞춘 결과).
 
 ### 2026-11-27 · 총: 궤적 선 없앰 + 총구 번쩍임 절반
 - **무엇을**: 사용자 지시 "총 쏠 때 레이저 같은 긴 선 안 나오게, 총구 번쩍임 크기 반으로". 내 총(1인칭)·다른 플레이어 총 모두 궤적 선(`effects.tracer`)을 부르지 않는다. 1인칭 번쩍임·빛무리는 `FLASH_SCALE = 0.5`, 월드 번쩍임 스프라이트 0.75→0.375(내 것)·0.5→0.25(남의 것). 총알 자국(5초)은 그대로.

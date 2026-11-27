@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { CELL, WALL_H } from '../../shared/map/GameMap.js';
 import { crayonGlowTexture, glowTexture } from './DungeonKit.js';
+import { placeModel } from './MapModels.js';
 
 // 탈출문: 석재 아치 + 철창문(양문) + X자 사슬 4가닥 + 빛나는 자물쇠.
 // 열림 연출: 자물쇠 번쩍 → 걸쇠 풀리고 떨어짐 → 사슬 늘어지며 떨어짐 → 철창문이 안쪽으로 열리며 탈출구 빛.
@@ -12,6 +13,13 @@ const GRAVITY = 16;
 const SWING_START = 0.85;
 const SWING_TIME = 2.0;
 const TOTAL = SWING_START + SWING_TIME + 0.1;
+
+// GLB 문 (models 를 주면): door_frame.glb 의 문 구멍은 반폭 = 높이 × 0.235, 구멍 꼭대기 = 높이 × 0.749,
+// door_leaf.glb 는 경첩이 왼쪽(-X)인 왼짝, door_lock.glb 는 아래 70% 가 몸통·위가 걸쇠 (tools 로 잰 값 — 모델이 바뀌면 다시 잰다)
+const FRAME_INNER = 0.235;
+const FRAME_OPEN_TOP = 0.749;
+const LOCK_SPLIT = 0.7;
+const LOCK_Y = 3.2;
 
 const easeInOut = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 
@@ -99,8 +107,9 @@ class ChainStrand {
 }
 
 export class EscapeGate {
-  constructor({ door, kit, glowTex }) {
+  constructor({ door, kit, glowTex, models = null }) {
     this.kit = kit;
+    this.models = models; // { frame, leaf, lock } GLB 이름 (없으면 코드로 그린 석재 아치·철창·자물쇠)
     this.door = door;
     this.group = new THREE.Group();
     this.state = 'closed';
@@ -134,6 +143,24 @@ export class EscapeGate {
 
   // 석재 아치 프레임 + 좌우 기둥 + 배너
   buildArch() {
+    const root = this.group;
+    this.group = new THREE.Group(); // 아래 석재 아치는 이 묶음에 담아, GLB 문틀이 있으면 그 대신으로만 쓴다
+    this._buildStoneArch();
+    const arch = this.group;
+    this.group = root;
+    // 통로 끝 벽 (문 너머가 허공으로 뚫려 보이지 않게) — 늘 있음
+    const back = new THREE.Mesh(new THREE.BoxGeometry(this.hw * 2 + 2.4, WALL_H, 0.6), this.kit.mats.stoneDark);
+    back.position.set(0, WALL_H / 2, -this.depth - 0.25);
+    root.add(back);
+    if (!this.models?.frame) return root.add(arch);
+    const H = (this.hw + 0.1) / FRAME_INNER; // 문 구멍이 문 칸 너비에 맞는 문틀 높이
+    this.openTop = H * FRAME_OPEN_TOP;
+    const frame = placeModel(this.models.frame, { fallback: arch, fit: { y: H } });
+    frame.position.z = 0.35;
+    root.add(frame);
+  }
+
+  _buildStoneArch() {
     const { mats } = this.kit;
     const hw = this.hw;
     const r = hw + 0.42;
@@ -166,10 +193,6 @@ export class EscapeGate {
     band.position.set(0, bandY, 0.08);
     this.group.add(band);
 
-    // 통로 끝 벽 (문 너머가 허공으로 뚫려 보이지 않게)
-    const back = new THREE.Mesh(new THREE.BoxGeometry(hw * 2 + 2.4, WALL_H, 0.6), mats.stoneDark);
-    back.position.set(0, WALL_H / 2, -this.depth - 0.25);
-    this.group.add(back);
 
     // 문 옆 배너 (술래 탑뷰 참고 이미지의 보라 깃발) — 문틀 기둥(hw+1.15 까지) 바깥에 걸어 가려지지 않게
     const cloth = new THREE.PlaneGeometry(1.1, 2.1);
@@ -187,6 +210,7 @@ export class EscapeGate {
 
   // 철창문 두 짝 (경첩이 문틀에 붙어 안쪽으로 열린다)
   buildLeaves() {
+    if (this.models?.leaf) return this._buildModelLeaves();
     const { mats } = this.kit;
     const hw = this.hw;
     const H = 5.35;
@@ -220,7 +244,25 @@ export class EscapeGate {
       brace.rotation.z = side * 0.5;
       leaf.add(brace);
       this.group.add(leaf);
-      this.leaves.push({ group: leaf, side });
+      this.leaves.push({ group: leaf, side, dir: 1 });
+    }
+  }
+
+  // GLB 문짝 두 개: 경첩이 문틀 양끝, 문짝은 가운데 쪽으로 뻗고 탈출구(-Z) 쪽으로 열린다. 오른짝은 왼짝을 거울로.
+  _buildModelLeaves() {
+    const hw = this.hw;
+    const h = (this.openTop || 7) - 0.25;
+    this.leaves = [];
+    for (const side of [-1, 1]) {
+      const leaf = new THREE.Group();
+      leaf.position.set(side * hw, 0, -0.1);
+      const panel = new THREE.Mesh(new THREE.BoxGeometry(hw, h, 0.15).translate(0, h / 2, 0), new THREE.MeshLambertMaterial({ color: 0x2c2833 }));
+      const m = placeModel(this.models.leaf, { fallback: panel, fit: { x: hw, y: h } });
+      m.position.x = -side * hw / 2;
+      if (side > 0) m.scale.x = -1;
+      leaf.add(m);
+      this.group.add(leaf);
+      this.leaves.push({ group: leaf, side, dir: -1 });
     }
   }
 
@@ -277,6 +319,7 @@ export class EscapeGate {
     const hole = new THREE.Mesh(new THREE.ShapeGeometry(key, 12), new THREE.MeshBasicMaterial({ color: 0x0d0205 }));
     hole.position.set(0, -0.08, 0.252); // 쇠판 앞면(0.25)보다 살짝 앞
     this.lockGroup.add(plate, hole);
+    if (this.models?.lock) this._useModelLock();
 
     // 크레용 광채 (자물쇠 뒤)
     this.aura = new THREE.Sprite(new THREE.SpriteMaterial({
@@ -293,9 +336,56 @@ export class EscapeGate {
     // 실제 빛은 SceneBuilder 가 하나만 만들어 이 자리로 옮겨 단다 (조명 개수 고정)
     this.lockLevel = 7;
     this.lockAnchor = new THREE.Object3D();
-    this.lockAnchor.position.set(0, 2.9, 1.4);
+    // GLB 자물쇠는 무늬가 보이게 붉은 빛을 조금 떨어뜨려 단다
+    this.lockAnchor.position.set(0, this.models?.lock ? LOCK_Y + 0.15 : 2.9, this.models?.lock ? 3.2 : 1.4);
     this.group.add(this.lockAnchor);
     this.group.add(this.lockGroup);
+  }
+
+  // GLB 자물쇠: 코드 자물쇠 부품을 숨기고, 모델을 몸통·걸쇠 두 조각으로 나눠 단다 (열릴 때 걸쇠가 튀어 오름)
+  _useModelLock() {
+    const prim = this.lockGroup.children.filter((o) => o !== this.shackle && o !== this.aura);
+    const fallback = new THREE.Group();
+    prim.forEach((o) => fallback.add(o));
+    fallback.add(this.shackle);
+    this.lockGroup.position.set(0, LOCK_Y, 0.5);
+    const m = placeModel(this.models.lock, { fallback, decorate: (model) => this._splitLock(model) });
+    this.lockGroup.add(m);
+  }
+
+  _splitLock(model) {
+    let mesh = null;
+    model.traverse((o) => { if (o.isMesh && !mesh) mesh = o; });
+    if (!mesh || mesh.userData.split) return;
+    const g = mesh.geometry.index ? mesh.geometry.toNonIndexed() : mesh.geometry;
+    g.computeBoundingBox();
+    const y0 = g.boundingBox.min.y, cut = y0 + (g.boundingBox.max.y - y0) * LOCK_SPLIT;
+    const pos = g.attributes.position;
+    const pick = (top) => {
+      const out = new THREE.BufferGeometry();
+      for (const [name, attr] of Object.entries(g.attributes)) {
+        const arr = [];
+        for (let t = 0; t < pos.count; t += 3) {
+          const cy = (pos.getY(t) + pos.getY(t + 1) + pos.getY(t + 2)) / 3;
+          if ((cy > cut) !== top) continue;
+          for (let k = 0; k < 3; k++) for (let c = 0; c < attr.itemSize; c++) arr.push(attr.array[(t + k) * attr.itemSize + c]);
+        }
+        out.setAttribute(name, new THREE.Float32BufferAttribute(arr, attr.itemSize));
+      }
+      return out;
+    };
+    // 재질은 문마다 따로 (붉게 맥동·사라짐을 이 문만)
+    this.lockBodyMat = mesh.material.clone();
+    this.lockBodyMat.emissive = new THREE.Color(0x8a0c18);
+    this.shackleMat = this.lockBodyMat.clone();
+    this.faceMat = new THREE.MeshBasicMaterial();
+    const body = new THREE.Mesh(pick(false), this.lockBodyMat);
+    const shackle = new THREE.Mesh(pick(true), this.shackleMat);
+    body.userData.split = shackle.userData.split = true;
+    mesh.parent.add(body, shackle);
+    mesh.parent.remove(mesh);
+    this.glbShackle = shackle;
+    this.glbShackleScale = new THREE.Vector3();
   }
 
   // X자 사슬 4가닥
@@ -384,7 +474,7 @@ export class EscapeGate {
   }
 
   applyOpenEnd() {
-    this.leaves?.forEach((l) => { l.group.rotation.y = l.side * (Math.PI / 2 - 0.04); });
+    this.leaves?.forEach((l) => { l.group.rotation.y = l.side * l.dir * (Math.PI / 2 - 0.04); });
     this.chains?.forEach((c) => { c.strand.mesh.visible = false; });
     this.lockGroup.visible = false;
     this.lockLevel = 0;
@@ -403,7 +493,7 @@ export class EscapeGate {
       this.lockLevel = (this.revealed ? 12 : 6.5) * p;
       this.aura.material.opacity = 0.5 * p;
       this.aura.scale.setScalar(4.1 + p * 0.5);
-      this.lockGroup.position.y = 2.75 + Math.sin(time * 1.6) * 0.02;
+      this.lockGroup.position.y = (this.models?.lock ? LOCK_Y : 2.75) + Math.sin(time * 1.6) * 0.02;
       return;
     }
     if (this.state === 'open') return;
@@ -422,7 +512,7 @@ export class EscapeGate {
       const shake = 0.035 * (1 - k);
       this.lockGroup.position.x = Math.sin(t * 70) * shake;
       this.group.position.y = Math.sin(t * 55) * shake * 0.4;
-      this.leaves.forEach((l) => { l.group.rotation.y = l.side * 0.01 * (1 - k) * Math.sin(t * 60); });
+      this.leaves.forEach((l) => { l.group.rotation.y = l.side * l.dir * 0.01 * (1 - k) * Math.sin(t * 60); });
     }
     // 2) 걸쇠가 튀어나가고 자물쇠가 떨어진다
     if (t >= 0.5 && this.lockGroup.visible) {
@@ -433,7 +523,14 @@ export class EscapeGate {
       this.aura.material.opacity = Math.max(0, 1.0 - tau * 1.4);
       this.shackle.position.y = Math.min(1.5, tau * 7);
       this.shackle.rotation.z = tau * 3;
-      this.lockGroup.position.y = 2.75 - 0.5 * GRAVITY * tau * tau;
+      if (this.glbShackle) {
+        // GLB 걸쇠: 같은 움직임을 모델 안 좌표로 (부모 배율로 나눔)
+        this.glbShackle.parent.getWorldScale(this.glbShackleScale);
+        const k = this.lockGroup.getWorldScale(new THREE.Vector3()).y / this.glbShackleScale.y;
+        this.glbShackle.position.y = this.shackle.position.y * k * 0.6;
+        this.glbShackle.rotation.z = this.shackle.rotation.z * 0.5;
+      }
+      this.lockGroup.position.y = (this.models?.lock ? LOCK_Y : 2.75) - 0.5 * GRAVITY * tau * tau;
       this.lockGroup.rotation.z = 0.05 + tau * 2.2;
       this.lockGroup.position.z = 0.6 + tau * 0.5;
       const o = Math.max(0, 1 - tau / 1.1);
@@ -469,7 +566,7 @@ export class EscapeGate {
     if (t >= SWING_START) {
       const k = Math.min(1, (t - SWING_START) / SWING_TIME);
       const a = easeInOut(k) * (Math.PI / 2 - 0.04);
-      this.leaves.forEach((l) => { l.group.rotation.y = l.side * a; });
+      this.leaves.forEach((l) => { l.group.rotation.y = l.side * l.dir * a; });
       // 탈출구 빛
       this.exitGlowMat.opacity = 0.28 + 0.54 * Math.min(1, (t - SWING_START + 0.25) / 1.5);
       this.exitFloorMat.opacity = 0.05 + 0.3 * Math.min(1, k * 1.4);

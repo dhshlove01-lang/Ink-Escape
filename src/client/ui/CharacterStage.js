@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { placeModel } from '../render/MapModels.js';
 import { el } from './dom.js';
 import { createCharacterModel } from '../render/AnimalModels.js';
 import { makeTextures, flameTexture } from '../player/SceneBuilder.js';
@@ -434,11 +435,15 @@ function roundRect(g, x, y, w, h, r) {
 // ── 테마로 만드는 대기실 방 (게임 전장과 같은 재료: 돌벽·기둥·벽 횃불·천·크레용 원·낙서) ──
 function buildThemeRoom(theme, fallback) {
   const room = new THREE.Group();
-  const wallTex = texture(theme.tex.wall, { repeat: [1, WALL_H / CELL] }) || fallback.wall;
-  const pillarTex = texture(theme.tex.pillar, { repeat: [1, WALL_H / CELL] });
-  const floorTex = (texture(theme.tex.floor, { repeat: [12, 12] }) || fallback.floor).clone();
+  const H = WALL_H + 3; // 카메라가 위를 조금 더 보므로 높게
+  // 텍스처 한 장 크기(theme.tile, m)가 있으면 그 크기대로 반복 (궁전), 없으면 칸마다 한 장 (던전)
+  const wallRep = theme.tile ? [CELL / theme.tile.wall[0], H / theme.tile.wall[1]] : [1, WALL_H / CELL];
+  const wallTex = texture(theme.tex.wall, { repeat: wallRep }) || fallback.wall;
+  const pillarTex = theme.tex.pillar ? texture(theme.tex.pillar, { repeat: [1, WALL_H / CELL] }) : null;
+  const floorRep = theme.tile ? 40 / theme.tile.floor : 12;
+  const floorTex = (texture(theme.tex.floor, { repeat: [floorRep, floorRep] }) || fallback.floor).clone();
   floorTex.wrapS = floorTex.wrapT = THREE.RepeatWrapping;
-  floorTex.repeat.set(12, 12);
+  floorTex.repeat.set(floorRep, floorRep);
   floorTex.needsUpdate = true;
   const kit = createDungeonKit({ wallTex, floorTex, pillarTex });
   const { mats } = kit;
@@ -453,7 +458,6 @@ function buildThemeRoom(theme, fallback) {
   const cells = [];
   for (let x = -16; x <= 16; x += CELL) cells.push([x, BACK_Z]);
   for (const sx of [-1, 1]) for (let z = BACK_Z + CELL; z <= 6; z += CELL) cells.push([sx * 15, z]);
-  const H = WALL_H + 3; // 카메라가 위를 조금 더 보므로 높게
   const box = new THREE.BoxGeometry(CELL, H, CELL);
   const walls = new THREE.InstancedMesh(box, mats.stone, cells.length);
   const skirt = new THREE.InstancedMesh(new THREE.BoxGeometry(CELL + 0.04, 0.85, CELL + 0.04), mats.stoneDark, cells.length);
@@ -466,6 +470,12 @@ function buildThemeRoom(theme, fallback) {
 
   // 기둥 두 개 (머리·받침)
   for (const x of [-7.2, 7.2]) {
+    if (theme.models?.pillar) {
+      const gp = placeModel(theme.models.pillar, { fit: { x: CELL * 0.95, y: H } });
+      gp.position.set(x, 0, BACK_Z + CELL * 0.95);
+      room.add(gp);
+      continue;
+    }
     const p = new THREE.Mesh(new THREE.BoxGeometry(CELL * 0.84, H, CELL * 0.84), mats.pillar);
     p.position.set(x, H / 2, BACK_Z + CELL * 0.95);
     const base = new THREE.Mesh(new THREE.BoxGeometry(CELL * 0.98, 0.6, CELL * 0.98), mats.trim);
@@ -476,7 +486,7 @@ function buildThemeRoom(theme, fallback) {
   // 벽 횃불 (게임과 같은 모양) + 실제 빛
   const flame = flameTexture(), glow = glowTexture();
   const torches = [-4.4, 4.4].map((x, i) => {
-    const tor = buildTorch(kit, { flame, glow }, { x, z: BACK_Z + CELL / 2, nx: 0, nz: 1 }, i);
+    const tor = buildTorch(kit, { flame, glow }, { x, z: BACK_Z + CELL / 2, nx: 0, nz: 1 }, i, theme.models?.torch);
     const light = new THREE.PointLight(theme.torch, 30, 16, 1.5);
     light.position.copy(tor.tip);
     room.add(tor.group, light);
@@ -489,6 +499,13 @@ function buildThemeRoom(theme, fallback) {
     const banner = new THREE.Mesh(new THREE.PlaneGeometry(1.5, 2.6), mats.cloth);
     banner.position.set(0, 4.6, BACK_Z + CELL / 2 + 0.03);
     room.add(banner);
+  }
+
+  // 뒷벽 가운데 스테인드글라스 창 (궁전)
+  if (theme.lobby?.window) {
+    const w = placeModel(theme.lobby.window, { decorate: (m) => m.traverse((o) => { if (o.isMesh) { o.material.emissive = new THREE.Color(0xffffff); o.material.emissiveMap = o.material.map; o.material.emissiveIntensity = 0.55; } }) });
+    w.position.set(0, 1.6, BACK_Z + CELL / 2 + 0.12);
+    room.add(w);
   }
 
   // 바닥 크레용 원 (단상 아래)

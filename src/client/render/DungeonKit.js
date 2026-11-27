@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { placeModel } from './MapModels.js';
 import { CELL, TILE } from '../../shared/map/GameMap.js';
 
 // 던전 소품·재질 키트. SceneBuilder(1인칭/구석 카메라)와 TopDownMap(술래 탑뷰)이
@@ -507,7 +508,8 @@ export function buildRuneCircle(scene, x, z, radius = 6.2) {
 }
 
 // 횃불 한 자리: 벽 받침 + 비스듬한 손잡이 + 잔 + 불꽃 + 빛무리 (실제 빛은 SceneBuilder 가 가까운 것에만)
-export function buildTorch(kit, tex, t, i) {
+// modelName 을 주면 받침·손잡이·잔 대신 그 GLB 횃불 (불꽃·빛무리는 그대로)
+export function buildTorch(kit, tex, t, i, modelName = null) {
   const { mats } = kit;
   const g = new THREE.Group();
   g.position.set(t.x, 3.0, t.z);
@@ -525,7 +527,14 @@ export function buildTorch(kit, tex, t, i) {
   const glow = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex.glow, color: 0xffa050, blending: THREE.AdditiveBlending, depthWrite: false, transparent: true, opacity: 0.45 }));
   glow.scale.set(3.8, 3.8, 1);
   glow.position.set(0, 0.8, 0.4);
-  g.add(plate, arm, cup, flame, glow);
+  if (modelName) {
+    const parts = new THREE.Group();
+    parts.add(plate, arm, cup);
+    const m = placeModel(modelName, { fallback: parts });
+    m.position.set(0, 0.12, 0.2);
+    m.rotation.x = -0.35; // 불 붙은 끝이 방 쪽으로 기울게
+    g.add(m, flame, glow);
+  } else g.add(plate, arm, cup, flame, glow);
   const tip = new THREE.Vector3(t.x + (t.nx || 0) * 0.9, 3.8, t.z + (t.nz || 1) * 0.9);
   return { group: g, flame, glow, tip, phase: i * 1.7 };
 }

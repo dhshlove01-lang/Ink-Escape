@@ -175,7 +175,7 @@ export class Match {
       color: s.attrs[0]?.key || 'black',
     };
     this.projectiles.push(pr);
-    this.emit(EV.PROJ, { id: pr.id, x: sx, y: sy, z: sz, vx: pr.vx, vy: pr.vy, vz: pr.vz, ttl: pr.ttl, color: pr.color });
+    this.emit(EV.PROJ, { id: pr.id, x: sx, y: sy, z: sz, vx: pr.vx, vy: pr.vy, vz: pr.vz, ttl: pr.ttl, color: pr.color, boss: s.kind !== 'normal' });
   }
 
   finish(winner, reason) {

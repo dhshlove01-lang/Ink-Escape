@@ -1,4 +1,6 @@
 import * as THREE from 'three';
+import { placeModel } from '../render/MapModels.js';
+import { getModelLibrary } from '../render/AnimalModels.js';
 import { texture } from '../render/Images.js';
 
 // 일회성 연출: 총알 궤적, 지우개 수류탄, 폭발, 소환 연기.
@@ -192,7 +194,14 @@ export class Effects {
   }
 
   grenade(sx, sz, x, z, fuse) {
+    // 3D 지우개 수류탄 (못 받으면 2D 그림 → 그것도 없으면 상자)
     const sp = vfxSprite('vfx.grenade', 0.55, { additive: false });
+    const g = placeModel('grenade_eraser', { fallback: sp });
+    if (getModelLibrary()?.defs.grenade_eraser) {
+      this.scene.add(g);
+      this.items.push({ obj: g, life: fuse, max: fuse, kind: 'arc', sx, sz, x, z });
+      return;
+    }
     if (sp) {
       this.scene.add(sp);
       this.items.push({ obj: sp, life: fuse, max: fuse, kind: 'arc', sx, sz, x, z, spin: true });

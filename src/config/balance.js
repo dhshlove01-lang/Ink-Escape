@@ -106,6 +106,8 @@ export const BALANCE = {
     pickupRadius: 1.8,      // 상자를 줍는 거리 (m)
     dropMinPlayerDist: 12,  // 상자는 플레이어에게서 이만큼 떨어진 곳에 (가야 하는 목표)
     dropMinDoorDist: 8,
+    healDrops: [1],         // 이 번째(0부터) 보급은 회복 상자: 줍는 사람 HP 회복 + 카드는 똑같이 ([] 이면 끔)
+    healHp: 35,             // 회복 상자 HP 회복량
   },
   // 증강 수치. max = 같은 증강을 몇 번까지 가질 수 있나 (수치형 2, 효과형 1). 아이콘·순서는 config/augments.js
   aug: {
