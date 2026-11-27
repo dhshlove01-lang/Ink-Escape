@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { InkRenderer } from '../render/InkRenderer.js';
 import { minPlayerDist } from '../../shared/augmentMath.js';
 import { Emitter } from '../Emitter.js';
 import { WALL_H } from '../../shared/map/GameMap.js';
@@ -71,6 +72,7 @@ export class TaggerCam extends Emitter {
     if (this.ready) return;
     this.ready = true;
     this.renderer = new THREE.WebGLRenderer({ antialias: gfx.preset.antialias });
+    this.ink = new InkRenderer(this.renderer, { fadeNear: 70, fadeFar: 150 }); // 위에서 멀리 보므로 선이 늦게 흐려짐
     this.renderer.setPixelRatio(gfx.pixelRatio(this.root.clientWidth || 1));
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.root.append(this.renderer.domElement);
@@ -344,12 +346,13 @@ export class TaggerCam extends Emitter {
     if (this._acc < 1 / RENDER_FPS) return;
     this._acc = 0;
     this.view3d.update(dt, time, this.camera);
-    this.renderer.render(this.scene, this.camera);
+    this.ink.render(this.scene, this.camera);
   }
 
   dispose() {
     if (!this.ready) return;
     this.view3d.dispose();
+    this.ink.dispose();
     this.renderer.dispose();
     this.root.remove();
   }

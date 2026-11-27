@@ -6,6 +6,7 @@ import { CEILING_LAYER } from './SceneBuilder.js';
 import { WALL_H } from '../../shared/map/GameMap.js';
 import { FpsController } from './FpsController.js';
 import { Weapon } from './Weapon.js';
+import { InkRenderer } from '../render/InkRenderer.js';
 import { CameraRecoil, FovPunch, CrosshairBloom } from './GunFeel.js';
 import { Shells } from './Shells.js';
 import { Hud } from './Hud.js';
@@ -29,6 +30,7 @@ export class PlayerView {
     this.renderer = new THREE.WebGLRenderer({ antialias: gfx.preset.antialias });
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.root.append(this.renderer.domElement);
+    this.ink = new InkRenderer(this.renderer, { fadeNear: 30, fadeFar: 75 });
 
     this.view3d = new WorldRenderer({ session, palette, attributes, balance, sfx, skipPlayerId: session.me });
     this.scene = this.view3d.scene;
@@ -322,10 +324,10 @@ export class PlayerView {
       const r = this.renderer;
       r.autoClear = false;
       r.clear();
-      r.render(this.scene, this.camera);
+      this.ink.render(this.scene, this.camera); // 잉크 스타일 (그래픽 '끄기'면 평소대로)
       if (this.weapon.view.visible) {
         r.clearDepth();
-        r.render(this.weapon.vmScene, this.weapon.vmCam);
+        this.ink.render(this.weapon.vmScene, this.weapon.vmCam, { overlay: true });
       }
     }
   }
@@ -374,6 +376,7 @@ export class PlayerView {
     this.shells.dispose();
     this.view3d.dispose();
     this.hud.dispose();
+    this.ink.dispose();
     this.renderer.dispose();
     this.root.remove();
   }

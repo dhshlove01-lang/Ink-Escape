@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { placeModel } from '../render/MapModels.js';
+import { InkRenderer } from '../render/InkRenderer.js';
 import { el } from './dom.js';
 import { createCharacterModel } from '../render/AnimalModels.js';
 import { makeTextures, flameTexture } from '../player/SceneBuilder.js';
@@ -28,6 +29,7 @@ export class CharacterStage {
     parent.append(this.root);
 
     this.renderer = new THREE.WebGLRenderer({ antialias: gfx.preset.antialias });
+    this.ink = new InkRenderer(this.renderer, { fadeNear: 30, fadeFar: 70 }); // 잉크 스타일 (그래픽 '끄기'면 평소대로)
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.root.append(this.renderer.domElement);
 
@@ -339,7 +341,7 @@ export class CharacterStage {
       this.camera.position.y = this.baseCam.y + Math.sin(t * 0.31 + 1) * 0.03;
       this.camera.lookAt(this.cameraLook);
     }
-    this.renderer.render(this.scene, this.camera);
+    this.ink.render(this.scene, this.camera);
   }
 
   resize() {
@@ -367,6 +369,7 @@ export class CharacterStage {
         else m?.dispose?.();
       }
     });
+    this.ink.dispose();
     this.renderer.dispose();
     this.root.remove();
   }

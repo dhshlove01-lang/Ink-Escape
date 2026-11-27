@@ -10,9 +10,10 @@ const URL = process.env.URL || 'http://localhost:8765/index.html';
   page.on('response', (r) => r.status() >= 400 && !r.url().includes('fonts.g') && errors.push(`${r.status()} ${r.url()}`));
   await page.goto(URL, { waitUntil: 'domcontentloaded' });
   await page.waitForSelector('.btn.ghost', { timeout: 30000 });
-  await page.click('.btn.ghost');
-  await page.waitForTimeout(300);
-  await page.click('.btn.primary.big');
+  await page.evaluate(() => document.querySelector('.btn.ghost').click());
+  await page.waitForSelector('.btn.primary.big', { timeout: 30000 });
+  await page.waitForTimeout(1500);
+  await page.evaluate(() => document.querySelector('.btn.primary.big').click()); // 잉크 화면은 헤드리스에서 느려 마우스 클릭이 자주 빗나감
   await page.waitForTimeout(800);
   await page.keyboard.press('Tab');
   await page.evaluate(() => {
@@ -31,7 +32,8 @@ const URL = process.env.URL || 'http://localhost:8765/index.html';
     tv.beginPlace(tv.pad.getStrokes(), true); // SPAWN
     tv.onPick({ x: sp.x + 12, z: sp.z }); // 지도 클릭
   });
-  await page.waitForTimeout(3400);
+  // 소환 3초 뒤 등장 — 느린 헤드리스를 위해 최대 15초까지 기다림
+  await page.waitForFunction(() => window.__app.session.latest?.m?.length >= 1, null, { timeout: 15000 }).catch(() => {});
   const n = await page.evaluate(() => window.__app.session.latest.m.length);
   await page.keyboard.press('Tab');
   for (let i = 0; i < 5; i++) await page.evaluate(() => window.__app.views.player.weapon.fire());
