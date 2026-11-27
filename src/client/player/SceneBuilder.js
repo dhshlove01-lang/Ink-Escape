@@ -1,6 +1,5 @@
 import * as THREE from 'three';
 import { themeFor } from '../../config/themes.js';
-import { gfx } from '../render/GraphicsSettings.js';
 import { CELL, WALL_H, TILE } from '../../shared/map/GameMap.js';
 import { texture, textureFromUrl } from '../render/Images.js';
 import { DECALS } from '../../config/assets.js';
@@ -134,14 +133,12 @@ export function buildScene(map) {
   const floorTex = texture(theme.tex.floor, { repeat: [map.worldW / 3, map.worldH / 3] }) || tex.floor;
   const kit = createDungeonKit({ wallTex, floorTex, pillarTex });
 
-  // 은은한 기본광 + 위에서 내리쬐는 차가운 림 라이트 (횃불이 주인공)
+  // 조명은 2개뿐 (2026-11-27 최적화): 전체를 밝히는 반구광 + 셀 명암용 위쪽 빛.
+  // 횃불·샹들리에·문은 진짜 빛 대신 빛무리 그림만 (픽셀마다 조명 수만큼 계산하므로 9개 → 2개)
   scene.add(new THREE.HemisphereLight(theme.hemi.sky, theme.hemi.ground, theme.hemi.intensity));
-  const rim = new THREE.DirectionalLight(0x8e7ae0, 0.55);
-  rim.position.set(-0.4, 1, 0.55);
-  scene.add(rim);
-  const warmFill = new THREE.DirectionalLight(0xff8a4a, 0.18);
-  warmFill.position.set(0.5, 0.35, -0.8);
-  scene.add(warmFill);
+  const key = new THREE.DirectionalLight(theme.key?.color ?? 0xffe2c4, theme.key?.intensity ?? 1.3);
+  key.position.set(0.45, 1, 0.3);
+  scene.add(key);
 
   // 둥근 맵(궁전): 바닥·천장·둥근 벽은 PalaceBuilder, 안쪽 벽만 아래 상자로
   const round = map.bounds ? buildRoundHall(scene, map, theme, kit, CEILING_LAYER) : null;
@@ -258,14 +255,7 @@ export function buildScene(map) {
     scene.add(beam);
     return beam;
   });
-  // 문 조명은 하나만 (예고된 문으로 옮긴다). 조명 개수가 바뀌면 셰이더를 다시 만들어 끊기므로 개수는 고정.
-  const doorLight = new THREE.PointLight(0xff3048, 0, 26, 1.4);
-  scene.add(doorLight);
-  // 탈출구 빛도 하나만 (문이 열릴 때 그 통로로 옮긴다)
-  const exitLight = new THREE.PointLight(0xffe0a0, 0, 30, 1.6);
-  scene.add(exitLight);
-
-  // 횃불: 벽에 붙은 받침 + 불꽃 + 빛무리. 실제 빛은 카메라에서 가까운 몇 개만.
+  // 횃불: 벽에 붙은 받침 + 불꽃 + 빛무리 (진짜 빛 없음)
   const flameTex = flameTexture();
   const glowTex = glowTexture();
   const torches = map.torches.map((t, i) => {
@@ -273,22 +263,14 @@ export function buildScene(map) {
     scene.add(tor.group);
     return tor;
   });
-  const TORCH_LIGHTS = gfx.preset.torchLights; // 실제 빛을 주는 횃불 수 (그래픽 설정, 판마다 고정 — 바뀌면 셰이더를 다시 만들어 끊김)
-  const pool = Array.from({ length: TORCH_LIGHTS }, () => {
-    const l = new THREE.PointLight(theme.torch, 0, 30, 1.5);
-    scene.add(l);
-    return l;
-  });
 
   if (theme.decals) addDecals(scene, map);
 
-  const tmp = new THREE.Vector3();
   let revealed = -1;
   let last = -1;
   return {
     scene,
-    // camPos: 이 카메라에서 가까운 횃불 몇 개에만 실제 빛을 옮겨 단다
-    update(time, camPos) {
+    update(time) {
       const dt = last < 0 ? 0 : Math.min(0.05, Math.max(0, time - last));
       last = time;
       for (const t of torches) {
@@ -298,38 +280,13 @@ export function buildScene(map) {
           t.glow.material.opacity = 0.34 + 0.16 * t.f;
           t.glow.scale.setScalar(3.4 + t.f * 0.8);
         }
-        t.d = camPos ? t.tip.distanceToSquared(camPos) : 0;
       }
-      const near = camPos ? [...torches].sort((a, b) => a.d - b.d) : torches;
-      pool.forEach((l, k) => {
-        const t = near[k];
-        if (!t) return (l.intensity = 0);
-        l.position.copy(t.tip);
-        l.intensity = 46 * t.f;
-      });
       for (const g of gates) g.update(dt, time);
-      // 자물쇠·탈출구 빛: 예고/열린 문 하나에만
-      const g = revealed >= 0 ? gates[revealed] : null;
-      if (g) {
-        if (g.state === 'open') {
-          doorLight.intensity = 0;
-          exitLight.position.copy(g.exitPos(tmp));
-          exitLight.intensity = g.exitLevel;
-        } else {
-          doorLight.position.copy(g.lockPos(tmp));
-          doorLight.intensity = g.lockLevel;
-          exitLight.intensity = 0;
-        }
-      }
     },
     revealDoor(i) {
       revealed = i;
       gates[i]?.reveal();
       if (beams[i]) beams[i].material.opacity = 0.13;
-      if (gates[i]) {
-        doorLight.position.copy(gates[i].lockPos(tmp));
-        doorLight.intensity = 24;
-      }
     },
     openDoor(i, instant = false) {
       if (revealed < 0) revealed = i;
@@ -341,9 +298,6 @@ export function buildScene(map) {
       if (gates[i] && instant) {
         // 이미 열린 뒤 만들어진 화면: 바로 열린 상태로
         gates[i].update(0, 0);
-        doorLight.intensity = 0;
-        exitLight.position.copy(gates[i].exitPos(tmp));
-        exitLight.intensity = gates[i].exitLevel || 40;
       }
     },
     doors: gates,

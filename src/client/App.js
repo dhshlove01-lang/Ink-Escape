@@ -43,6 +43,7 @@ export class App {
     const frame = (t) => {
       this._raf = requestAnimationFrame(frame);
       if (this._last && t - this._last < gfx.frameInterval()) return;
+      if (this.views && this._last) gfx.frame(t - this._last, t); // 경기 중 프레임 시간 → 자동 해상도·성능 표시
       const dt = Math.min(0.05, (t - (this._last || t)) / 1000);
       this._last = t;
       if (!this.views) return;

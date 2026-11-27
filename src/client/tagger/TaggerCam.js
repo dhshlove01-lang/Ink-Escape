@@ -73,6 +73,7 @@ export class TaggerCam extends Emitter {
     this.ready = true;
     this.renderer = new THREE.WebGLRenderer({ antialias: gfx.preset.antialias });
     this.ink = new InkRenderer(this.renderer, { fadeNear: 70, fadeFar: 150 }); // 위에서 멀리 보므로 선이 늦게 흐려짐
+    this._offGfx = gfx.onChange(() => this.resize()); // 그래픽 설정·자동 해상도가 바뀌면
     this.renderer.setPixelRatio(gfx.pixelRatio(this.root.clientWidth || 1));
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.root.append(this.renderer.domElement);
@@ -87,11 +88,7 @@ export class TaggerCam extends Emitter {
     this.scene.add(this.topLight);
     this.topLight.target.position.set(0, 0, 0);
     this.scene.add(this.topLight.target);
-    this.topFill = new THREE.DirectionalLight(0x7f6ec0, 0.8);
-    this.topFill.position.set(-0.5, 0.4, -0.6);
-    this.scene.add(this.topFill);
-    this.topAmbient = new THREE.AmbientLight(0x8b80b0, 0.55);
-    this.scene.add(this.topAmbient);
+    // (보조 빛·주변광은 뺐다 — 조명 수 = 픽셀마다 계산량. 장면의 반구광이 이미 밝힘)
 
     const m = this.session.map;
     this.center = new THREE.Vector3(m.worldW / 2, 0, m.worldH / 2);
@@ -206,8 +203,6 @@ export class TaggerCam extends Emitter {
     const top = this.mode === 'top';
     this.scene.fog = top ? null : this.fog; // 탑뷰는 카메라가 멀어서 안개에 다 잠긴다
     this.topLight.intensity = top ? 3.4 : 0.2;
-    this.topFill.intensity = top ? 0.5 : 0.05;
-    this.topAmbient.intensity = top ? 0.55 : 0.15;
     this.arrow.visible = !top;
     this.hoverRing.visible = false;
   }
@@ -352,6 +347,7 @@ export class TaggerCam extends Emitter {
   dispose() {
     if (!this.ready) return;
     this.view3d.dispose();
+    this._offGfx?.();
     this.ink.dispose();
     this.renderer.dispose();
     this.root.remove();

@@ -2,9 +2,10 @@ import * as THREE from 'three';
 import { gfx } from './GraphicsSettings.js';
 
 // 잉크 스타일 렌더링 (2026-11-27, art/style/ink-test 시험을 게임에 적용).
-//   1) 색: PBR·램버트 재질을 그 자리에서 셀 셰이딩(MeshToonMaterial, 3단 명암)으로 바꿔 그린다 — 원래 재질은 그대로 둔다
-//   2) 면 방향·깊이: 따로 한 번 더 그려서
-//   3) 합치기: 깊이 차이 = 윤곽선, 면 방향이 크게 꺾인 곳 = 주름선 → 검은 잉크 선 + 종이 결
+//   1) 색 + 깊이: PBR·램버트 재질을 그 자리에서 셀 셰이딩(MeshToonMaterial, 3단 명암)으로 바꿔 장면을 **한 번만** 그린다
+//      (원래 재질은 그대로 둔다). 반투명·빛 효과는 이 동안 깊이를 안 쓰게 해서 선이 안 생긴다
+//   2) 합치기: 깊이 차이 = 윤곽선, 깊이로 되살린 면 방향이 크게 꺾인 곳 = 주름선 → 검은 잉크 선 + 종이 결
+//   (2026-11-27 최적화: 예전엔 면 방향을 따로 한 번 더 그렸다 → 장면 그리기 2번 → 1번)
 // 선은 화면 고정 흔들림 없이 물체에 붙어 다닌다. 반투명·빛 효과(스프라이트·빛무리·자국·장판)는 선 계산에서 뺀다.
 // 그래픽 '끄기'(gfx.preset.ink === false)면 평소처럼 그냥 그린다.
 
@@ -85,24 +86,6 @@ function skipInk(o) {
   return m.transparent && !(m.alphaTest > 0);
 }
 
-const NORMAL_MAT = new THREE.MeshNormalMaterial();
-// 잘라낸 종이 그림(몬스터): 그림 모양대로만 면 방향을 쓴다
-const cutoutOf = new WeakMap();
-function cutoutNormal(m) {
-  let c = cutoutOf.get(m);
-  if (!c) {
-    c = new THREE.ShaderMaterial({
-      uniforms: { map: { value: m.map }, alphaTest: { value: m.alphaTest } },
-      side: THREE.DoubleSide,
-      vertexShader: 'varying vec3 vN; varying vec2 vUv; void main(){ vUv = uv; vN = normalize(normalMatrix * normal); gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
-      fragmentShader: 'uniform sampler2D map; uniform float alphaTest; varying vec3 vN; varying vec2 vUv; void main(){ if (texture2D(map, vUv).a < alphaTest) discard; vec3 n = gl_FrontFacing ? vN : -vN; gl_FragColor = vec4(n * 0.5 + 0.5, 1.0); }',
-    });
-    cutoutOf.set(m, c);
-  }
-  c.uniforms.map.value = m.map;
-  return c;
-}
-
 export class InkRenderer {
   constructor(renderer, opts = {}) {
     this.r = renderer;
@@ -113,8 +96,8 @@ export class InkRenderer {
     this._v = new THREE.Vector2();
     this.post = new THREE.ShaderMaterial({
       uniforms: {
-        tColor: { value: null }, tNormal: { value: null }, tDepth: { value: null }, tPaper: { value: PAPER },
-        res: { value: new THREE.Vector2() }, near: { value: 0.1 }, far: { value: 100 }, ortho: { value: 0 },
+        tColor: { value: null }, tDepth: { value: null }, tPaper: { value: PAPER },
+        res: { value: new THREE.Vector2() }, near: { value: 0.1 }, far: { value: 100 }, ortho: { value: 0 }, invProj: { value: new THREE.Matrix4() },
         lineW: { value: 2 }, fade: { value: new THREE.Vector2(this.o.fadeNear, this.o.fadeFar) }, overlay: { value: 0 },
       },
       depthTest: false,
@@ -122,24 +105,32 @@ export class InkRenderer {
       transparent: true,
       vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }',
       fragmentShader: `
-        uniform sampler2D tColor, tNormal, tDepth, tPaper; uniform vec2 res, fade; uniform float near, far, ortho, lineW, overlay; varying vec2 vUv;
+        uniform sampler2D tColor, tDepth, tPaper; uniform vec2 res, fade; uniform float near, far, ortho, lineW, overlay; uniform mat4 invProj; varying vec2 vUv;
         float lin(float d){ if (ortho > 0.5) return near + d * (far - near); float z = d * 2.0 - 1.0; return (2.0 * near * far) / (far + near - z * (far - near)); }
+        vec3 viewPos(vec2 uv){ vec4 v = invProj * vec4(uv * 2.0 - 1.0, texture2D(tDepth, uv).r * 2.0 - 1.0, 1.0); return v.xyz / v.w; }
+        // 깊이에서 되살린 면 방향 (따로 그리지 않음)
+        vec3 nrm(vec2 uv, vec2 px){ vec3 p = viewPos(uv); return normalize(cross(viewPos(uv + vec2(px.x, 0.)) - p, viewPos(uv + vec2(0., px.y)) - p)); }
         void main(){
-          vec2 px = lineW / res;
+          vec2 px = lineW / res, one = 1.0 / res;
           float d0 = lin(texture2D(tDepth, vUv).r);
-          vec3 n0 = texture2D(tNormal, vUv).rgb;
-          float dEdge = 0.0, nEdge = 0.0, nHits = 0.0;
+          float dEdge = 0.0;
           for (int i = 0; i < 8; i++) {
             vec2 o = vec2(i == 0 || i == 4 || i == 5 ? 1. : i == 1 || i == 6 || i == 7 ? -1. : 0.,
                           i == 2 || i == 4 || i == 6 ? 1. : i == 3 || i == 5 || i == 7 ? -1. : 0.) * px;
             float dn = lin(texture2D(tDepth, vUv + o).r);
             dEdge = max(dEdge, abs(dn - d0) / min(dn, d0));
-            float nd = distance(texture2D(tNormal, vUv + o).rgb, n0);
+          }
+          float silhouette = smoothstep(0.03, 0.06, dEdge);                   // 윤곽 (거리 차이)
+          // 접힌 곳: 가운데 면 방향과 상하좌우 면 방향이 크게 다르고, 두 곳 이상일 때만 (외톨이 점 없음)
+          vec3 n0 = nrm(vUv, one);
+          float nHits = 0.0, nEdge = 0.0;
+          for (int i = 0; i < 4; i++) {
+            vec2 o = vec2(i == 0 ? 1. : i == 1 ? -1. : 0., i == 2 ? 1. : i == 3 ? -1. : 0.) * px;
+            float nd = distance(nrm(vUv + o, one), n0);
             nEdge = max(nEdge, nd);
             nHits += step(0.5, nd);
           }
-          float silhouette = smoothstep(0.03, 0.06, dEdge);               // 윤곽 (거리 차이)
-          float crease = smoothstep(0.55, 0.9, nEdge) * step(2.5, nHits);  // 접힌 곳 (이웃 3곳 이상 → 외톨이 점 없음)
+          float crease = smoothstep(0.55, 0.9, nEdge) * step(1.5, nHits) * (1.0 - silhouette);
           float edge = max(silhouette, crease) * (1.0 - smoothstep(fade.x, fade.y, min(d0, far * 0.999)));
           vec4 c = texture2D(tColor, vUv);
           vec3 p = texture2D(tPaper, vUv * res / 256.0).rgb;
@@ -154,7 +145,7 @@ export class InkRenderer {
     this.postScene = new THREE.Scene();
     this.postScene.add(this.quad);
     this.postCam = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
-    this._hidden = [];
+    this._noDepth = [];
     this._swapped = [];
   }
 
@@ -166,25 +157,33 @@ export class InkRenderer {
     const s = this.r.getDrawingBufferSize(this._v);
     if (s.x === this.size.x && s.y === this.size.y && this.rtColor) return;
     this.size.copy(s);
+    this.rtColor?.depthTexture?.dispose();
     this.rtColor?.dispose();
-    this.rtNormal?.dispose();
-    this.rtNormal?.depthTexture?.dispose();
     this.rtColor = new THREE.WebGLRenderTarget(s.x, s.y, { samples: gfx.preset.antialias ? 4 : 0, type: THREE.HalfFloatType });
-    this.rtNormal = new THREE.WebGLRenderTarget(s.x, s.y);
-    this.rtNormal.depthTexture = new THREE.DepthTexture(s.x, s.y);
+    this.rtColor.depthTexture = new THREE.DepthTexture(s.x, s.y);
   }
 
   // overlay: 1인칭 총처럼 이미 그린 화면 위에 덧그릴 때 (배경은 투명)
   render(scene, camera, { overlay = false } = {}) {
     const r = this.r;
-    if (!this.enabled) return r.render(scene, camera);
+    if (!this.enabled) {
+      r.render(scene, camera);
+      gfx.count(r.info);
+      return;
+    }
     this._targets();
     const autoClear = r.autoClear;
     const clearColor = r.getClearColor(new THREE.Color()), clearAlpha = r.getClearAlpha();
     r.autoClear = false;
 
-    // 1) 색 (셀 셰이딩)
+    // 1) 색 + 깊이 (셀 셰이딩, 반투명·빛 효과는 깊이를 안 써서 선이 안 생김)
     scene.traverse((o) => {
+      if (!o.isMesh && !o.isSprite && !o.isPoints && !o.isLine) return;
+      const ms = Array.isArray(o.material) ? o.material : [o.material];
+      if (skipInk(o)) {
+        for (const m of ms) if (m && m.depthWrite) (this._noDepth.push(m), (m.depthWrite = false));
+        return;
+      }
       if (!o.isMesh) return;
       if (Array.isArray(o.material)) {
         if (o.material.some(TOON_FROM)) {
@@ -200,41 +199,17 @@ export class InkRenderer {
     r.setClearColor(overlay ? 0x000000 : clearColor, overlay ? 0 : clearAlpha);
     r.clear();
     r.render(scene, camera);
+    gfx.count(r.info);
     for (const [o, m] of this._swapped) o.material = m;
     this._swapped.length = 0;
-
-    // 2) 면 방향·깊이 (선 계산용 — 효과·반투명은 숨김)
-    const bg = scene.background, fog = scene.fog;
-    scene.background = null;
-    scene.fog = null;
-    scene.traverse((o) => {
-      if (!o.visible) return;
-      if (skipInk(o)) {
-        o.visible = false;
-        this._hidden.push(o);
-        return;
-      }
-      if (!o.isMesh) return;
-      const m = Array.isArray(o.material) ? o.material[0] : o.material;
-      this._swapped.push([o, o.material]);
-      o.material = m.alphaTest > 0 && m.map ? cutoutNormal(m) : NORMAL_MAT;
-    });
-    r.setRenderTarget(this.rtNormal);
-    r.setClearColor(0x8080ff, 1);
-    r.clear();
-    r.render(scene, camera);
-    for (const [o, m] of this._swapped) o.material = m;
-    this._swapped.length = 0;
-    for (const o of this._hidden) o.visible = true;
-    this._hidden.length = 0;
-    scene.background = bg;
-    scene.fog = fog;
+    for (const m of this._noDepth) m.depthWrite = true;
+    this._noDepth.length = 0;
 
     // 3) 합치기 → 화면
     const u = this.post.uniforms;
     u.tColor.value = this.rtColor.texture;
-    u.tNormal.value = this.rtNormal.texture;
-    u.tDepth.value = this.rtNormal.depthTexture;
+    u.tDepth.value = this.rtColor.depthTexture;
+    u.invProj.value.copy(camera.projectionMatrixInverse);
     u.res.value.copy(this.size);
     u.near.value = camera.near;
     u.far.value = camera.far;
@@ -250,9 +225,8 @@ export class InkRenderer {
   }
 
   dispose() {
+    this.rtColor?.depthTexture?.dispose();
     this.rtColor?.dispose();
-    this.rtNormal?.dispose();
-    this.rtNormal?.depthTexture?.dispose();
     this.post.dispose();
     this.quad.geometry.dispose();
   }

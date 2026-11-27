@@ -6,7 +6,8 @@ export const THEMES = {
     tex: { wall: 'tex.wall', floor: 'tex.floor', pillar: 'tex.pillar' }, // config/assets.js 의 이미지 키
     background: 0x08060d,
     fog: { color: 0x0a0712, near: 11, far: 64 },
-    hemi: { sky: 0x7a68a8, ground: 0x2a1c18, intensity: 1.05 },
+    hemi: { sky: 0x9a88c8, ground: 0x4a3428, intensity: 3.6 },
+    key: { color: 0xffe2c4, intensity: 2.2 }, // 셀 명암을 만드는 위쪽 빛 하나 (진짜 점광원은 없음 — 횃불·샹들리에는 빛무리 그림만)
     torch: 0xff9a4a,
     decals: { chalk: [0, 1, 2, 3, 6, 9], red: [0, 1] }, // 로비 벽에 붙일 낙서 (DECALS 번호)
     rune: true, // 바닥 빨간 크레용 원
@@ -17,8 +18,9 @@ export const THEMES = {
     tex: { wall: 'tex.palace_wall', floor: 'tex.palace_floor', carpet: 'tex.palace_carpet' },
     tile: { wall: [4.5, 7], floor: 4, carpet: 2.4 }, // 텍스처 한 장의 실제 크기(m): 벽 [가로, 세로], 바닥 한 변, 카펫 길이
     background: 0x0b0710,
-    fog: { color: 0x120a16, near: 16, far: 78 },
-    hemi: { sky: 0xb8a4e0, ground: 0x5a3424, intensity: 2.6 },
+    fog: { color: 0x1c1222, near: 20, far: 90 },
+    hemi: { sky: 0xecd6e4, ground: 0x8a5a40, intensity: 5.2 }, // 진짜 점광원을 뺀 만큼 밝게 (따뜻한 횃불빛 느낌)
+    key: { color: 0xffe6c8, intensity: 2.6 },
     torch: 0xffa35a,
     decals: null,
     rune: false,

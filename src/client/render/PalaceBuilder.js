@@ -164,7 +164,7 @@ export function buildMapProps(scene, map, theme) {
     holder.rotation.y = p.ry || 0;
     scene.add(holder);
   }
-  // 샹들리에: 천장까지 사슬 + 촛불 빛무리 (실제 빛은 가운데 하나만 — 조명 수 고정)
+  // 샹들리에: 천장까지 사슬 + 촛불 빛무리 (진짜 빛 없음 — 빛나 보이기만)
   const glow = glowTexture();
   const chainMat = lam(0x1c1a20);
   for (const c of chandeliers) {
@@ -176,11 +176,6 @@ export function buildMapProps(scene, map, theme) {
     halo.scale.set(5.5, 3.2, 1);
     halo.position.set(c.x, c.y + 0.9, c.z);
     scene.add(halo);
-  }
-  if (chandeliers[0]) {
-    const l = new THREE.PointLight(0xffb870, 180, 30, 1.3);
-    l.position.set(chandeliers[0].x, chandeliers[0].y + 0.5, chandeliers[0].z);
-    scene.add(l);
   }
 }
 

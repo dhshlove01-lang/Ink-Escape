@@ -699,3 +699,6 @@ h1.logo img { display: block; width: min(340px, 78%); height: auto; margin: 0 au
 .opt-count { text-align: center; color: var(--muted); font-family: var(--font-body); font-size: 13px; }
 .lobby-rules { margin-top: 8px; font-family: var(--font-body); font-size: 13px; color: var(--muted); cursor: help; }
 .lobby-rules.custom { color: #f0bd1e; }
+
+/* 성능 표시 (F3) — ui/PerfOverlay.js */
+.perf-overlay { position: fixed; left: 8px; top: 8px; z-index: 9999; white-space: pre; pointer-events: none; padding: 6px 9px; border-radius: 8px; background: rgba(0,0,0,0.62); color: #b8ffb0; font: 12px/1.45 var(--font-body); }

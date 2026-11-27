@@ -60,13 +60,11 @@ export class CharacterStage {
   // 캐릭터 조명은 고정, 방(벽·바닥·횃불·소품)은 지금 맵의 테마로 만든다 → 맵이 바뀌면 setTheme 으로 다시 만든다.
   buildLights() {
     const s = this.scene;
-    s.add(new THREE.HemisphereLight(0xa79dd6, 0x33262a, 1.6));
-    const key = new THREE.DirectionalLight(0xfff0d8, 1.5);
+    // 조명 2개 (+결과 화면에서만 스포트라이트). 횃불은 빛무리 그림만 (2026-11-27 최적화)
+    s.add(new THREE.HemisphereLight(0xb4aae0, 0x4a3630, 2.4));
+    const key = new THREE.DirectionalLight(0xfff0d8, 1.6);
     key.position.set(3.5, 6, 4.5);
     s.add(key);
-    const rim = new THREE.DirectionalLight(0xff4a5e, 0.9);
-    rim.position.set(-4, 3, -5);
-    s.add(rim);
     // 결과 화면용: 중앙 단상 위 스포트라이트 + 바닥 광채
     this.spot = new THREE.SpotLight(0xfff2d0, 0, 16, 0.5, 0.55, 1.2);
     this.spot.position.set(0, 7.5, 2.2);
@@ -247,6 +245,7 @@ export class CharacterStage {
     const dist = Math.max(base, fitW + 0.7);
     this.baseCam = { x: 0, y: this.mode === 'result' ? 2.0 : 2.1, z: dist, lookY: this.mode === 'result' ? 0.95 : 1.05 };
     this.spot.intensity = this.mode === 'result' ? 26 : 0;
+    this.spot.visible = this.mode === 'result'; // 꺼 둔 빛은 계산에서 빠진다
     this.cameraLook = new THREE.Vector3(0, this.baseCam.lookY, 0);
     this.camera.position.set(this.baseCam.x, this.baseCam.y, this.baseCam.z);
     this.camera.lookAt(this.cameraLook);
@@ -330,7 +329,6 @@ export class CharacterStage {
 
     for (const tc of this.torches || []) {
       const fl = 0.85 + Math.sin(t * 9 + tc.phase) * 0.1 + Math.sin(t * 23 + tc.phase * 2) * 0.06;
-      tc.light.intensity = 30 * fl;
       tc.flame.scale.set(0.7 * (0.9 + fl * 0.12), 0.95 * (0.9 + fl * 0.12), 1);
       tc.glow.material.opacity = 0.35 + fl * 0.12;
     }
@@ -486,14 +484,12 @@ function buildThemeRoom(theme, fallback) {
     room.add(p, base);
   }
 
-  // 벽 횃불 (게임과 같은 모양) + 실제 빛
+  // 벽 횃불 (게임과 같은 모양, 빛무리만)
   const flame = flameTexture(), glow = glowTexture();
   const torches = [-4.4, 4.4].map((x, i) => {
     const tor = buildTorch(kit, { flame, glow }, { x, z: BACK_Z + CELL / 2, nx: 0, nz: 1 }, i, theme.models?.torch);
-    const light = new THREE.PointLight(theme.torch, 30, 16, 1.5);
-    light.position.copy(tor.tip);
-    room.add(tor.group, light);
-    return { flame: tor.flame, glow: tor.glow, light, phase: i * 2.1 + 0.4 };
+    room.add(tor.group);
+    return { flame: tor.flame, glow: tor.glow, phase: i * 2.1 + 0.4 };
   });
   room.userData.torches = torches;
 

@@ -16,8 +16,13 @@ import { setModelLibrary } from './client/render/AnimalModels.js';
 import { IMAGE_DEFS } from './config/assets.js';
 import { loadImages, url } from './client/render/Images.js';
 import { UpdateWatcher } from './client/UpdateWatcher.js';
+import { mountPerfOverlay } from './client/ui/PerfOverlay.js';
+import { gfx } from './client/render/GraphicsSettings.js';
 
 // 새 배포 감지 (서비스 워커 등록·배포 전용 주소는 index.html 이 한다)
+// 성능 표시 (F3)
+mountPerfOverlay();
+
 const updates = new UpdateWatcher({ base: window.BUILD_STAMP });
 updates.start();
 
@@ -70,3 +75,4 @@ if (kitKeys.every((k) => url(k))) {
 }
 app.start();
 window.__app = app; // 디버그·자동 테스트용
+window.__gfx = gfx; // 디버그·자동 테스트용 (그래픽 설정·성능 숫자)
