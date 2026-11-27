@@ -121,6 +121,11 @@ URL=https://dhshlove01-lang.github.io/Ink-Escape/ NODE_PATH=$(npm root -g) node 
 
 ## 작업 기록
 
+### 2026-11-27 · 총: 궤적 선 없앰 + 총구 번쩍임 절반
+- **무엇을**: 사용자 지시 "총 쏠 때 레이저 같은 긴 선 안 나오게, 총구 번쩍임 크기 반으로". 내 총(1인칭)·다른 플레이어 총 모두 궤적 선(`effects.tracer`)을 부르지 않는다. 1인칭 번쩍임·빛무리는 `FLASH_SCALE = 0.5`, 월드 번쩍임 스프라이트 0.75→0.375(내 것)·0.5→0.25(남의 것). 총알 자국(5초)은 그대로.
+- **어디**: `Weapon.js`(`FLASH_SCALE`, `update`), `PlayerView.onShot`, `WorldRenderer` EV.SHOT. `Effects.tracer` 함수는 남겨 둠(다시 쓸 수 있게).
+- **검증**: smoke `errors: []`, `monsters: 1`.
+
 ### 2026-11-27 · 로비 대기 동작: 찌그러짐 없이 천천히 좌우로만
 - **무엇을**: 사용자 지적 "대기 때 몸이 길어지거나 갑자기 움직이고 너무 찌그러짐" → 대기실 캐릭터는 정면을 본 채 천천히 좌우로 도는 것만(약 ±18°, `IDLE_SWAY`). 숨쉬기 크기 변화·위아래 들썩임·기지개(늘어남)·깡총 찌그러짐 제거, 플레이어 딴짓(인사·두리번·기지개·깡총·한 바퀴·갸우뚱) 끔. 술래의 연필 바닥 낙서는 유지(몸 모양은 안 바뀜). 결과 화면 축하 동작(깡총·한 바퀴·인사)은 유지하되 찌그러짐은 뺌.
 - **어디**: `src/client/ui/CharacterStage.js` — `update()` (scale 항상 1), `IDLE_SWAY`, `PLAYER_ACTS = []`, `pickAct` 빈 목록이면 null, `actPose('hop')`.

@@ -8,6 +8,9 @@ import { fireRate, reloadSec } from '../../shared/augmentMath.js';
 const VIEW_POS = [0.25, -0.23, -0.52]; // 손·총 위치 (카메라 기준)
 const AIM_DIST = 15; // 총신이 화면 가운데 이 거리(m)의 점을 겨눈다
 
+
+// 총구 번쩍임 크기 배율 (2026-11-27 사용자 지시: 반으로)
+const FLASH_SCALE = 0.5;
 export class Weapon {
   constructor({ balance, camera, animal, raycast, onShot, sfx, getAug = () => ({}) }) {
     this.b = balance;
@@ -198,9 +201,9 @@ export class Weapon {
     this.flash.visible = this.flashT > 0;
     this.flashHalo.visible = this.flashT > 0;
     if (this.flash.visible) {
-      const s = 0.26 + 0.3 * fk;
+      const s = (0.26 + 0.3 * fk) * FLASH_SCALE;
       this.flash.scale.set(s, s, 1);
-      const hs = 0.5 + 0.5 * fk;
+      const hs = (0.5 + 0.5 * fk) * FLASH_SCALE;
       this.flashHalo.scale.set(hs, hs, 1);
       this.flash.material.opacity = 1 - fk * 0.7;
       this.flashHalo.material.opacity = (1 - fk) * 0.9;

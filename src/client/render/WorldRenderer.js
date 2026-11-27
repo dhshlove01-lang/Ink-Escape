@@ -36,8 +36,7 @@ export class WorldRenderer {
       session.on(EV.SHOT, (e) => {
         if (e.from === skipPlayerId) return; // 내 총알은 1인칭 쪽에서 바로 그린다
         const a = new THREE.Vector3(...e.a), b = new THREE.Vector3(...e.b);
-        this.effects.muzzle(a, 0.5);
-        this.effects.tracer(a, b, 0xffc46b);
+        this.effects.muzzle(a, 0.25); // 궤적 선 없음
         const s = surfaceAt(session.map, b, new THREE.Vector3().subVectors(b, a));
         if (s) this.effects.bulletHole(b, s.normal, s.kind);
       }),

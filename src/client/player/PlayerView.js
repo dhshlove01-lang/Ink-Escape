@@ -204,8 +204,7 @@ export class PlayerView {
   }
 
   onShot({ origin, muzzle, point, monsterId, monsterIds = monsterId ? [monsterId] : [], follow }) {
-    this.effects.muzzle(muzzle, 0.75);
-    this.effects.tracer(muzzle, point, undefined, follow);
+    this.effects.muzzle(muzzle, 0.375); // 총알 궤적 선은 그리지 않는다 (2026-11-27 사용자 지시: 레이저 같은 긴 선 제거)
     if (!monsterId) {
       const s = surfaceAt(this.session.map, point, new THREE.Vector3().subVectors(point, origin));
       if (s) this.effects.bulletHole(point, s.normal, s.kind);
