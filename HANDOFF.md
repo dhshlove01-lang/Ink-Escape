@@ -107,6 +107,9 @@ URL=https://dhshlove01-lang.github.io/Ink-Escape/ NODE_PATH=$(npm root -g) node 
 9. 캐릭터 **대기(idle) 클립** — 지금은 정지 시 바인드(A포즈)다. Tripo 에서 idle 을 뽑아 `assets/models/<동물>.glb` 안에 넣으면 `CharacterRig` 가 `pickClip(clips,'idle')` 로 자동 재생(코드 한 줄 추가). 있으면 로비 단상도 훨씬 살아난다.
 10. 애니메이션 클립 추가(피격·사망·재장전·부활) — 같은 리그에 클립만 늘리면 된다(`CharacterRig` 가 이름으로 찾는다).
 
+## 사용자 메모 (2026-11-27)
+- 배경(궁전 벽·바닥·천장 등)은 **잉크로 그린 느낌**으로 사용자가 나중에 바꿀 예정. 지금 텍스처(`assets/tex/palace_*`)·시작 화면 배경은 임시로 본다.
+
 ## 3D 오브젝트 부족 목록 (사용자가 나중에 3D 로 만들어 줌 — 2026-11-27 기록)
 
 지금은 코드 도형·2D 그림으로 대신 그리는 것들. GLB 를 받으면 `assets/models/<이름>.glb` + `config/models.js` 에 `prop('<이름>', 크기)` 한 줄, 쓰는 곳은 `placeModel('<이름>', { fallback: 지금 도형 })` 으로 바꾸면 된다 (못 받으면 지금 도형 그대로).
