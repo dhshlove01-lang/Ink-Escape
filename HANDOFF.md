@@ -96,6 +96,7 @@ URL=https://dhshlove01-lang.github.io/Ink-Escape/ NODE_PATH=$(npm root -g) node 
 
 ## 다음 할 일 (우선순위)
 
+0. **아트 방향 바꾸기 — 선 없이 자연스러운 다크 마왕 방** (2026-11-27 사용자 요청, 정리만 함): `docs/art_direction_dark_palace.md` 를 먼저 읽고 1단계(분위기 가짜 조명)부터. 참고 그림 `art/style/reference/stylized_mood_ref.jpg`.
 1. 보급 카드 (3분마다 10장 중 3장) — 기획안 10장
 2. 핑 기준 방장 자동 선택 + 방장 이전
 3. 봇 플레이어 / AI 술래 (갤러리 그림 사용), 연습 모드
