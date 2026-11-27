@@ -278,12 +278,10 @@ export class CharacterStage {
 
     for (const f of this.figures) {
       const ph = f.phase;
-      // 숨쉬기 + 아주 작은 들썩임 (가만히 있을 때)
-      const breath = 1 + Math.sin(t * 2.0 + ph) * 0.016;
-      let bob = Math.sin(t * 1.5 + ph) * 0.03;
-      let rx = 0, rz = 0, ry = result ? Math.sin(t * 0.55 + ph) * 0.7 : Math.sin(t * 0.6 + ph) * 0.18;
-      let sy = breath, sxz = 1 + (1 - breath) * 0.7;
-      // 딴짓: 몇 초마다 하나씩 (인사·두리번·기지개·깡총·한 바퀴·갸우뚱 / 술래는 연필로 바닥 낙서)
+      // 대기: 정면을 본 채 천천히 좌우로 고개(몸)만 돌린다. 몸을 늘이거나 찌그러뜨리지 않는다 (사용자 지시 2026-11-27)
+      let bob = 0;
+      let rx = 0, rz = 0, ry = result ? Math.sin(t * 0.55 + ph) * 0.7 : Math.sin(t * IDLE_SWAY.speed + ph) * IDLE_SWAY.angle;
+      // 딴짓: 대기실에선 술래의 연필 낙서만, 결과 화면에선 인사·깡총·한 바퀴
       if (!f.act) {
         f.nextAct -= dt;
         if (f.nextAct <= 0) f.act = pickAct(f, result);
@@ -298,8 +296,6 @@ export class CharacterStage {
         rz += o.rz || 0;
         ry = (o.ryAbs ?? ry) + (o.ry || 0);
         bob += o.dy || 0;
-        sy *= o.sy || 1;
-        sxz *= o.sxz || 1;
         if (a.name === 'draw') {
           f.pencil.visible = f.kind !== 'devil';
           f.pencil.rotation.z = -0.9 + Math.sin(t * 14) * 0.12;
@@ -317,7 +313,7 @@ export class CharacterStage {
       }
       f.doodle.update(dt);
       f.sway.position.y = bob;
-      f.sway.scale.set(sxz, sy, sxz);
+      f.sway.scale.set(1, 1, 1);
       f.sway.rotation.set(rx, f.yaw + ry, rz);
       // 단상 링: 내 캐릭터는 노랗게, READY 는 초록으로 은은히
       const on = f.ringTarget || 0;
@@ -527,7 +523,8 @@ function disposeTree(root) {
 }
 
 // ── 대기실 딴짓 ─────────────────────────────────────────────────
-const PLAYER_ACTS = ['bow', 'look', 'stretch', 'hop', 'spin', 'tilt', 'bow', 'look'];
+const IDLE_SWAY = { speed: 0.5, angle: 0.32 }; // 대기 좌우 돌기: 속도(rad/s 배율)·최대 각도(rad ≈ 18°)
+const PLAYER_ACTS = []; // 대기실 플레이어는 딴짓 없이 좌우로만
 const RESULT_ACTS = ['hop', 'spin', 'bow'];
 const DOODLES = ['spiral', 'star', 'smile', 'heart', 'zigzag'];
 
@@ -536,6 +533,7 @@ function pickAct(f, result) {
     return { name: 'draw', t: 0, dur: 4.2, shape: DOODLES[Math.floor(Math.random() * DOODLES.length)] };
   }
   const list = result ? RESULT_ACTS : PLAYER_ACTS;
+  if (!list.length) return null;
   let name = list[Math.floor(Math.random() * list.length)];
   if (name === f.lastAct) name = list[(list.indexOf(name) + 1) % list.length];
   f.lastAct = name;
@@ -556,9 +554,9 @@ function actPose(name, k, env, t) {
       return { ry: Math.sin(k * Math.PI * 2) * 0.75 * env, rz: Math.sin(k * Math.PI * 2) * 0.05 };
     case 'stretch': // 기지개: 쭉 늘었다가
       return { sy: 1 + env * 0.13, sxz: 1 - env * 0.06, rx: -env * 0.12 };
-    case 'hop': { // 깡총깡총 (착지할 때 찌그러짐)
+    case 'hop': { // 깡총깡총
       const h = Math.abs(Math.sin(k * Math.PI * 2));
-      return { dy: h * 0.38 * (1 - k * 0.35), sy: 1 - (1 - h) * env * 0.08, sxz: 1 + (1 - h) * env * 0.05 };
+      return { dy: h * 0.38 * (1 - k * 0.35) };
     }
     case 'spin': // 제자리 한 바퀴
       return { ry: ease(k) * Math.PI * 2, dy: env * 0.22 };
