@@ -12,14 +12,23 @@ export class ModelLibrary {
     this.models = new Map();
     this.waiters = new Map();
     this.factories = new Map(); // 코드 모델: 이름 → 보정까지 한 새 모델을 돌려주는 함수
+    this.pending = new Map(); // 불러오는 중인 약속 (같은 모델을 두 번 받지 않는다)
     this.loader = new GLTFLoader();
   }
 
+  // lazy: true 인 모델은 시작할 때 받지 않는다 (필요할 때 load(name) 으로)
   loadAll() {
-    return Promise.allSettled(Object.keys(this.defs).map((name) => this.load(name)));
+    return Promise.allSettled(Object.keys(this.defs).filter((n) => !this.defs[n].lazy).map((name) => this.load(name)));
   }
 
-  async load(name) {
+  load(name) {
+    if (this.pending.has(name)) return this.pending.get(name);
+    const p = this._load(name).finally(() => this.pending.delete(name));
+    this.pending.set(name, p);
+    return p;
+  }
+
+  async _load(name) {
     const def = this.defs[name];
     try {
       if (def.procedural) {

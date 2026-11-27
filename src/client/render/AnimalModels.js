@@ -214,7 +214,6 @@ function primitiveAnimal(kind, { gun = true } = {}) {
 
 // 1인칭 앞발 + 총 (카메라 기준 뷰모델). 동물마다 털색·무늬·소매·발바닥이 다르다.
 export function createViewModel(kind) {
-  const L = ANIMAL_LOOK[kind] || ANIMAL_LOOK.shiba;
   const g = new THREE.Group();
   const gun = createGunMesh(toViewModelMaterial);
   g.userData.gun = gun;
@@ -224,25 +223,35 @@ export function createViewModel(kind) {
 
   // 방아쇠를 쥔 오른발 (총 손잡이 뒤) · 총열을 받치는 왼발 (앞몸통 아래)
   // 좌표는 view 기준(m). 총은 대각선(-z 쪽이 왼쪽 위)이라 발도 그 각도에 맞춘다.
-  const rearWrist = new THREE.Vector3(-0.07, -0.094, -0.028);
-  const rearElbow = new THREE.Vector3(0.02, -0.5, 0.06);
-  const frontWrist = new THREE.Vector3(-0.106, -0.056, -0.15);
-  const frontElbow = new THREE.Vector3(-0.15, -0.5, -0.01);
-  g.add(buildArm(rearWrist, rearElbow, L, kind));
-  g.add(buildArm(frontWrist, frontElbow, L, kind));
+  const rearWrist = new THREE.Vector3(-0.05, -0.105, -0.005);
+  const frontWrist = new THREE.Vector3(-0.06, -0.015, -0.17);
 
-  const rear = buildPawView(L, kind, { size: 0.05, padsUp: false });
+  // 손 하나 = 홀더(손목 자리) + 그 안의 앞발. 팔뚝은 화면 아래 바깥으로 비스듬히 빠진다
+  // → 예전처럼 팔꿈치를 수직으로 떨어뜨려 손목만 꺾는 90도 꺾임이 없다.
+  const rear = new THREE.Group();
   rear.position.copy(rearWrist);
-  rear.rotation.set(1.05, 0.12, 0.32);
   g.add(rear);
-
-  const front = buildPawView(L, kind, { size: 0.047, padsUp: true });
+  const front = new THREE.Group();
   front.position.copy(frontWrist);
-  front.rotation.set(1.0, 0.12, 0.75);
   g.add(front);
+
+  putPaw(rear, kind, {
+    name: 'paw_' + kind,
+    elbow: new THREE.Vector3(0.30, -0.46, 0.14), // 팔뚝이 오른쪽 아래로
+    fallbackRot: new THREE.Euler(1.05, 0.12, 0.32),
+    pawSize: 0.05,
+    gripX: -0.16, gripY: 0.08, rotZ: -0.55, rotX: -0.12, mirror: false,
+  });
+  putPaw(front, kind, {
+    name: 'paw_' + kind,
+    elbow: new THREE.Vector3(-0.34, -0.42, 0.04), // 팔뚝이 왼쪽 아래로
+    fallbackRot: new THREE.Euler(1.0, 0.12, 0.75),
+    pawSize: 0.047,
+    gripX: -0.16, gripY: 0.08, rotZ: 0.50, rotX: -0.12, mirror: true, scale: 0.85,
+  });
   // Weapon.aimGun 이 총을 조준점 쪽으로 돌릴 때 발도 같이 옮긴다 (배열이어야 함)
   g.userData.paws = [rear, front];
-  g.userData.pawParts = { rear, front, rearArm: g.children[1], frontArm: g.children[2] };
+  g.userData.pawParts = { rear, front };
 
   // 레드도트 사이트 (총 위) — 빛나는 점의 위치를 Weapon 이 받아 쓴다
   const sight = buildRedDotSight();
@@ -253,6 +262,53 @@ export function createViewModel(kind) {
 
   toViewModelMaterial(g);
   return g;
+}
+
+// 손 하나 붙이기: GLB 앞발이 있으면 그것을, 아직 없으면(또는 실패) 코드 팔+앞발을 그 자리에.
+// GLB 가 늦게 도착하면 그때 바꿔 끼운다 (홀더 위치는 그대로).
+function putPaw(holder, kind, pose) {
+  const L = ANIMAL_LOOK[kind] || ANIMAL_LOOK.shiba;
+  const fallback = () => {
+    const grp = new THREE.Group();
+    grp.add(buildArm(new THREE.Vector3(), pose.elbow.clone(), L, kind));
+    const paw = buildPawView(L, kind, { size: pose.pawSize, padsUp: false });
+    paw.rotation.copy(pose.fallbackRot);
+    grp.add(paw);
+    return grp;
+  };
+  holder.add(fallback());
+  if (!library) return;
+  const swap = () => {
+    const glb = buildGlbPaw(pose.name, pose);
+    if (!glb) return;
+    holder.clear();
+    holder.add(glb);
+  };
+  if (library.has(pose.name)) swap();
+  else {
+    library.onReady(pose.name, swap);
+    library.load(pose.name); // lazy 모델: 이 동물로 플레이할 때만 받는다
+  }
+}
+
+// 그림에서 부풀린 앞발 GLB 를 손 자세로: 쥔 부분(grip)을 홀더 원점에 두고, 왼손은 좌우 반전.
+// 그림 자체에 명암·굵은 외곽선이 구워져 있으므로 조명 없는 재질(Basic)로 그대로 쓴다.
+function buildGlbPaw(name, { gripX = -0.20, gripY = 0.15, rotZ = 0, rotX = 0, mirror = false, scale = 1 }) {
+  const model = library?.get(name);
+  if (!model) return null;
+  const size = library.defs?.[name]?.size || 0.30;
+  const inner = new THREE.Group();
+  model.position.set(-gripX * size, -gripY * size, 0); // 쥔 부분 = 원점
+  inner.add(model);
+  inner.rotation.set(rotX, 0, rotZ);
+  inner.scale.set(mirror ? -scale : scale, scale, scale);
+  inner.traverse((o) => {
+    if (!o.isMesh) return;
+    const src = Array.isArray(o.material) ? o.material[0] : o.material;
+    o.material = new THREE.MeshBasicMaterial({ map: src?.map || null, color: 0xffffff, side: THREE.DoubleSide, alphaTest: 0.5 });
+    o.userData.vm = true;
+  });
+  return inner;
 }
 
 // 1인칭 동물 앞발 ────────────────────────────────────────────

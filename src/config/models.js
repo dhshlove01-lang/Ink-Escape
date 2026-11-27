@@ -26,6 +26,14 @@ export const MODEL_DEFS = {
   rabbit: { url: 'assets/models/rabbit.glb', ...CHARACTER },
   cat: { url: 'assets/models/cat.glb', ...CHARACTER },
   devil: { url: 'assets/models/devil.glb', ...CHARACTER },
+
+  // 1인칭 앞발(팔뚝+앞발). 그림 1장을 부풀려 만든 메시라 긴 변 = 1 이 되게 맞춘다.
+  // lazy: 시작할 때 모두 받지 않고, 그 동물로 플레이할 때만 받는다 (4종 합쳐 9MB).
+  // 원본이 그림 그대로 +Z 를 보므로 돌리지 않는다. 자세·위치는 AnimalModels.createViewModel.
+  paw_shiba: { url: 'assets/models/paw_shiba.glb', size: 0.19, rotateY: 0, anchor: 'center', lazy: true },
+  paw_bear: { url: 'assets/models/paw_bear.glb', size: 0.19, rotateY: 0, anchor: 'center', lazy: true },
+  paw_rabbit: { url: 'assets/models/paw_rabbit.glb', size: 0.19, rotateY: 0, anchor: 'center', lazy: true },
+  paw_cat: { url: 'assets/models/paw_cat.glb', size: 0.19, rotateY: 0, anchor: 'center', lazy: true },
 };
 
 // 다른 모양 묶음: 주소에 ?models=<이름> 을 붙이면 그 묶음의 줄이 위 기본 줄을 대신한다 (비교·시험용).

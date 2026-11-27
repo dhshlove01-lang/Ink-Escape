@@ -103,7 +103,7 @@ URL=https://dhshlove01-lang.github.io/Ink-Escape/ NODE_PATH=$(npm root -g) node 
 5. 무기 레이어 (칼 휘두르기·총 쏘기)
 6. 맵 2·3 (한밤의 미술실, 한밤의 책상 위)
 7. 신고·다른 사람 그림 숨기기·스트리머 모드
-8. 1인칭 앞발 GLB(지금은 코드 모델 — 털·무늬·발바닥·소매·잉크 외곽선 적용됨) · 효과음 파일 (동물 3D 모델은 2026-11-26 적용 완료)
+8. 1인칭 앞발 — **2026-11-27 GLB 4종으로 교체 완료**(`paw_*.glb`). 남은 건 총 손잡이를 감싸는 느낌 다듬기, 그리고 SF3D 한도가 풀리면 같은 파일명으로 재구성 모델 덮어쓰기 · 효과음 파일
 
 ## 알려진 문제
 
@@ -113,6 +113,22 @@ URL=https://dhshlove01-lang.github.io/Ink-Escape/ NODE_PATH=$(npm root -g) node 
 - 효과음은 아직 임시.
 
 ## 작업 기록
+
+### 2026-11-27 · 1인칭 동물 앞발 GLB 4종 (그림 → 3D 메시) · 손목 90도 꺾임 제거
+- **무엇을**: 1인칭 손이 코드 도형(공 조합)이라 손목이 90도로 꺾여 보이던 것을, 동물 4종(시바·곰·토끼·삼색고양이)의 **새 앞발 그림에서 만든 GLB 4종**으로 교체.
+  - 원래 계획은 Stable Fast 3D(허깅페이스) 이미지→GLB 변환이었으나, `deok` 계정의 **ZeroGPU 무료 한도가 하루치 소진**(`You have exceeded your free ZeroGPU quota (60s requested vs. 0s left)`)되어 쓸 수 없었다. CPU 로 도는 TripoSR 복제 스페이스들은 모두 generate 단계에서 깨져 있었고, 이 작업 환경은 CPU 2코어라 로컬 추론도 불가 → 사용자가 **"그림 그대로 로컬에서 3D로 만들어 오늘 배포"** 를 선택(2026-11-27 10:0x).
+  - **`tools/paw_mesh.py`**: 앞발 그림 1장 → 닫힌 메시 + 그림 텍스처 GLB 생성기. HSV 로 실루엣 마스크(배경 회색은 채도 0 → 색거리 방식은 배경 그라데이션까지 잡아 회색 테두리가 남았다) → 거리변환으로 부피 → 앞/뒤 두 면. 텍스처는 가장자리 색을 배경 쪽으로 28px 번지게 하고, 재질은 `alphaTest 0.5` 로 배경 텍셀을 버린다. 그림 자체에 명암·굵은 잉크 외곽선이 있어 조명 없는 Basic 재질로 그대로 쓴다.
+  - **SF3D 가 다시 되면**: 같은 파일 이름(`assets/models/paw_<동물>.glb`)만 덮어쓰면 코드 수정 없이 교체된다.
+- **왜**: 사용자 지적 — "손 퀄리티가 너무 구린데 꺾여잇음 심지어".
+- **어디**
+  - `assets/models/paw_{shiba,bear,rabbit,cat}.glb` (새 파일, 각 3.1~3.3MB)
+  - `src/config/models.js`: `paw_*` 4줄 (`size: 0.19`, `anchor: 'center'`, **`lazy: true`**).
+  - `src/client/render/ModelLibrary.js`: `lazy` 모델은 `loadAll()` 에서 건너뛰고 필요할 때 `load(name)`; 같은 모델 중복 요청은 `pending` 약속으로 하나만 받는다.
+  - `src/client/render/AnimalModels.js`: `createViewModel()` 이 손마다 홀더(Group)를 만들고 `putPaw()` 가 그 안에 GLB 를 넣는다. GLB 가 없거나 실패하면 예전 코드 팔+앞발로 폴백(팔뚝을 대각선으로 바꿔 폴백도 꺾여 보이지 않게). `buildGlbPaw()` 가 쥔 부분을 홀더 원점에 맞추고 왼손은 `scale.x = -1` 미러. `toViewModelMaterial` 이 손대지 않도록 `userData.vm = true`.
+  - `tools/paw_mesh.py`(생성기), `art/models/paw/source/`(원본 그림 4장), `art/models/paw/README.md`(다시 만드는 법).
+- **자세(튜닝값)**: 오른손(방아쇠) 홀더 `(-0.05,-0.105,-0.005)`, 왼손(총열 받침) `(-0.06,-0.015,-0.17)`·`scale 0.85`, 회전 `rotZ -0.55 / +0.50`, `rotX -0.12`, 쥔 지점 `(-0.16, 0.08)`.
+- **검증**: 로컬 http.server + Playwright(스위프트셰이더)로 4종 각각 혼자 테스트 → 1인칭 스크린샷 4장 확인(`downloads/ink_escape_paws/final_{shiba,bear,rabbit,cat}.png`), `pageerror 0`, 4xx/404 0. 4종 색·발바닥 확인, 손목 꺾임 없음(메시가 팔뚝까지 이어진다). **이 환경에 node 가 없어 `npm test`·`tools/smoke.cjs` 는 못 돌렸다 — 다음 AI 가 먼저 돌릴 것.**
+- **남은 것**: 앞발이 총 손잡이를 감싸 쥐는 느낌은 아직 약하다(그림이 2D라 손가락이 붙어 보임). 진짜 재구성 모델(SF3D)이 되면 같은 파일명 덮어쓰기로 교체.
 
 ### 2026-11-27 · ponytail 스킬 설치
 - **무엇을**: 사용자 요청으로 https://github.com/DietrichGebert/ponytail (v5.3.3, 커밋 ebd8654, MIT) 의 스킬 6개를 `.claude/skills/` 에 설치 — `ponytail`(가장 작은 완전한 변경 + 답 끝에 안 한 것·위험), `ponytail-review`, `ponytail-audit`, `ponytail-debt`, `ponytail-gain`, `ponytail-help`.
