@@ -334,7 +334,7 @@ export class LobbyView {
     }
 
     // 3D 대기실: 배경은 이번 판 맵의 테마, 로비에 있는 사람들이 각자 단상 위에 선다
-    this.stage.setTheme(state.settings.mapId || 'dungeon');
+    this.stage.setTheme(state.settings.mapId || 'palace');
     this.stage.setCharacters(
       state.members.map((m) => ({ id: m.id, kind: m.animal, name: m.name, ready: m.ready, role: m.role })),
       { me: this.me, ownerId: state.ownerId, solo: this.solo },

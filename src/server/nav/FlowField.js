@@ -1,4 +1,4 @@
-// 플레이어 한 명까지의 길 거리표 (BFS). 몬스터는 숫자가 줄어드는 칸으로 걸어간다.
+// 플레이어 한 명까지의 길 거리표 (BFS). 몬스터는 숫자가 줄어드는 칸으로 걸어간다. 벽·소품 칸은 못 지나간다 (map.blocked).
 
 const N4 = [[-1, 0], [1, 0], [0, -1], [0, 1]];
 
@@ -14,7 +14,7 @@ export class FlowField {
     const dist = this.dist;
     const q = this.queue;
     dist.fill(-1);
-    if (cx < 0 || cy < 0 || cx >= w || cy >= h || this.map.solid(cx, cy)) return this;
+    if (cx < 0 || cy < 0 || cx >= w || cy >= h || this.map.blocked(cx, cy)) return this;
     let head = 0;
     let tail = 0;
     dist[cy * w + cx] = 0;
@@ -29,7 +29,7 @@ export class FlowField {
         const ny = y + dy;
         if (nx < 0 || ny < 0 || nx >= w || ny >= h) continue;
         const j = ny * w + nx;
-        if (dist[j] !== -1 || this.map.solid(nx, ny)) continue;
+        if (dist[j] !== -1 || this.map.blocked(nx, ny)) continue;
         dist[j] = d;
         q[tail++] = j;
       }
@@ -53,7 +53,7 @@ export class FlowField {
         if (!dx && !dy) continue;
         const d = this.at(cx + dx, cy + dy);
         if (d < 0) continue;
-        if (dx && dy && (this.map.solid(cx + dx, cy) || this.map.solid(cx, cy + dy))) continue;
+        if (dx && dy && (this.map.blocked(cx + dx, cy) || this.map.blocked(cx, cy + dy))) continue;
         const score = d + (dx && dy ? 0.4 : 0);
         if (score < bestD) {
           bestD = score;

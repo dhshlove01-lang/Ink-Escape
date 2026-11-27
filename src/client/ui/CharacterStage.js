@@ -21,7 +21,7 @@ const ROLE_ICON = { [ROLE.TAGGER]: '👁', [ROLE.PLAYER]: '🔫', [ROLE.RANDOM]:
 
 export class CharacterStage {
   /** @param mode 'lobby' | 'result' */
-  constructor(parent, { mode = 'lobby', mapId = 'dungeon' } = {}) {
+  constructor(parent, { mode = 'lobby', mapId = 'palace' } = {}) {
     this.mode = mode;
     this.root = el('div', { class: 'stage-canvas' });
     parent.append(this.root);

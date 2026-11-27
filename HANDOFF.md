@@ -97,7 +97,9 @@ URL=https://dhshlove01-lang.github.io/Ink-Escape/ NODE_PATH=$(npm root -g) node 
 - 보스 의자(왕좌) + 그 앞에 발판, 잉크병 여러 개 배치. 탈출 자물쇠를 문에 붙이고 문 열릴 때 자물쇠도 열림
 - 오브젝트에 **부딪히게**(지금은 통과). 교체: 던전 소품(오크통·상자·횃불·샹들리에), 탈출문, 보급·회복 상자, 던지는 것(지우개 수류탄·보스 잉크 폭탄·연필 공격)
 - 받은 파일: GLB 15개(`ad141dbf-____glb.zip`) + 궁전 GLB 3개(`7a009314-_______.zip`, 파일명 의자↔창문 서로 바뀜) + 텍스처 3장(바닥·벽·카펫 1024 심리스, 채팅 첨부)
-- [ ] 1 GLB 정리(텍스처 줄이기)·등록  - [ ] 2 원통형 궁전 맵·천장 2배  - [ ] 3 소품 배치  - [ ] 4 탈출문+자물쇠  - [ ] 5 상자·던지는 것  - [ ] 6 충돌  - [ ] 7 검증·기록
+- [x] 1 GLB 정리: `assets/models/{prop_*,crate_*,boss_*,grenade_eraser,door_*,palace_*}.glb` (`tools/glb_shrink.py` 로 텍스처 1024/512 JPEG, 합계 9.9MB), 텍스처 `assets/tex/palace_{floor,wall,carpet}.webp`
+- [~] 2 원통형 궁전 맵: 공용 데이터 끝 (`maps.js buildPalace`, `GameMap` bounds·props 충돌·`VIEW_H`, `WALL_H` 14, `FlowField` → `map.blocked`, 테스트 `tests/map.test.mjs`). **화면(SceneBuilder) 아직 → 로비 기본 맵은 아직 dungeon** (`Lobby.js`, 다 되면 palace 로)
+- [ ]  - [ ] 3 소품 배치  - [ ] 4 탈출문+자물쇠  - [ ] 5 상자·던지는 것  - [ ] 6 충돌  - [ ] 7 검증·기록
 
 ## 다음 할 일 (우선순위)
 
