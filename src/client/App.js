@@ -59,21 +59,27 @@ export class App {
 
   onUpdate() {
     this.updatePending = true;
-    if (this.screen instanceof TitleView) location.reload();
+    if (this.screen instanceof TitleView) this.reloadForUpdate();
     else toast(t('common.updateReady'), 'warn');
+  }
+
+  // 새 버전으로 새로고침. 방금 같은 이유로 새로고침했는데도 옛 화면이면(CDN 지연) 반복하지 않고 그대로 쓴다.
+  reloadForUpdate() {
+    this.reloading = !!this.updates?.reload();
+    if (!this.reloading) this.updatePending = false;
+    return this.reloading;
   }
 
   // 방에 들어가기 직전에 한 번 더 확인: 새 버전이 있으면 들어가지 않고 새로고침 (옛 코드로 방에 들어가는 일 방지)
   async ensureLatest() {
     await this.updates?.check();
-    if (this.updatePending) await new Promise(() => {}); // 새로고침 중 — 더 진행하지 않음
+    if (this.reloading) await new Promise(() => {}); // 새로고침 중 — 더 진행하지 않음
   }
 
   showTitle() {
     if (this.updatePending) {
       this.teardownNet();
-      location.reload();
-      return;
+      if (this.reloadForUpdate()) return;
     }
     this.teardownNet();
     // 로비 3D 화면(WebGL)까지 정리한 뒤 시작 화면으로

@@ -19,6 +19,12 @@
     // 배포 시각 = 이 HTML 의 Last-Modified (GitHub Pages 는 배포마다 모든 파일에 배포 시각을 적는다).
     // 서비스 워커를 못 쓰면 ?v=<배포시각> 으로 대신한다.
     (async () => {
+      // 새 버전 새로고침이 붙인 ?fresh= 는 주소창에서 지운다 (UpdateWatcher.reload)
+      if (location.search.includes('fresh=')) {
+        const u = new URL(location.href);
+        u.searchParams.delete('fresh');
+        history.replaceState(null, '', u.pathname + u.search + u.hash);
+      }
       const ver = Date.parse(document.lastModified) || Date.now();
       window.BUILD_STAMP = ver;
       let base = '', q = '?v=' + ver;

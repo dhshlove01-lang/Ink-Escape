@@ -116,6 +116,11 @@ URL=https://dhshlove01-lang.github.io/Ink-Escape/ NODE_PATH=$(npm root -g) node 
 
 ## 작업 기록
 
+### 2026-11-27 · 버그: 사이트가 계속 새로고침됨 (무한 새로고침)
+- **원인**: 새 배포 감지(`UpdateWatcher`)가 "지금 화면의 배포 시각(document.lastModified) < index.html HEAD 의 Last-Modified" 이면 새로고침. 그런데 GitHub Pages CDN 서버마다 **같은 배포**인데 Last-Modified 가 1초 달랐다 (05:04:13 / 05:04:14). 화면은 :13 서버, HEAD 는 :14 서버에서 받으면 → 새로고침 → 또 :13 → 끝없이 반복 (헤드리스로 25초에 46번 재현).
+- **고침**: `src/client/UpdateWatcher.js` — 60초(`SAME_DEPLOY_MS`) 넘게 새로울 때만 새 배포로 봄. `reload()`: 주소에 `?fresh=<배포시각>` 을 붙여 CDN 옛 사본을 건너뛰고, 같은 버전 때문에 2분 안에 또 새로고침하지 않음(sessionStorage, `RELOAD_GUARD_MS`). `App.reloadForUpdate()` 가 이걸 쓰고, 거절되면 그냥 지금 화면으로 계속. `index.html` 로더가 `?fresh=` 를 주소창에서 지움.
+- **검증**: `tests/update.test.mjs`(1초 차이 무시 · 5분 뒤 배포는 감지 · 같은 버전 연속 새로고침 안 함), `npm test` 통과. 배포 후 실제 사이트에서 다시 확인(아래).
+
 ### 2026-11-27 · 대마왕 궁전 맵 (원통형·천장 2배) + 게임 오브젝트 GLB 17종 + 소품 충돌
 - **무엇을** (사용자 요청·답변): 지금 맵을 궁전으로 교체, **큰 원통형** 맵, 천장 **2배(7→14m)**, 오브젝트·표시 높이는 최대치(`VIEW_H` 7.5m), 보스 의자(왕좌) + 앞 발판 + 잉크병들, 탈출 자물쇠를 문에 붙여 **문 열릴 때 자물쇠도 열림**, 오브젝트 **통과 안 되게**, 던전 소품·탈출문·보급/회복 상자·던지는 것 GLB 교체.
 - **맵** `src/shared/map/maps.js buildPalace()` (map id `palace`, 이름 `map.palace` ko/en): 39×39 칸, 반지름 34m 원. 가운데 왕좌의 방(ㄱ자 벽 4개, 동서남북 10m 입구) + 바깥 둘레, 기둥 12개(둘레 8 + 방 안 4), 탈출문 북·서·동. 스폰은 홀 가운데. `Lobby.js` 기본 mapId `palace`. 예전 `dungeon` 빌더는 남겨 둠.
