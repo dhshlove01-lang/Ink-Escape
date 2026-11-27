@@ -1,0 +1,156 @@
+<!doctype html>
+<html><body style="margin:0;background:#000">
+<script type="importmap">{ "imports": { "three": "../../../vendor/three.module.min.js" } }</script>
+<script type="module">
+// 잉크 스타일 실험: 같은 장면을 '지금(before)' / '잉크(after)' 두 방식으로 그린다
+import * as THREE from 'three';
+import { GLTFLoader } from '../../../vendor/addons/loaders/GLTFLoader.js';
+
+const W = 900, H = 900;
+const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+renderer.setSize(W, H);
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+document.body.appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x0b0710);
+const cam = new THREE.PerspectiveCamera(32, W / H, 0.1, 100);
+cam.position.set(2.1, 1.55, 3.6);
+cam.lookAt(0, 0.8, 0);
+
+// 궁전 바닥·벽 (게임 텍스처)
+const tl = new THREE.TextureLoader();
+const tex = (u, r) => { const t = tl.load(u); t.colorSpace = THREE.SRGBColorSpace; t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(...r); return t; };
+const floor = new THREE.Mesh(new THREE.PlaneGeometry(20, 20), new THREE.MeshStandardMaterial({ map: tex('../../../assets/tex/palace_floor.webp', [5, 5]), roughness: 0.38, metalness: 0.15 }));
+floor.rotation.x = -Math.PI / 2;
+const wall = new THREE.Mesh(new THREE.PlaneGeometry(20, 14), new THREE.MeshStandardMaterial({ map: tex('../../../assets/tex/palace_wall.webp', [20 / 4.5, 2]), roughness: 0.8 }));
+wall.position.set(0, 7, -3.5);
+scene.add(floor, wall);
+
+// 조명: 게임 궁전 테마와 같은 반구광 + 따뜻한 횃불 하나
+const hemi = new THREE.HemisphereLight(0xb8a4e0, 0x5a3424, 2.6);
+const torch = new THREE.PointLight(0xffa35a, 30, 12, 1.5);
+torch.position.set(-1.8, 2.6, -1.2);
+const rim = new THREE.DirectionalLight(0x8e7ae0, 0.55);
+rim.position.set(-0.4, 1, 0.55);
+scene.add(hemi, torch, rim);
+
+let model = null;
+const origMats = new Map();
+const toonMats = new Map();
+
+// 셀 셰이딩용 3단 명암
+const steps = new Uint8Array([95, 95, 110, 255, 185, 180, 185, 255, 255, 255, 255, 255]);
+const grad = new THREE.DataTexture(steps, 3, 1, THREE.RGBAFormat);
+grad.minFilter = grad.magFilter = THREE.NearestFilter;
+grad.needsUpdate = true;
+
+// 바닥 접촉 그림자 (부드러운 원)
+const sc = document.createElement('canvas'); sc.width = sc.height = 128;
+const sg = sc.getContext('2d'); const gr = sg.createRadialGradient(64, 64, 4, 64, 64, 64);
+gr.addColorStop(0, 'rgba(0,0,0,0.75)'); gr.addColorStop(0.55, 'rgba(0,0,0,0.35)'); gr.addColorStop(1, 'rgba(0,0,0,0)');
+sg.fillStyle = gr; sg.fillRect(0, 0, 128, 128);
+const blob = new THREE.Mesh(new THREE.PlaneGeometry(1.5, 1.2), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(sc), transparent: true, depthWrite: false }));
+blob.rotation.x = -Math.PI / 2; blob.position.y = 0.01;
+scene.add(blob);
+
+// ── 잉크 외곽선 후처리: 깊이·법선 차이로 선을 찾아 검게 + 종이 질감 ──
+const rtColor = new THREE.WebGLRenderTarget(W, H, { samples: 4 });
+const rtNormal = new THREE.WebGLRenderTarget(W, H);
+rtNormal.depthTexture = new THREE.DepthTexture(W, H);
+const normalMat = new THREE.MeshNormalMaterial();
+const paper = (() => { // 종이 결 (잡음)
+  const c = document.createElement('canvas'); c.width = c.height = 256; const g = c.getContext('2d');
+  const d = g.createImageData(256, 256);
+  for (let i = 0; i < d.data.length; i += 4) { const v = 220 + Math.random() * 35; d.data[i] = v; d.data[i + 1] = v * 0.98; d.data[i + 2] = v * 0.92; d.data[i + 3] = 255; }
+  g.putImageData(d, 0, 0); const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; return t;
+})();
+const post = new THREE.ShaderMaterial({
+  uniforms: { tColor: { value: rtColor.texture }, tNormal: { value: rtNormal.texture }, tDepth: { value: rtNormal.depthTexture }, tPaper: { value: paper }, res: { value: new THREE.Vector2(W, H) }, near: { value: cam.near }, far: { value: cam.far } },
+  vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }',
+  fragmentShader: `
+    uniform sampler2D tColor, tNormal, tDepth, tPaper; uniform vec2 res; uniform float near, far; varying vec2 vUv;
+    float lin(float d){ float z = d * 2.0 - 1.0; return (2.0 * near * far) / (far + near - z * (far - near)); }
+    float hash(vec2 p){ return fract(sin(dot(p, vec2(12.9898,78.233))) * 43758.5453); }
+    void main(){
+      // 선이 손으로 그린 듯 살짝 흔들리게
+      vec2 wob = (vec2(hash(floor(vUv*160.0)), hash(floor(vUv*160.0)+7.0)) - 0.5) * 1.2 / res;
+      vec2 uv = vUv + wob; vec2 px = 2.4 / res; // 선 굵기 (px)
+      float d0 = lin(texture2D(tDepth, uv).r);
+      vec3 n0 = texture2D(tNormal, uv).rgb;
+      float dEdge = 0.0, nEdge = 0.0;
+      for (int i = 0; i < 4; i++) {
+        vec2 o = i == 0 ? vec2(px.x,0.) : i == 1 ? vec2(-px.x,0.) : i == 2 ? vec2(0.,px.y) : vec2(0.,-px.y);
+        dEdge += abs(lin(texture2D(tDepth, uv + o).r) - d0);
+        nEdge += distance(texture2D(tNormal, uv + o).rgb, n0);
+      }
+      float edge = max(smoothstep(0.05 * d0, 0.1 * d0, dEdge), smoothstep(0.45, 0.85, nEdge));
+      vec3 col = texture2D(tColor, vUv).rgb;
+      vec3 p = texture2D(tPaper, vUv * res / 256.0).rgb;
+      col *= mix(vec3(1.0), p * p, 0.9); // 종이 결
+      col = mix(col, vec3(0.004, 0.002, 0.006), edge); // 잉크 선 (검정)
+      gl_FragColor = vec4(col, 1.0);
+      #ifdef EDGE_ONLY
+      gl_FragColor = vec4(vec3(1.0 - edge), 1.0);
+      #endif
+      #include <colorspace_fragment>
+    }`,
+});
+const quad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), post);
+quad.frustumCulled = false;
+const postScene = new THREE.Scene(); postScene.add(quad);
+const postCam = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+
+new GLTFLoader().load('../../../assets/models/shiba.glb', (g) => {
+  model = g.scene;
+  // 걷기 클립 한 장면으로 자세 잡기 (A 자세 대신)
+  const clip = g.animations.find((c) => /walk/i.test(c.name)) || g.animations[0];
+  if (clip) { const mix = new THREE.AnimationMixer(model); mix.clipAction(clip).play(); mix.setTime(clip.duration * 0.3); }
+  model.rotation.y = 0.45; // Tripo 원본 정면 = +Z (카메라 쪽) + 살짝 비스듬히
+  const skinBox = () => {
+    model.updateMatrixWorld(true);
+    const bx = new THREE.Box3(), v = new THREE.Vector3();
+    model.traverse((o) => {
+      if (!o.isMesh) return;
+      const pos = o.geometry.attributes.position;
+      for (let i = 0; i < pos.count; i += 7) {
+        v.fromBufferAttribute(pos, i);
+        if (o.isSkinnedMesh) o.applyBoneTransform(i, v);
+        bx.expandByPoint(v.applyMatrix4(o.matrixWorld));
+      }
+    });
+    return bx;
+  };
+  const k = 1.55 / skinBox().getSize(new THREE.Vector3()).y;
+  model.scale.setScalar(k);
+  model.position.y -= skinBox().min.y;
+  model.traverse((o) => {
+    if (!o.isMesh) return;
+    origMats.set(o, o.material);
+    const m = o.material;
+    toonMats.set(o, new THREE.MeshToonMaterial({ map: m.map, gradientMap: grad, color: 0xffffff })); // 법선 지도는 빼야 명암이 깔끔한 덩어리로
+  });
+  scene.add(model);
+  window.ready = true;
+});
+
+window.render = (mode) => {
+  if (mode === 'edge') post.defines.EDGE_ONLY = 1; else delete post.defines.EDGE_ONLY;
+  post.needsUpdate = true;
+  const ink = mode !== 'before';
+  for (const [o, m] of origMats) o.material = ink ? toonMats.get(o) : m;
+  blob.visible = ink;
+  renderer.toneMapping = ink ? THREE.ACESFilmicToneMapping : THREE.NoToneMapping;
+  renderer.toneMappingExposure = ink ? 1.05 : 1;
+  if (!ink) { renderer.setRenderTarget(null); renderer.render(scene, cam); return; }
+  renderer.setRenderTarget(rtColor); renderer.render(scene, cam);
+  scene.overrideMaterial = normalMat; const bg = scene.background; scene.background = null;
+  renderer.setRenderTarget(rtNormal); renderer.render(scene, cam);
+  scene.overrideMaterial = null; scene.background = bg;
+  renderer.setRenderTarget(null);
+  const tm = renderer.toneMapping; renderer.toneMapping = THREE.NoToneMapping; // 후처리 단계는 그대로 복사
+  renderer.render(postScene, postCam);
+  renderer.toneMapping = tm;
+};
+</script>
+</body></html>
