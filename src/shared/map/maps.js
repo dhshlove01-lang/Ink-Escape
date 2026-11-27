@@ -146,18 +146,18 @@ function buildPalace() {
   // 횃불 (문 근처 제외)
   const torches = [45, 135, 165, 195, 225, 315].map((d) => { const w = onWall(d); return { x: w.x, z: w.z, nx: w.nx, nz: w.nz }; });
 
-  // 소품. solid = 부딪힘 모양 (r 원 / hx·hz 상자), tall = 총알·시야도 막음
+  // 소품. solid = 부딪힘 모양 (r 원 / hx·hz 상자), h = 윗면 높이(m, 점프로 닿으면 올라설 수 있음), tall = 총알·시야도 막음
   const props = [];
   const add = (p) => props.push(p);
   // 스테인드글라스 창 (벽에 붙음, 높이는 VIEW_H 안)
   for (const d of [30, 60, 120, 150, 180, 210, 240, 300, 330]) { const w = onWall(d, 0.12); add({ kind: 'window', x: w.x, z: w.z, ry: w.ry }); }
   // 왕좌의 방: 왕좌(북쪽을 봄) + 앞 발판 + 붉은 카펫 + 잉크병
   const throneZ = cz + 10;
-  add({ kind: 'throne', x: cx, z: throneZ, ry: Math.PI, solid: { hx: 1.35, hz: 1.0 }, tall: true });
-  add({ kind: 'pad', x: cx, z: throneZ - 2.7, ry: 0, solid: { r: 1.5 } });
+  add({ kind: 'throne', x: cx, z: throneZ, ry: Math.PI, solid: { hx: 1.35, hz: 1.0 }, h: 3.4, tall: true });
+  add({ kind: 'pad', x: cx, z: throneZ - 2.7, ry: 0, solid: { r: 1.5 }, h: 0.69 });
   add({ kind: 'carpet', x: cx, z: (cz - 14 + throneZ - 4.2) / 2, ry: 0, len: throneZ - 4.2 - (cz - 14), w: 2.4 });
   for (const [dx, dz] of [[-2.3, 0.4], [2.3, 0.4], [-2.6, -2.6], [2.6, -2.6], [-1.9, -4.6], [1.9, -4.6]]) {
-    add({ kind: 'inkbottle', x: cx + dx, z: throneZ + dz, ry: dx * 0.7, solid: { r: 0.3 } });
+    add({ kind: 'inkbottle', x: cx + dx, z: throneZ + dz, ry: dx * 0.7, solid: { r: 0.3 }, h: 0.6 });
   }
   // 샹들리에 (천장에 매달림 — 높이는 VIEW_H 까지만)
   add({ kind: 'chandelier', x: cx, z: cz - 3 });
@@ -169,9 +169,9 @@ function buildPalace() {
     for (const [kind, along, inset] of list) {
       const w = onWall(deg, inset);
       const x = w.x + tx * along, z = w.z + tz * along;
-      if (kind === 'barrel') add({ kind, x, z, ry: along * 1.3, solid: { r: 0.5 } });
-      else if (kind === 'crate') add({ kind, x, z, ry: w.ry + along * 0.2, solid: { hx: 0.55, hz: 0.55 } });
-      else add({ kind, x, z, ry: along, solid: { r: 0.3 } });
+      if (kind === 'barrel') add({ kind, x, z, ry: along * 1.3, solid: { r: 0.5 }, h: 1.1 });
+      else if (kind === 'crate') add({ kind, x, z, ry: w.ry + along * 0.2, solid: { hx: 0.55, hz: 0.55 }, h: 1.05 });
+      else add({ kind, x, z, ry: along, solid: { r: 0.3 }, h: 0.6 });
     }
   };
   pile(45, [['barrel', -1.6, 1.3], ['barrel', -0.5, 1.2], ['crate', 1.0, 1.3]]);
@@ -183,8 +183,8 @@ function buildPalace() {
   // 둘레 가운데쯤 엄폐용 상자 더미
   for (const d of [70, 200, 250, 20]) {
     const w = onWall(d, 7.5);
-    add({ kind: 'crate', x: w.x, z: w.z, ry: w.ry, solid: { hx: 0.55, hz: 0.55 } });
-    add({ kind: 'barrel', x: w.x + w.nz * 1.1, z: w.z - w.nx * 1.1, ry: d, solid: { r: 0.5 } });
+    add({ kind: 'crate', x: w.x, z: w.z, ry: w.ry, solid: { hx: 0.55, hz: 0.55 }, h: 1.05 });
+    add({ kind: 'barrel', x: w.x + w.nz * 1.1, z: w.z - w.nx * 1.1, ry: d, solid: { r: 0.5 }, h: 1.1 });
   }
 
   // 방(사각형): 왕좌의 방 먼저 (roomAt 은 처음 맞는 방), 그다음 네 사분면 (원 밖 점은 isFloor 가 걸러냄)

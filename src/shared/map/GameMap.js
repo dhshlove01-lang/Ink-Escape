@@ -6,6 +6,7 @@ export const CELL = 2;
 export const WALL_H = 14; // 천장 높이 (2026-11-27 사용자 지시: 7 → 2배)
 export const VIEW_H = 7.5; // 몬스터 그림·표시·걸린 소품이 올라갈 수 있는 최대 높이 (너무 높으면 안 보임)
 export const TILE = { FLOOR: 0, WALL: 1, PILLAR: 2, DOOR: 3 };
+const ON_TOP = 0.08; // 발이 소품 윗면보다 이만큼 아래까지는 '위에 있다'로 본다 (한 프레임 낙하 오차)
 
 export class GameMap {
   constructor({ id, name, w, h, cells, spawn, doors, torches, roomCenters, rooms = [], bounds = null, props = [] }) {
@@ -20,7 +21,7 @@ export class GameMap {
     this.roomCenters = roomCenters;
     this.rooms = rooms;          // [{ x0, z0, x1, z1 }] 월드 좌표 (카메라 위치 계산용)
     this.bounds = bounds;        // { x, z, r } 둥근 바깥벽 (없으면 격자만)
-    this.props = props;          // [{ kind, x, z, ry, s, y?, solid?: { r } | { hx, hz }, tall? }]
+    this.props = props;          // [{ kind, x, z, ry, s, y?, solid?: { r } | { hx, hz }, h?, tall? }] — h: 윗면 높이 (올라설 수 있음)
     this.solids = props.filter((p) => p.solid);
     this.openDoor = -1;
     this._doorOf = new Map();
@@ -39,6 +40,16 @@ export class GameMap {
     for (let cy = 0; cy < h; cy++) for (let cx = 0; cx < w; cx++) {
       if (this.solids.some((p) => insideProp(p, (cx + 0.5) * CELL, (cy + 0.5) * CELL, 0.2))) this._propCells.add(cy * w + cx);
     }
+  }
+
+  // 발을 디딜 높이: 발(y)이 윗면 근처 이상인 소품 중 발밑(반지름 r 원)에 걸친 가장 높은 윗면, 없으면 바닥 0
+  groundAt(x, z, r, y) {
+    let g = 0;
+    for (const p of this.solids) {
+      if (p.h === undefined || p.h <= g || y < p.h - ON_TOP) continue;
+      if (insideProp(p, x, z, r)) g = p.h;
+    }
+    return g;
   }
 
   inMouth(x, z) {
@@ -77,10 +88,11 @@ export class GameMap {
     return this.solid(Math.floor(x / CELL), Math.floor(z / CELL)) || !this.inBounds(x, z);
   }
 
-  // 원(플레이어·몬스터)을 벽·둥근 벽·소품 밖으로 밀어낸다
-  collideCircle(x, z, r) {
+  // 원(플레이어·몬스터)을 벽·둥근 벽·소품 밖으로 밀어낸다.
+  // y = 발 높이: 소품 윗면(h)보다 높이 있으면 그 소품은 막지 않는다 (점프해서 위로 넘어가 올라섬). 몬스터는 y 없이 = 늘 막힘
+  collideCircle(x, z, r, y = 0) {
     for (let iter = 0; iter < 2; iter++) {
-      for (const p of this.solids) ({ x, z } = pushOut(p, x, z, r));
+      for (const p of this.solids) if (!(p.h !== undefined && y >= p.h - ON_TOP)) ({ x, z } = pushOut(p, x, z, r));
       const b = this.bounds;
       if (b && !this.inMouth(x, z)) {
         const dx = x - b.x, dz = z - b.z, d = Math.hypot(dx, dz);

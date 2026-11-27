@@ -90,11 +90,11 @@ export class FpsController {
       const sin = Math.sin(this.yaw), cos = Math.cos(this.yaw);
       const wx = fx * cos + fz * sin;
       const wz = -fx * sin + fz * cos;
-      const p = this.map.collideCircle(this.x + wx * speed * dt, this.z + wz * speed * dt, this.b.radius);
+      const p = this.map.collideCircle(this.x + wx * speed * dt, this.z + wz * speed * dt, this.b.radius, this.y);
       this.x = p.x;
       this.z = p.z;
     } else {
-      const p = this.map.collideCircle(this.x, this.z, this.b.radius);
+      const p = this.map.collideCircle(this.x, this.z, this.b.radius, this.y);
       this.x = p.x;
       this.z = p.z;
     }
@@ -107,13 +107,15 @@ export class FpsController {
       this.onGround = false;
     }
     this._space = space;
+    // 발밑 높이: 바닥(0) 또는 올라선 소품 윗면 (점프로 닿을 때만 — 떨어지기 전 발 높이로 판단)
+    const ground = this.map.groundAt ? this.map.groundAt(this.x, this.z, this.b.radius * 0.5, this.y) : 0;
     this.vy -= this.b.gravity * dt;
     this.y += this.vy * dt;
-    if (this.y <= 0) {
-      this.y = 0;
+    if (this.y <= ground) {
+      this.y = ground;
       this.vy = 0;
       this.onGround = true;
-    }
+    } else this.onGround = false; // 소품 끝에서 걸어 나가면 떨어진다
     this.applyCamera();
   }
 
