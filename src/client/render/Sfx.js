@@ -1,3 +1,5 @@
+import { GUN_FEEL } from '../../config/gunfeel.js';
+
 // 효과음: 파일 없이 WebAudio 로 합성 (임시). 첫 클릭 이후에만 소리가 난다.
 
 export class Sfx {
@@ -36,6 +38,17 @@ export class Sfx {
     return src;
   }
 
+  // 걸러진 잡음 한 겹 (총성·기계음)
+  _band(len, type, freq, t, a, d, peak) {
+    const n = this._noise(len);
+    const f = this.ctx.createBiquadFilter();
+    f.type = type;
+    f.frequency.value = freq;
+    n.connect(f);
+    this._env(f, t, a, d, peak);
+    n.start(t);
+  }
+
   _tone(type, f0, f1, t, dur, peak) {
     const o = this.ctx.createOscillator();
     o.type = type;
@@ -51,16 +64,25 @@ export class Sfx {
     const t = this.ctx.currentTime;
     switch (name) {
       case 'shot': {
-        const n = this._noise(0.08);
-        const f = this.ctx.createBiquadFilter();
-        f.type = 'lowpass';
-        f.frequency.value = 2200;
-        n.connect(f);
-        this._env(f, t, 0.002, 0.07, 0.6);
-        n.start(t);
-        this._tone('square', 180, 60, t, 0.06, 0.25);
+        // 3겹: 저음 펀치 + 날카로운 총성 + 노리쇠·탄피 기계음. 매 발 피치·볼륨 무작위 (config/gunfeel.js sound)
+        const { pitch: pr, volume: vr } = GUN_FEEL.sound;
+        const p = pr[0] + Math.random() * (pr[1] - pr[0]);
+        const v = vr[0] + Math.random() * (vr[1] - vr[0]);
+        this._tone('sine', 120 * p, 42 * p, t, 0.11, 0.55 * v); // 저음 펀치 (몸으로 느끼는 쿵)
+        this._tone('square', 190 * p, 70 * p, t, 0.05, 0.16 * v);
+        this._band(0.07, 'highpass', 1700 * p, t, 0.0015, 0.06, 0.5 * v); // 날카로운 총성 (탕)
+        this._band(0.03, 'bandpass', 3600 * p, t + 0.032, 0.001, 0.025, 0.22 * v); // 노리쇠 철컥
+        this._tone('square', 1500 * p, 950 * p, t + 0.034, 0.018, 0.05 * v);
         break;
       }
+      case 'shell': // 탄피가 바닥에 떨어지는 팅
+        this._tone('sine', 5200 + Math.random() * 900, 4300, t, 0.05, 0.05);
+        this._tone('sine', 7300 + Math.random() * 600, 6600, t + 0.06, 0.035, 0.025);
+        break;
+      case 'hitKill': // 처치 한 발: 높은 '띵'
+        this._tone('triangle', 1600, 2400, t, 0.07, 0.3);
+        this._tone('sine', 3200, 3600, t + 0.02, 0.09, 0.14);
+        break;
       case 'hit':
         this._tone('triangle', 900, 1400, t, 0.05, 0.25);
         break;

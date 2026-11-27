@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { createViewModel } from '../render/AnimalModels.js';
 import { texture } from '../render/Images.js';
 import { fireRate, reloadSec } from '../../shared/augmentMath.js';
+import { KickSpring } from './GunFeel.js';
 
 // 공통 총 1종: 30발, 예비 탄약 무한, 재장전 1초. 발사 판정(히트스캔)은 주입된 raycast 가 한다.
 
@@ -12,7 +13,8 @@ const AIM_DIST = 15; // 총신이 화면 가운데 이 거리(m)의 점을 겨�
 // 총구 번쩍임 크기 배율 (2026-11-27 사용자 지시: 반으로)
 const FLASH_SCALE = 0.5;
 export class Weapon {
-  constructor({ balance, camera, animal, raycast, onShot, sfx, getAug = () => ({}) }) {
+  // spread(): 지금 탄 퍼짐(라디안, 크로스헤어 블룸) · onFire(): 한 발 쏜 직후 (반동·FOV·블룸·탄피 — GunFeel)
+  constructor({ balance, camera, animal, raycast, onShot, sfx, getAug = () => ({}), spread = () => 0.006, onFire = () => {} }) {
     this.b = balance;
     this.g = balance.gun;
     this.getAug = getAug; // 내 보급 증강 (빠른 앞발: 연사·재장전)
@@ -24,7 +26,10 @@ export class Weapon {
     this.reloadUntil = 0;
     this.cooldown = 0;
     this.trigger = false;
-    this.kick = 0;
+    this.kick = 0; // 0~1, 레드도트 밝기용
+    this.kickSpring = new KickSpring(); // 총기 킥백 (config/gunfeel.js kick)
+    this.spread = spread;
+    this.onFire = onFire;
     this.bobT = 0;
 
     // 손·총은 따로 장면(뷰모델 층)에 두고 전장을 다 그린 뒤 맨 위에 그린다 (PlayerView.render).
@@ -189,11 +194,13 @@ export class Weapon {
     }
     // 화면 흔들림·반동·재장전 연출
     this.kick = Math.max(0, this.kick - dt * 10);
+    this.kickSpring.update(dt);
+    const kp = this.kickSpring.pos, kr = this.kickSpring.rot;
     if (moving) this.bobT += dt * 9;
     const bob = moving ? Math.sin(this.bobT) * 0.012 : 0;
     const dip = this.reloading ? Math.sin(((this.reloadUntil - now) / reloadSec(this.b, this.getAug())) * Math.PI) * 0.25 : 0;
-    this.view.position.set(VIEW_POS[0] + Math.cos(this.bobT * 0.5) * (moving ? 0.008 : 0), VIEW_POS[1] + bob - dip, VIEW_POS[2] + this.kick * 0.06);
-    this.view.rotation.x = this.kick * 0.03 + dip * 0.8; // 반동은 주로 뒤로 (위로 많이 들리면 총알이 총구보다 아래로 나가 보임)
+    this.view.position.set(VIEW_POS[0] + Math.cos(this.bobT * 0.5) * (moving ? 0.008 : 0), VIEW_POS[1] + bob - dip + kp.y, VIEW_POS[2] + kp.z);
+    this.view.rotation.set(kr.x + dip * 0.8, 0, kr.z); // 킥백: 뒤로·위로 밀리고 총구 들림·비틀림 → 스프링으로 복귀
     this.placeFlash();
     // 총구 불꽃은 한 번의 사격에 55ms 남짓, 그 사이 부풀었다 줄어든다
     this.flashT = Math.max(0, this.flashT - dt);
@@ -213,6 +220,7 @@ export class Weapon {
 
   fire() {
     this.kick = 1;
+    this.kickSpring.fire();
     this.flashT = 0.055;
     this.flash.material.rotation = Math.random() * Math.PI * 2;
     this.sfx.play('shot');
@@ -220,12 +228,14 @@ export class Weapon {
     const dir = new THREE.Vector3();
     this.camera.getWorldPosition(origin);
     this.camera.getWorldDirection(dir);
-    // 아주 약간 퍼짐
-    dir.x += (Math.random() - 0.5) * 0.012;
-    dir.y += (Math.random() - 0.5) * 0.012;
-    dir.normalize();
+    // 탄 퍼짐: 크로스헤어가 벌어진 만큼(원뿔 안 무작위). 이번 발의 반동·블룸은 쏜 뒤에 더해진다
+    const a = this.spread() * Math.sqrt(Math.random()), t = Math.random() * Math.PI * 2;
+    const right = new THREE.Vector3().crossVectors(dir, this.camera.up).normalize();
+    const up = new THREE.Vector3().crossVectors(right, dir).normalize();
+    dir.addScaledVector(right, Math.cos(t) * Math.tan(a)).addScaledVector(up, Math.sin(t) * Math.tan(a)).normalize();
     const hit = this.raycast(origin, dir, this.g.range);
-    this.onShot({ origin, muzzle: this.muzzleWorld(), point: hit.point, monsterId: hit.monsterId, monsterIds: hit.monsterIds, follow: () => this.muzzleWorld() });
+    this.onShot({ origin, muzzle: this.muzzleWorld(), point: hit.point, monsterId: hit.monsterId, monsterIds: hit.monsterIds });
+    this.onFire();
   }
 
   // 지금 총구 끝의 전장 좌표 (뷰모델 층 좌표 = 카메라 기준 → 카메라 행렬로 변환)

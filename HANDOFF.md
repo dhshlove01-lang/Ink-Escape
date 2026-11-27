@@ -92,8 +92,7 @@ URL=https://dhshlove01-lang.github.io/Ink-Escape/ NODE_PATH=$(npm root -g) node 
 
 ## 지금 진행 중
 
-2026-11-27 총 타격감 (Claude 작업 중) — 사용자가 붙여 준 Unity/UE 용 표준 수치를 우리 Three.js 코드에. 답변: 약한 실제 반동(발당 +0.4°·좌우 ±0.2°, 손 떼면 복귀, 크로스헤어 벌어짐만큼 탄 퍼짐), 궤적 없음, 빨간 히트마커 = 처치 한 발, 탄피 = 1인칭만·코드 탄피.
-- [ ] 총 킥백 스프링(뒤 0.04m·위 0.008m·피치 2.5°·롤 ±1.5°, 감쇠 13)  - [ ] 카메라 반동 + FOV 펀치(+1.2°, 0.1초)  - [ ] 총소리 3겹 + 피치·볼륨 랜덤  - [ ] 크로스헤어 블룸(10px, +5/발, 최대 45, 이동 추가, Lerp 12)  - [ ] 히트마커 1.3→1.0 0.12초 + 처치 빨강·고음  - [ ] 몬스터 피격 번쩍(0.06초)  - [ ] 탄피  - [ ] 검증·기록
+(없음)
 
 ## 다음 할 일 (우선순위)
 
@@ -116,6 +115,18 @@ URL=https://dhshlove01-lang.github.io/Ink-Escape/ NODE_PATH=$(npm root -g) node 
 - 효과음은 아직 임시.
 
 ## 작업 기록
+
+### 2026-11-27 · 총 타격감 (킥백·반동·FOV·3겹 총소리·크로스헤어 블룸·히트마커·피격 번쩍·탄피)
+- **무엇을**: 사용자가 붙여 준 Unity/UE5 용 "표준 FPS 타격감" 수치를 우리 Three.js 코드에 (Fast In, Slow Out). 사용자 답: 약한 실제 반동, 궤적 계속 없음, 빨간 히트마커 = 처치 한 발, 탄피 = 1인칭만·코드.
+- **어디**
+  - 숫자: `src/config/gunfeel.js`(보이는·들리는 것: kick·fovPunch·crosshair·hitmarker·hitFlashSec·sound·shells) + `balance.js gun.recoil`(발당 위 0.4°·좌우 ±0.2°·최대 6°·0.12초 뒤 복귀) · `gun.spread`(크로스헤어 벌어짐의 0.5배만큼 실제 탄 퍼짐).
+  - `src/client/player/GunFeel.js`(three 없음, 테스트 가능): `KickSpring`(뒤 0.04m·위 0.008m·피치 2.5°·롤 ±1.5° 즉시 → 감쇠 스프링 k210·d13, 연사 누적 2.2배 제한), `CameraRecoil`(시점에 더하는 pitch/yaw, 멈추면 지수 감쇠), `FovPunch`(+1.2° → 0.1초), `CrosshairBloom`(10px, 발당 +5, 최대 45, 걷기+6·달리기+14·공중+18, Lerp 12, `spreadRad`).
+  - `Shells.js`: 1인칭 탄피 — 카메라 기준 배출구에서 오른쪽·위로, 회전·중력·바닥 튐(0.35)·바닥에 눕기·2.6초 뒤 작아지며 사라짐, 최대 24개, 첫 튐에 '팅'(`sfx shell`).
+  - `Weapon.js`: 예전 `kick` 위치 연출 → `KickSpring`, 고정 퍼짐 → 주입된 `spread()`(원뿔 안 무작위), 쏜 뒤 `onFire()`. `FpsController.recoil`(시점에만 더함 — 마우스 값은 그대로). `PlayerView`: 조립·매 프레임 update·`hud.setSpread`, 몬스터 명중 시 서버 응답 전에 바로 `monsters.flash`, 처치 한 발 `hud.hit(true)` + `sfx hitKill`.
+  - `Hud.js` + `style.css`: 크로스헤어 4선을 `--gap` 으로 배치(그림 크로스헤어는 `--cs` 로 크기), 히트마커 X(가운데 빈 막대 2개) 1.3→1.0배·0.12초 페이드, 처치는 빨강.
+  - `Sfx.js shot`: 3겹(저음 사인 펀치 + 고역 잡음 '탕' + 32ms 뒤 노리쇠 '철컥'), 매 발 피치 0.95~1.05·볼륨 0.90~1.00. 새 소리 `shell`, `hitKill`.
+  - `MonsterRenderer`: 피격 번쩍을 진짜 흰색으로(`whiteFlash` — 셰이더 끝에서 흰색과 섞음, 검은 잉크 그림도 하얗게), 0.06초.
+- **검증**: `npm test` 23 통과(새 `tests/gunfeel.test.mjs`: 킥백 복귀·누적 제한, 반동 누적·복귀, FOV 0.1초, 블룸 +5/45/복귀/달리기). smoke `errors: []`·`monsters: 1`. 헤드리스: 연사 시 크로스헤어 벌어짐·탄피 생성(6발→6개, 바닥 y 0.02)·히트마커 CSS 애니메이션(hitmark 0.12s, 처치 빨강)·`--gap` 30px → 선 -37px 확인. 실제 손맛(속도감)은 헤드리스가 느려 사용자 확인 필요.
 
 ### 2026-11-27 · 버그: 사이트가 계속 새로고침됨 (무한 새로고침)
 - **원인**: 새 배포 감지(`UpdateWatcher`)가 "지금 화면의 배포 시각(document.lastModified) < index.html HEAD 의 Last-Modified" 이면 새로고침. 그런데 GitHub Pages CDN 서버마다 **같은 배포**인데 Last-Modified 가 1초 달랐다 (05:04:13 / 05:04:14). 화면은 :13 서버, HEAD 는 :14 서버에서 받으면 → 새로고침 → 또 :13 → 끝없이 반복 (헤드리스로 25초에 46번 재현).

@@ -11,6 +11,7 @@ export class FpsController {
     this.z = 0;
     this.yaw = 0;
     this.pitch = 0;
+    this.recoil = null; // { pitch, yaw } 총 반동 (GunFeel.CameraRecoil) — 시점에 더한다
     this.vy = 0;
     this.onGround = true;
     this.keys = new Set();
@@ -133,6 +134,7 @@ export class FpsController {
 
   applyCamera() {
     this.camera.position.set(this.x, this.y + this.b.eye, this.z);
-    this.camera.rotation.set(this.pitch, this.yaw, 0);
+    const rp = this.recoil?.pitch || 0, ry = this.recoil?.yaw || 0;
+    this.camera.rotation.set(Math.min(1.5, this.pitch + rp), this.yaw + ry, 0);
   }
 }

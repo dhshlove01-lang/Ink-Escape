@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { placeModel } from '../render/MapModels.js';
+import { GUN_FEEL } from '../../config/gunfeel.js';
 import { EV } from '../../shared/protocol.js';
 import { buildCutout } from '../render/PaperCutout.js';
 import { texture, img } from '../render/Images.js';
@@ -115,6 +116,7 @@ export class MonsterRenderer {
     const s = st.height / cut.bbox.h;
     const pw = cut.canvas.width * s, ph = cut.canvas.height * s;
     const mat = new THREE.MeshBasicMaterial({ map: tex, transparent: true, alphaTest: 0.4, side: THREE.DoubleSide });
+    whiteFlash(mat); // 맞으면 그림 모양 그대로 하얗게 (mat.userData.flash.value 0~1)
     const plane = new THREE.Mesh(new THREE.PlaneGeometry(pw, ph), mat);
     const baseY = st.flyY ?? (st.fly ? 3 : 0);
     plane.position.y = baseY - cut.pad * s + ph / 2;
@@ -282,10 +284,9 @@ export class MonsterRenderer {
       // 흔들림·등장 연출로 커져도 천장 위로 못 나간다
       const top = it.plane.position.y + (it.ph * sy * pop) / 2;
       if (top > CEIL) it.plane.position.y -= top - CEIL;
-      // 맞으면 하얗게 번쩍
-      it.flashT = Math.max(0, it.flashT - dt * 8);
-      const f = 1 + it.flashT * 2.5;
-      it.mat.color.setRGB(f, f, f);
+      // 맞으면 하얗게 번쩍 (바로 하얗게 → hitFlashSec 동안 빠짐)
+      it.flashT = Math.max(0, it.flashT - dt / GUN_FEEL.hitFlashSec);
+      it.mat.userData.flash.value = it.flashT * 0.9;
       // 오라 입자
       for (const a of [it.aura, it.aura2]) {
         if (!a) continue;
@@ -363,4 +364,15 @@ export class MonsterRenderer {
     }
     return null;
   }
+}
+
+// 재질에 '하얗게 번쩍' 한 줄을 끼운다: 마지막 색을 흰색 쪽으로 섞음 (검은 잉크 그림도 하얗게 보인다)
+function whiteFlash(mat) {
+  const u = { value: 0 };
+  mat.userData.flash = u;
+  mat.onBeforeCompile = (sh) => {
+    sh.uniforms.uFlash = u;
+    sh.fragmentShader = 'uniform float uFlash;\n' + sh.fragmentShader.replace('#include <dithering_fragment>', '#include <dithering_fragment>\n  gl_FragColor.rgb = mix(gl_FragColor.rgb, vec3(1.0), uFlash);');
+  };
+  mat.customProgramCacheKey = () => 'whiteFlash';
 }

@@ -1,3 +1,4 @@
+import { GUN_FEEL } from '../../config/gunfeel.js';
 import { el, fmtTime, icon } from '../ui/dom.js';
 import { faceCanvas } from '../render/AnimalModels.js';
 import { PSTATE, STATUS_BIT } from '../../shared/protocol.js';
@@ -147,10 +148,22 @@ export class Hud {
     this.dmg.classList.add('on');
   }
 
+  // 히트마커: 1.3배로 떴다가 0.12초 동안 1.0배로 줄며 사라짐 (style.css .hitmark.on). 처치 한 발은 빨강
   hit(kill) {
+    this.hitmark.style.setProperty('--hm-from', GUN_FEEL.hitmarker.from);
+    this.hitmark.style.setProperty('--hm-sec', GUN_FEEL.hitmarker.sec + 's');
+    this.hitmark.className = 'hitmark';
+    void this.hitmark.offsetWidth; // 애니메이션 다시 시작
     this.hitmark.className = 'hitmark on' + (kill ? ' kill' : '');
-    clearTimeout(this._hm);
-    this._hm = setTimeout(() => (this.hitmark.className = 'hitmark'), 120);
+  }
+
+  // 크로스헤어 블룸: 가운데에서 선까지 px (GunFeel.CrosshairBloom)
+  setSpread(px) {
+    const v = Math.round(px * 2) / 2;
+    if (v === this._gap) return;
+    this._gap = v;
+    this.cross.style.setProperty('--gap', v + 'px');
+    this.cross.style.setProperty('--cs', (0.55 + (v / 22) * 0.45).toFixed(3)); // 그림 크로스헤어는 크기로 벌어짐
   }
 
   redAlert(ms = 2000) {

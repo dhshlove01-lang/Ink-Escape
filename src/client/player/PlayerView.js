@@ -6,6 +6,8 @@ import { CEILING_LAYER } from './SceneBuilder.js';
 import { WALL_H } from '../../shared/map/GameMap.js';
 import { FpsController } from './FpsController.js';
 import { Weapon } from './Weapon.js';
+import { CameraRecoil, FovPunch, CrosshairBloom } from './GunFeel.js';
+import { Shells } from './Shells.js';
 import { Hud } from './Hud.js';
 import { surfaceAt } from './surface.js';
 import { t } from '../i18n.js';
@@ -43,6 +45,12 @@ export class PlayerView {
     const ang = (Math.max(0, me0) / Math.max(1, session.playerCount)) * Math.PI * 2;
     this.ctrl.setPosition(session.map.spawn.x + Math.cos(ang) * 2, session.map.spawn.z + Math.sin(ang) * 2);
 
+    // 총 타격감 (config/gunfeel.js · balance.gun.recoil/spread): 카메라 반동·FOV 펀치·크로스헤어 블룸·탄피
+    this.recoil = new CameraRecoil(balance.gun.recoil);
+    this.ctrl.recoil = this.recoil;
+    this.fovPunch = new FovPunch(this.camera);
+    this.bloom = new CrosshairBloom();
+    this.shells = new Shells({ scene: this.scene, sfx });
     this.weapon = new Weapon({
       balance,
       camera: this.camera,
@@ -51,6 +59,13 @@ export class PlayerView {
       raycast: (o, d, r) => this.raycast(o, d, r),
       onShot: (s) => this.onShot(s),
       getAug: () => session.augOf(session.me),
+      spread: () => this.bloom.spreadRad(this.camera, this.renderer.domElement.clientHeight || 800, balance.gun.spread),
+      onFire: () => {
+        this.recoil.fire();
+        this.fovPunch.fire();
+        this.bloom.fire();
+        this.shells.eject(this.camera);
+      },
     });
     this.hud = new Hud(this.root, session, attributes, balance);
     this.banner = new Banner(this.root);
@@ -98,7 +113,11 @@ export class PlayerView {
     const s = this.session;
     const name = (id) => s.nameOf(id);
     this._off = [
-      s.on(EV.MDIE, (e) => e.by === s.me && this.hud.hit(true)),
+      s.on(EV.MDIE, (e) => {
+        if (e.by !== s.me) return;
+        this.hud.hit(true); // 처치 한 발: 빨간 히트마커 + 높은 소리
+        this.sfx.play('hitKill');
+      }),
       s.on(EV.BOSS, (e) => {
         this.banner.show(t(e.kind === 'giant' ? 'player.giantAppear' : 'player.bossAppear', { icons: e.icons }), { kind: 'boss', ms: 3000 });
         this.sfx.play('siren');
@@ -203,7 +222,7 @@ export class PlayerView {
     return { point: origin.clone().addScaledVector(dir, best), monsterId, monsterIds: taken.map((h) => h.id), dist: best };
   }
 
-  onShot({ origin, muzzle, point, monsterId, monsterIds = monsterId ? [monsterId] : [], follow }) {
+  onShot({ origin, muzzle, point, monsterId, monsterIds = monsterId ? [monsterId] : [] }) {
     this.effects.muzzle(muzzle, 0.375); // 총알 궤적 선은 그리지 않는다 (2026-11-27 사용자 지시: 레이저 같은 긴 선 제거)
     if (!monsterId) {
       const s = surfaceAt(this.session.map, point, new THREE.Vector3().subVectors(point, origin));
@@ -211,7 +230,10 @@ export class PlayerView {
     }
     this.effects.spark(point, monsterId ? 0xff5050 : 0xffe0a0);
     if (monsterId) {
-      for (const id of monsterIds) this.session.send({ t: MSG.HIT, id });
+      for (const id of monsterIds) {
+        this.session.send({ t: MSG.HIT, id });
+        this.monsters.flash(id); // 서버 응답을 기다리지 않고 바로 하얗게 번쩍
+      }
       this.hud.hit(false);
       this.sfx.play('hit');
     }
@@ -277,6 +299,11 @@ export class PlayerView {
       center = this.spectate(me);
     }
     this.weapon.update(dt, this.time, { canFire: alive && this.active && this.ctrl.locked, moving: this.ctrl.moving });
+    this.recoil.update(dt);
+    this.fovPunch.update(dt);
+    this.bloom.update(dt, { moving: this.ctrl.moving, running: this.ctrl.running && this.ctrl.moving, airborne: !this.ctrl.onGround });
+    this.hud.setSpread(this.bloom.px);
+    this.shells.update(dt);
     this.weapon.view.visible = alive;
     const rev = this.updateRevive(me);
 
@@ -344,6 +371,7 @@ export class PlayerView {
     window.removeEventListener('mouseup', this._up);
     window.removeEventListener('keydown', this._key);
     this.ctrl.dispose();
+    this.shells.dispose();
     this.view3d.dispose();
     this.hud.dispose();
     this.renderer.dispose();

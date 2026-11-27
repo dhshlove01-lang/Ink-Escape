@@ -42,6 +42,16 @@ export const BALANCE = {
     range: 90,
     holeSec: 5, // 벽·바닥 총알 자국이 남는 시간(초)
     holeMax: 60, // 동시에 남는 자국 최대 개수 (넘으면 오래된 것부터 지움)
+    // 약한 실제 반동 (2026-11-27): 연사하면 조준이 조금씩 올라가고, 쏘기를 멈추면 원래 조준으로 돌아온다
+    recoil: {
+      pitchDeg: 0.4,     // 한 발마다 위로 (표준 0.8 의 절반 — 초보·캐주얼)
+      yawDeg: 0.2,       // 한 발마다 좌우 ± 무작위
+      maxDeg: 6,         // 위로 쌓이는 최대
+      recoverDelay: 0.12, // 마지막 발사 후 이만큼 지나면 돌아오기 시작 (초)
+      recoverSpeed: 7,   // 돌아오는 빠르기 (클수록 빨리, /초)
+    },
+    // 탄 퍼짐: 크로스헤어가 벌어진 만큼 (config/gunfeel.js crosshair) 이 비율로 실제로 퍼진다
+    spread: 0.5,
   },
 
   grenade: {
