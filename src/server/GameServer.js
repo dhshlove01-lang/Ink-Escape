@@ -1,3 +1,4 @@
+import { currentRules } from '../config/balanceStore.js';
 import { MSG } from '../shared/protocol.js';
 import { Lobby } from './Lobby.js';
 import { Match } from './Match.js';
@@ -39,7 +40,8 @@ export class GameServer {
   }
 
   broadcastLobby() {
-    this.broadcast({ t: MSG.LOBBY, ...this.lobby.view(), solo: this.solo });
+    // rules: 방장이 옵션 창에서 바꾼 밸런스 — 들어온 사람도 같은 값으로 (balanceStore)
+    this.broadcast({ t: MSG.LOBBY, ...this.lobby.view(), solo: this.solo, rules: currentRules(this.b) });
   }
 
   error(id, message) {
@@ -115,6 +117,7 @@ export class GameServer {
         duration: this.lobby.settings.matchSeconds,
         solo: this.solo,
         playerCount: roster.players.length,
+        rules: currentRules(this.b),
       });
     }
     this.startLoop();

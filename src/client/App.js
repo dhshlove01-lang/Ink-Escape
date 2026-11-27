@@ -1,3 +1,4 @@
+import { applyRules, loadLocalRules } from '../config/balanceStore.js';
 import { MSG } from '../shared/protocol.js';
 import { MemoryLink } from '../net/Link.js';
 import { Connection } from './Connection.js';
@@ -86,6 +87,7 @@ export class App {
     this.lobby?.destroy();
     this.lobby = null;
     this.lastLobby = null;
+    applyRules(loadLocalRules()); // 방을 나오면 다시 내 규칙 (남의 방 규칙을 지움)
     this.setScreen(
       new TitleView(this.root, {
         onCreate: (name) => this.createRoom(name),
@@ -147,6 +149,7 @@ export class App {
       this.setScreen(this.lobby);
     });
     conn.on(MSG.LOBBY, (st) => {
+      applyRules(st.rules); // 이 방의 밸런스 = 방장 규칙 (내가 방장이면 내 규칙 그대로)
       this.lastLobby = st;
       if (this.screen === this.lobby) this.lobby.render(st);
     });
@@ -167,6 +170,7 @@ export class App {
   }
 
   startMatch(m) {
+    applyRules(m.rules);
     this.setScreen(null);
     const map = this.createMap(m.mapId);
     const session = new GameSession({ start: m, map, conn: this.conn });

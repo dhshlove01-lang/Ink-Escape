@@ -2,6 +2,7 @@
 // 통신 수단을 Steam 등으로 바꾸려면 network 객체만 갈아 끼우면 된다.
 
 import { BALANCE } from './config/balance.js';
+import { applyRules, loadLocalRules } from './config/balanceStore.js';
 import { PALETTE, ATTRIBUTES } from './shared/attributes.js';
 import { createJudge } from './shared/judge/Judge.js';
 import { createMap } from './shared/map/maps.js';
@@ -25,6 +26,9 @@ updates.start();
 const models = new ModelLibrary(modelDefsFor(new URLSearchParams(location.search).get('models')));
 setModelLibrary(models);
 models.loadAll();
+
+// 옵션 창에서 바꿔 둔 밸런스 (내 PC 저장) — 내가 방장인 방은 이 값으로 (config/balanceStore.js)
+applyRules(loadLocalRules());
 
 const judge = createJudge({ balance: BALANCE, palette: PALETTE, attributes: ATTRIBUTES });
 

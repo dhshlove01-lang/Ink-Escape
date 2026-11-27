@@ -5,6 +5,7 @@ import { CharacterStage } from './CharacterStage.js';
 import { ANIMALS, ROLE, MSG } from '../../shared/protocol.js';
 import { t, tr, LANGS, getLang, setLang, onLangChange } from '../i18n.js';
 import { gfx } from '../render/GraphicsSettings.js';
+import { optionsModal, describeRules } from './OptionsView.js';
 
 // 시작 화면 · 로비 · 결과 화면. 화면은 그리기와 버튼만 맡고, 실제 동작은 콜백으로 받는다.
 
@@ -160,6 +161,7 @@ export class TitleView {
       body: [howtoBlock('title.howtoPlayer'), howtoBlock('title.howtoTagger'), howtoBlock('title.howtoSolo')],
       actions: el('button', { class: 'btn primary', onclick: closeHelp }, t('common.ok')),
     });
+    const options = optionsModal({});
     this.picker?._off?.();
     this.picker = langPicker();
     this.gfxPick?._off?.();
@@ -178,13 +180,18 @@ export class TitleView {
           el('button', { class: 'btn ghost', onclick: () => run(() => onSolo(getName())) }, t('title.solo')),
         ),
         this.status,
-        el('button', { class: 'howto-btn', onclick: () => {
-          help.hidden = false;
-          help.querySelector('.btn')?.focus();
-        } }, '🎮 ', t('title.howto')),
+        el('div', { class: 'howto-row' },
+          el('button', { class: 'howto-btn', onclick: () => {
+            help.hidden = false;
+            help.querySelector('.btn')?.focus();
+          } }, '🎮 ', t('title.howto')),
+          // 옵션(밸런스) 창: 바꾼 값은 내가 만든 방 전원에게 적용 (ui/OptionsView.js)
+          el('button', { class: 'howto-btn', onclick: () => options.open() }, '⚙ ', t('title.options')),
+        ),
       ),
       modal,
       help,
+      options,
     );
   }
 
@@ -229,6 +236,7 @@ export class LobbyView {
     this.animalGrid = el('div', { class: 'animal-btns' });
     this.roleRow = el('div', { class: 'role-btns role-3' });
     this.timeRow = el('div', { class: 'role-btns time-btns' });
+    this.rulesLine = el('div', { class: 'lobby-rules' }); // 방장이 옵션 창에서 바꾼 규칙 (마우스를 올리면 목록)
     this.actionRow = el('div', { class: 'lobby-actions' });
     this.note = el('p', { class: 'muted lobby-note' });
 
@@ -241,7 +249,7 @@ export class LobbyView {
             (this.h3Members = el('h3', {}, t('lobby.members'))), this.memberList,
             (this.h3Char = el('h3', {}, t('lobby.character'))), this.animalGrid,
             (this.h3Role = el('h3', {}, t('lobby.role'))), this.roleRow,
-            (this.h3Time = el('h3', {}, t('lobby.time'))), this.timeRow,
+            (this.h3Time = el('h3', {}, t('lobby.time'))), this.timeRow, this.rulesLine,
             this.actionRow,
             this.note,
           ),
@@ -310,6 +318,12 @@ export class LobbyView {
     // 경기 시간
     this.timeRow.replaceChildren(...[[180, t('lobby.min3')], [300, t('lobby.min5')], [600, t('lobby.min10')]].map(([sec, label]) =>
       el('button', { class: 'btn small' + (state.settings.matchSeconds === sec ? ' on' : ''), disabled: !owner, onclick: () => send({ t: MSG.SETTINGS, matchSeconds: sec }) }, label)));
+
+    // 이 방 규칙 (방장 옵션)
+    const rl = describeRules(state.rules);
+    this.rulesLine.textContent = rl.length ? t('lobby.rules', { n: rl.length }) : t('lobby.rulesNone');
+    this.rulesLine.title = rl.join('\n');
+    this.rulesLine.classList.toggle('custom', rl.length > 0);
 
     // READY / 시작
     const others = state.members.filter((m) => m.id !== state.ownerId);
