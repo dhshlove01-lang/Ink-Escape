@@ -127,6 +127,25 @@ URL=https://dhshlove01-lang.github.io/Ink-Escape/ NODE_PATH=$(npm root -g) node 
 | 1인칭 레드도트 점·총구 불꽃 | 2D 스프라이트 | `player/Weapon.js` | 그대로 둬도 됨 (2D 가 맞는 효과) |
 | 캐릭터 애니메이션 | 달리기·걷기만 | `CharacterRig` | idle·피격·사망·재장전·부활 클립, 술래 악마는 클립 없음 |
 
+## 2D 이미지 부족 목록 (2026-11-27 기록 — 지금은 이모지·코드 그림으로 대신)
+
+넣는 법: `assets/...` 에 webp 저장 → `config/assets.js IMAGE_DEFS` 에 키 한 줄. 키가 있으면 코드가 자동으로 그림을 쓰고, 없으면 지금 대체물.
+
+| 우선 | 이미지 | 키 / 파일 | 지금 대체 | 쓰는 곳 |
+| --- | --- | --- | --- | --- |
+| ★ | 증강 아이콘 20장 (플레이어 10 + 술래 10) | `aug.<키>` (tummy·snack·paws·pierce·eraserShot·heart·cheer·eraserPro·swift·rescue / pencil·sharpener·twin·thick·sharp·wind·recycle·bigBrush·sticky·shadow) | 이모지 | 카드 고르기·HUD·술래 화면 (`AugmentPicker.augIcon`) — 피클 프롬프트는 예전에 드림 |
+| ★ | 술래 악마 얼굴 | `face.devil` → `assets/ui/faces/devil.webp` | 코드로 그린 얼굴 | 로비 캐릭터 카드·참가자 줄·HUD (`AnimalModels.drawAnimalFace`) — 4종은 있음 |
+| ★ | 상태 이상 아이콘 4개: 화상·느려짐·독·무적 | (새 키 필요: `icon.burn` 등) | 🔥❄☠✨ 글자 | HUD 왼쪽 아래 (`Hud.js status`) |
+| ★ | 검정(가드) 속성 원거리 탄 | `vfx.proj_black` | 불꽃 그림(spark) 재사용 | 일반 몬스터 탄 (나머지 4색은 있음) |
+| ☆ | 회복 상자 아이콘 (초록) | (새 키) | 보급 상자 그림 하나로 같이 씀 | 술래 지도·탑뷰 표시, 상자 방향 안내 |
+| ☆ | 몬스터 오라 입자 | (새 키) | 하얀 네모 점 (보기 안 좋음) | `MonsterRenderer` 오라 |
+| ☆ | 목숨 하트 (꽉 찬/빈) | (새 키) | ❤🖤 | 1:1 HUD |
+| ☆ | 궁전 천장 텍스처 (심리스) | (테마 `tex.ceiling`) | 어두운 돌 무늬 코드 그림 | 위를 보면 보이는 14m 천장 |
+| ☆ | 시작 화면 배경 (궁전 버전) | `ui.title_bg` 교체 | 지금은 던전 그림 | 맵이 궁전으로 바뀜 |
+| ☆ | 작은 버튼 아이콘: 조작법·옵션·보급 상자 안내 | (새 키) | 🎮 ⚙ 📦 | 시작 화면, HUD |
+
+2D 로 두는 게 맞는 것(교체 불필요): 총구 불꽃·레드도트·히트마커·크로스헤어(그림 있음)·소환 장판·지우개 폭발.
+
 ## 알려진 문제
 
 - 방장 탭이 뒤로 가면 브라우저가 타이머를 늦춰 다른 사람 화면이 끊긴다.
