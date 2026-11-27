@@ -107,6 +107,26 @@ URL=https://dhshlove01-lang.github.io/Ink-Escape/ NODE_PATH=$(npm root -g) node 
 9. 캐릭터 **대기(idle) 클립** — 지금은 정지 시 바인드(A포즈)다. Tripo 에서 idle 을 뽑아 `assets/models/<동물>.glb` 안에 넣으면 `CharacterRig` 가 `pickClip(clips,'idle')` 로 자동 재생(코드 한 줄 추가). 있으면 로비 단상도 훨씬 살아난다.
 10. 애니메이션 클립 추가(피격·사망·재장전·부활) — 같은 리그에 클립만 늘리면 된다(`CharacterRig` 가 이름으로 찾는다).
 
+## 3D 오브젝트 부족 목록 (사용자가 나중에 3D 로 만들어 줌 — 2026-11-27 기록)
+
+지금은 코드 도형·2D 그림으로 대신 그리는 것들. GLB 를 받으면 `assets/models/<이름>.glb` + `config/models.js` 에 `prop('<이름>', 크기)` 한 줄, 쓰는 곳은 `placeModel('<이름>', { fallback: 지금 도형 })` 으로 바꾸면 된다 (못 받으면 지금 도형 그대로).
+
+| 오브젝트 | 지금 | 쓰는 곳 | 메모 |
+| --- | --- | --- | --- |
+| 탄피 (5.56mm) | 황동 원기둥 | `player/Shells.js` | 아주 작음(실제 4.5cm × 1.6배). 1인칭 오른쪽 배출 |
+| 지우개 수류탄 폭발 조각 | 분홍·흰 상자 26개 | `player/Effects.js boom()` | 지우개 부스러기 조각 1~2종이면 충분 |
+| 몬스터 처치 연기 | 흰 공 | `Effects.js puff()` | 종이·잉크 연기 느낌 |
+| 탈출문 X자 사슬 | 고리 도형 반복 | `render/EscapeGate.js buildChains` | 사슬 고리 1개(반복 배치) 또는 X자 사슬 한 덩어리 |
+| 샹들리에 매다는 사슬 | 검은 원기둥 | `render/PalaceBuilder.js` | 천장(14m)~샹들리에 위(7.5m), 세로로 긴 사슬 |
+| 로비 술래 연필 (바닥 낙서용) | 원기둥·원뿔 | `ui/CharacterStage.js makePencil` | 손에 쥐는 노란 연필 (보스 연필 공격 GLB 와 다른, 작은 것) |
+| 일반 몬스터 원거리 탄 | 2D 그림(속성 색) | `player/MonsterRenderer.js` | 보스 탄은 GLB(연필 창·잉크 폭탄). 일반용은 작은 잉크 방울 5색 |
+| 몬스터 오라 입자 | 하얀 네모 점 | `MonsterRenderer.js` (aura Points) | 네모로 보이는 문제 있음 — 입자 그림(2D)이나 작은 잉크 방울 |
+| 문 너머 막힌 벽 | 검은 상자 | `EscapeGate.js` (back) | 열리면 보이는 탈출 통로 끝 (빛나는 출구) |
+| 궁전 안쪽 벽(왕좌의 방 ㄱ자 벽) | 궁전 벽 텍스처 상자 | `SceneBuilder` | 모서리·윗부분 장식(몰딩) 조각이 있으면 좋음 |
+| 보급 상자 착지 표시·술래 지도 아이콘 | 2D 그림 | `render/SupplyCrates.js`, `TopDownMap` | 3D 는 이미 GLB. 회복 상자용 아이콘(초록)이 따로 없음 |
+| 1인칭 레드도트 점·총구 불꽃 | 2D 스프라이트 | `player/Weapon.js` | 그대로 둬도 됨 (2D 가 맞는 효과) |
+| 캐릭터 애니메이션 | 달리기·걷기만 | `CharacterRig` | idle·피격·사망·재장전·부활 클립, 술래 악마는 클립 없음 |
+
 ## 알려진 문제
 
 - 방장 탭이 뒤로 가면 브라우저가 타이머를 늦춰 다른 사람 화면이 끊긴다.
