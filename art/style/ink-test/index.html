@@ -40,9 +40,16 @@ const origMats = new Map();
 const toonMats = new Map();
 
 // 셀 셰이딩용 3단 명암
-const steps = new Uint8Array([95, 95, 110, 255, 185, 180, 185, 255, 255, 255, 255, 255]);
-const grad = new THREE.DataTexture(steps, 3, 1, THREE.RGBAFormat);
-grad.minFilter = grad.magFilter = THREE.NearestFilter;
+// 셀 명암 띠: 어두움 → 중간 → 밝음 3단, 경계만 살짝 부드럽게 (딱 끊으면 털 무늬마다 얼룩이 생김)
+const RAMP = 64, steps = new Uint8Array(RAMP * 4);
+for (let i = 0; i < RAMP; i++) {
+  const x = i / (RAMP - 1);
+  const band = (a, e, w) => 1 / (1 + Math.exp(-(x - e) / w));
+  const v = 0.42 + 0.3 * band(0, 0.32, 0.035) + 0.28 * band(0, 0.68, 0.035);
+  steps.set([v * 255, v * 248, v * 250, 255], i * 4);
+}
+const grad = new THREE.DataTexture(steps, RAMP, 1, THREE.RGBAFormat);
+grad.minFilter = grad.magFilter = THREE.LinearFilter;
 grad.needsUpdate = true;
 
 // 바닥 접촉 그림자 (부드러운 원)
@@ -71,20 +78,24 @@ const post = new THREE.ShaderMaterial({
   fragmentShader: `
     uniform sampler2D tColor, tNormal, tDepth, tPaper; uniform vec2 res; uniform float near, far; varying vec2 vUv;
     float lin(float d){ float z = d * 2.0 - 1.0; return (2.0 * near * far) / (far + near - z * (far - near)); }
-    float hash(vec2 p){ return fract(sin(dot(p, vec2(12.9898,78.233))) * 43758.5453); }
-    void main(){
-      // 선이 손으로 그린 듯 살짝 흔들리게
-      vec2 wob = (vec2(hash(floor(vUv*160.0)), hash(floor(vUv*160.0)+7.0)) - 0.5) * 1.2 / res;
-      vec2 uv = vUv + wob; vec2 px = 2.4 / res; // 선 굵기 (px)
+        void main(){
+      // 화면에 고정된 흔들림은 넣지 않는다 (움직이면 선이 물체와 따로 미끄러져 보임)
+      vec2 uv = vUv; vec2 px = 2.0 / res; // 선 굵기 (px)
       float d0 = lin(texture2D(tDepth, uv).r);
       vec3 n0 = texture2D(tNormal, uv).rgb;
-      float dEdge = 0.0, nEdge = 0.0;
-      for (int i = 0; i < 4; i++) {
-        vec2 o = i == 0 ? vec2(px.x,0.) : i == 1 ? vec2(-px.x,0.) : i == 2 ? vec2(0.,px.y) : vec2(0.,-px.y);
-        dEdge += abs(lin(texture2D(tDepth, uv + o).r) - d0);
-        nEdge += distance(texture2D(tNormal, uv + o).rgb, n0);
+      float dEdge = 0.0, nEdge = 0.0, nHits = 0.0;
+      for (int i = 0; i < 8; i++) {
+        vec2 o = vec2(i == 0 || i == 4 || i == 5 ? 1. : i == 1 || i == 6 || i == 7 ? -1. : 0.,
+                      i == 2 || i == 4 || i == 6 ? 1. : i == 3 || i == 5 || i == 7 ? -1. : 0.) * px;
+        dEdge = max(dEdge, abs(lin(texture2D(tDepth, uv + o).r) - d0));
+        float nd = distance(texture2D(tNormal, uv + o).rgb, n0);
+        nEdge = max(nEdge, nd);
+        nHits += step(0.5, nd);
       }
-      float edge = max(smoothstep(0.05 * d0, 0.1 * d0, dEdge), smoothstep(0.45, 0.85, nEdge));
+      float silhouette = smoothstep(0.03 * d0, 0.06 * d0, dEdge);       // 윤곽 (거리 차이)
+      float crease = smoothstep(0.55, 0.9, nEdge) * step(2.5, nHits);     // 접힌 곳 (이웃 3곳 이상일 때만 → 외톨이 점 없음)
+      float edge = max(silhouette, crease);
+      edge *= 1.0 - smoothstep(25.0, 60.0, d0);                            // 먼 곳은 선을 흐리게 (안개 속 지저분함 방지)
       vec3 col = texture2D(tColor, vUv).rgb;
       vec3 p = texture2D(tPaper, vUv * res / 256.0).rgb;
       col *= mix(vec3(1.0), p * p, 0.9); // 종이 결
@@ -134,6 +145,7 @@ new GLTFLoader().load('../../../assets/models/shiba.glb', (g) => {
   window.ready = true;
 });
 
+window.pose = (rot, camX) => { if (model) model.rotation.y = rot; cam.position.x = camX; cam.lookAt(0, 0.8, 0); };
 window.render = (mode) => {
   if (mode === 'edge') post.defines.EDGE_ONLY = 1; else delete post.defines.EDGE_ONLY;
   post.needsUpdate = true;
