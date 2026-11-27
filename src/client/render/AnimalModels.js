@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { img } from './Images.js';
+import { createCharacterRig } from './CharacterRig.js';
 
 // 동글동글 동물 4종을 공·원기둥으로 만든다 (임시 모델 — 나중에 진짜 3D 모델 파일로 교체).
 // 모든 모델은 -Z 쪽을 바라본다 (카메라와 같은 방향).
@@ -73,13 +74,22 @@ export function createCharacterModel(kind, { gun = false } = {}) {
 }
 
 // 인게임 동물 몸: GLB 가 있으면 GLB + 총, 없으면 공·상자 임시 모델. 늦게 도착하면 그 자리에서 바꿔 끼운다.
+// 총은 캐릭터의 오른손을 따라가고(CharacterRig), 달릴 때는 오른팔을 "총 든 자세"로 덮어쓴다.
 export function createAnimalModel(kind, { gun = true } = {}) {
-  if (!gun) return library?.get(kind) || primitiveAnimal(kind, { gun: false });
   const holder = new THREE.Group();
   const put = (obj) => {
     holder.clear();
+    holder.userData.rig = null;
     holder.add(obj);
-    if (gun) holder.add(rifleMesh());
+    if (!gun) return;
+    const g = createGunMesh();
+    g.scale.setScalar(1.1);
+    g.rotation.set(0.04, -0.1, 0);
+    holder.add(g);
+    // 뼈대·애니메이션이 있는 모델이면 리그를 붙인다 (손 위치로 총을 옮기고 달리기 클립 재생)
+    const rig = createCharacterRig(obj, { gun: g });
+    if (!rig.rigged) g.position.set(0.34, 0.62, -0.66); // 뼈가 없으면 예전처럼 몸 앞에
+    holder.userData.rig = rig;
   };
   if (library?.has(kind)) put(library.get(kind));
   else {
@@ -90,14 +100,7 @@ export function createAnimalModel(kind, { gun = true } = {}) {
   return holder;
 }
 
-// 진짜 몸에 들려주는 총 (몸 앞쪽 오른발 근처, 총구가 앞)
-function rifleMesh() {
-  const g = createGunMesh();
-  g.scale.setScalar(1.15);
-  g.position.set(0.34, 0.62, -0.66);
-  g.rotation.set(0.06, -0.12, 0);
-  return g;
-}
+// 진짜 몸에 들려주는 총의 예전 자리 (뼈대가 없는 임시 모델용: 몸 앞 오른쪽, 총구가 앞)
 
 function primitiveAnimal(kind, { gun = true } = {}) {
   const L = ANIMAL_LOOK[kind] || ANIMAL_LOOK.shiba;
@@ -215,16 +218,34 @@ function primitiveAnimal(kind, { gun = true } = {}) {
 // 1인칭 앞발 + 총 (카메라 기준 뷰모델). 동물마다 털색·무늬·소매·발바닥이 다르다.
 export function createViewModel(kind) {
   const g = new THREE.Group();
-  const gun = createGunMesh(toViewModelMaterial);
-  g.userData.gun = gun;
-  gun.scale.setScalar(0.7);
-  gun.rotation.y = 0.05; // 총구가 조준점 쪽, 옆면이 살짝 보이게
-  g.add(gun);
-
   // 방아쇠를 쥔 오른발 (총 손잡이 뒤) · 총열을 받치는 왼발 (앞몸통 아래)
   // 좌표는 view 기준(m). 총은 대각선(-z 쪽이 왼쪽 위)이라 발도 그 각도에 맞춘다.
   const rearWrist = new THREE.Vector3(-0.05, -0.105, -0.005);
   const frontWrist = new THREE.Vector3(-0.06, -0.015, -0.17);
+  const GUN_SCALE = 0.78;
+  // 총의 손잡이(모델이 알려준 grip)가 오른발 손목 자리에 오게 총을 놓는다
+  // 빨간 점(사이트)도 모델의 가늠쇠 위로 옮긴다 (총 모델이 바뀌어도 자동으로 맞음)
+  const sightObj = () => g.userData.sightObj;
+  const placeGun = (holder) => {
+    const src = holder.children[0];
+    const grip = src?.userData?.grip;
+    if (!grip) return;
+    const s = GUN_SCALE;
+    holder.position.set(rearWrist.x - grip.x * s, rearWrist.y - grip.y * s, rearWrist.z - grip.z * s);
+    const sight = src.userData.sight;
+    if (!sight) return;
+    g.userData.sight = { x: holder.position.x + sight.x * s, y: holder.position.y + sight.y * s, z: holder.position.z + sight.z * s };
+    if (sightObj()) sightObj().position.set(g.userData.sight.x, g.userData.sight.y, g.userData.sight.z);
+  };
+  const gun = createGunMesh((holder) => {
+    toViewModelMaterial(holder);
+    placeGun(holder);
+  });
+  g.userData.gun = gun;
+  gun.scale.setScalar(GUN_SCALE);
+  gun.rotation.y = 0.05; // 총구가 조준점 쪽, 옆면이 살짝 보이게
+  g.add(gun);
+  placeGun(gun);
 
   // 손 하나 = 홀더(손목 자리) + 그 안의 앞발. 팔뚝은 화면 아래 바깥으로 비스듬히 빠진다
   // → 예전처럼 팔꿈치를 수직으로 떨어뜨려 손목만 꺾는 90도 꺾임이 없다.
@@ -254,11 +275,14 @@ export function createViewModel(kind) {
   g.userData.pawParts = { rear, front };
 
   // 레드도트 사이트 (총 위) — 빛나는 점의 위치를 Weapon 이 받아 쓴다
+  // 모델 자체에 레드도트 사이트가 있으므로 덧대는 상자는 치우고, 빨간 점만 모델 사이트 위에 놓는다
   const sight = buildRedDotSight();
+  sight.visible = false;
   sight.position.set(-0.014, 0.085, 0.03);
   g.add(sight);
   g.userData.sightObj = sight;
   g.userData.sight = { x: -0.014, y: 0.087, z: 0.062 };
+  placeGun(gun);
 
   toViewModelMaterial(g);
   return g;

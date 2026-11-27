@@ -10,17 +10,17 @@
 //
 // 파일이 아직 없으면 그 줄을 넣지 않는다 (없는 파일은 404 가 되고, 임시 모델로 대신 그린다).
 
-const CHARACTER = { rotateY: 0, size: 1.55, anchor: 'bottom', material: { metalness: 0, roughness: 0.88 } };
+const CHARACTER = { rotateY: Math.PI, size: 1.55, anchor: 'bottom', material: { metalness: 0, roughness: 0.88 } };
 
 export const MODEL_DEFS = {
   gun: {
     url: 'assets/models/gun.glb',
-    rotateY: Math.PI / 2, // 원본은 총구가 +X
+    rotateY: -Math.PI / 2, // Tripo 원본은 총구가 -X
     size: 0.62,
     tip: '-z', // 총구 끝 = 가장 앞쪽(-Z) 점들 → 불꽃·총알 궤적 시작점
     material: { metalness: 0, roughness: 0.65, darkenNeutral: 0.3 },
   },
-  // 캐릭터 (원본이 이미 -Z 를 보므로 돌리지 않는다 — 원단이 +Z 를 보면 여기만 고치면 된다)
+  // 캐릭터 (Tripo 원본은 +Z 를 보므로 반 바퀴 돌려 -Z 를 보게 한다)
   shiba: { url: 'assets/models/shiba.glb', ...CHARACTER },
   bear: { url: 'assets/models/bear.glb', ...CHARACTER },
   rabbit: { url: 'assets/models/rabbit.glb', ...CHARACTER },

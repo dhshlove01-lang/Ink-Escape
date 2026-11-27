@@ -71,8 +71,17 @@ export class RemotePlayers {
       it.lastX = p.x;
       it.lastZ = p.z;
       it.t += dt * (moved > 0.5 ? 10 : 2);
-      m.rotation.set(0, p.yaw, moved > 0.5 ? Math.sin(it.t) * 0.12 : 0);
-      m.position.y = p.y + (moved > 0.5 ? Math.abs(Math.sin(it.t)) * 0.08 : 0);
+      // 2026-11-27: 애니메이션이 있는 GLB 캐릭터는 달리기/걷기 클립 + 총 든 자세를 rig 가 맡는다.
+      // (그전에는 몸 전체를 흔드는 방식이라 그냥 달리는 것처럼 보였다)
+      const rig = m.userData.rig;
+      if (rig) {
+        rig.update(dt, moved);
+        m.rotation.set(0, p.yaw, 0);
+        m.position.y = p.y;
+      } else {
+        m.rotation.set(0, p.yaw, moved > 0.5 ? Math.sin(it.t) * 0.12 : 0);
+        m.position.y = p.y + (moved > 0.5 ? Math.abs(Math.sin(it.t)) * 0.08 : 0);
+      }
       m.visible = !(p.bits & STATUS_BIT.INVULN) || Math.floor(time * 10) % 2 === 0;
     }
   }

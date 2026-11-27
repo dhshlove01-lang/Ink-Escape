@@ -104,6 +104,8 @@ URL=https://dhshlove01-lang.github.io/Ink-Escape/ NODE_PATH=$(npm root -g) node 
 6. 맵 2·3 (한밤의 미술실, 한밤의 책상 위)
 7. 신고·다른 사람 그림 숨기기·스트리머 모드
 8. 1인칭 앞발 — **2026-11-27 GLB 4종으로 교체 완료**(`paw_*.glb`). 남은 건 총 손잡이를 감싸는 느낌 다듬기, 그리고 SF3D 한도가 풀리면 같은 파일명으로 재구성 모델 덮어쓰기 · 효과음 파일
+9. 캐릭터 **대기(idle) 클립** — 지금은 정지 시 바인드(A포즈)다. Tripo 에서 idle 을 뽑아 `assets/models/<동물>.glb` 안에 넣으면 `CharacterRig` 가 `pickClip(clips,'idle')` 로 자동 재생(코드 한 줄 추가). 있으면 로비 단상도 훨씬 살아난다.
+10. 애니메이션 클립 추가(피격·사망·재장전·부활) — 같은 리그에 클립만 늘리면 된다(`CharacterRig` 가 이름으로 찾는다).
 
 ## 알려진 문제
 
@@ -113,6 +115,41 @@ URL=https://dhshlove01-lang.github.io/Ink-Escape/ NODE_PATH=$(npm root -g) node 
 - 효과음은 아직 임시.
 
 ## 작업 기록
+
+### 2026-11-27 · Tripo GLB 6종(시바·곰·토끼·삼색고양이·술래·총) 교체 + 달리기 애니메이션 + "총 들고 달리기"
+- **무엇을**: 사용자가 Tripo AI 로 뽑아 메일(`제목 "트리포"`, 스레드 `1a21ade1c090be1b`, 메시지 `1a21ae100a9fff4d`)로 보낸 `.glb` 6개를 캐릭터 5종 + 총에 적용. 새 캐릭터 4종에는 **mixamo 뼈대(65개) + 달리기/걷기 클립**이 들어 있어, 그냥 달리는 대신 **총을 든 채로 달리는** 모습이 되도록 리그·IK·총 장착을 붙였다.
+- **파일 매핑**(메일 첨부 `tripo_convert_<uuid>.glb` → 이름은 4방향 렌더로 직접 눈으로 판별):
+  | 첨부 uuid | 정체 | 클립 | 비고 |
+  | --- | --- | --- | --- |
+  | `79f4196d-3be7-4e55-98f5-d67747be2374` | `cat.glb` (삼색고양이, 보라 베레모·목도리·가죽 가방) | walk.001 2.375s / **run.001 1.292s** | SkinnedMesh 65본 |
+  | `4be743bf-8015-4901-82ec-8e10c48a114a` | `rabbit.glb` (흰 토끼, 겨자색 모자·목도리) | 위와 같음 | |
+  | `d0e2685f-0d0c-4873-b6e2-1fc233dbe7f0` | `shiba.glb` (시바, 주황 목도리·가죽 벨트) | 위와 같음 | |
+  | `2cb8c045-abfc-4b01-ac04-5639f71a39fc` | `bear.glb` (군용 곰, 헬멧·고글·탄약 조끼) | 위와 같음 | |
+  | `d8e4670b-6dcb-4009-82fc-928050a3951f` | `devil.glb` (술래 악마, 박쥐날개·화살꼬리·연필) | **없음**(정적) | 단상 숨쉬기 연출 유지 |
+  | `da71c9fe-2349-4b74-859f-e3ceb6c8bd16` | `gun.glb` (보라 탄창 소총) | 없음 | 총구 = **-X** |
+- **왜**: 사용자 지적 — "달리는 게 총 들고 달려야 되는데 그냥 달리긴 해".
+- **어디**
+  - `assets/models/{shiba,bear,rabbit,cat,devil,gun}.glb` — 6개 전부 Tripo 판으로 교체(각 1.2~3.9MB, 총 18MB).
+  - `vendor/addons/utils/SkeletonUtils.js` — three r160 예제 그대로 추가(MIT). 세 곳에서만 쓰는 clipAction 대상.
+  - `src/config/models.js`: 캐릭터 `rotateY: Math.PI` (Tripo 원본이 **+Z 를 봄** → 반 바퀴), `gun` 은 `rotateY: -Math.PI/2` (원본 총구 **-X**).
+  - `src/client/render/ModelLibrary.js`
+    - **리깅 복제**: `get()` 이 `hasSkin()` 이면 `SkeletonUtils.clone(m)` — `clone(true)` 는 스킨·본 연결이 끊긴다. 애니메이션 클립은 `outer.userData.animations` 에 담아 복제본마다 넘긴다.
+    - **SkinnedMesh 크기 측정**: `visibleBox()` 가 스킨드 메시는 `applyBoneTransform` 으로 실제 뼈 변형 정점을 재서 상자를 만든다. (Tripo 모델은 geometry 바인드 상자가 실제 몸의 1/2 도 안 돼서, 예전 방식이면 캐릭터가 2배로 커졌다.)
+    - **뿌리 이동 제거** `stripRootMotion()`: run/walk 의 Hips 위치 트랙에서 첫 프레임 x·z 를 빼서, 달릴 때 모델이 앞으로 흘러가 충돌 위치와 어긋나지 않게(위아래 통통은 유지).
+    - **`userData.grip` / `userData.sight`**: 총 모델에서 손잡이(아래쪽 25% 중 가장 뒤쪽 뭉치)와 가늠쇠 꼭대기를 자동으로 찾는다 → 총 모델이 바뀌어도 1인칭 손·빨간 점이 따라온다.
+  - `src/client/render/CharacterRig.js` (신규) — 캐릭터 하나의 애니메이션·자세.
+    - `AnimationMixer` + `run`(속도 5.2m/s 초과)/`walk` 클립, 속도에 맞춘 `timeScale`, 정지 시 무게 페이드로 바인드(대기) 자세.
+    - **총 든 자세**: 매 프레임 오른팔 2뼈 IK 로 오른손을 어깨 앞(`forward 0.20 / right 0.02 / down 0.05`, 닿는 거리로 자름)에 두고, 상체(Spine2)를 살짝 앞으로 — 달리기 클립 위에 블렌딩(`blendSec 0.18`)한다.
+    - **총**: 손뼈 위치를 매 프레임 읽어 `gun.position` 만 옮긴다(뼈에 붙이지 않아 어떤 동작에서도 찌그러지지 않고, 방향은 캐릭터 앞 -Z 고정).
+  - `src/client/render/AnimalModels.js`: `createAnimalModel()` 이 GLB + 총 + `createCharacterRig()` 를 묶어 `holder.userData.rig` 로 넘긴다(뼈대 없는 임시 모델이면 예전 자리 `(0.34,0.62,-0.66)`). 1인칭은 `createViewModel()` 이 총의 grip 을 오른발 손목에 맞춰 놓고, 덧대던 사이트 상자는 숨기고 빨간 점만 모델 가늠쇠 위에 놓는다(총 스케일 0.78).
+  - `src/client/player/RemotePlayers.js`: `rig.update(dt, 실제 이동속도)` 로 달리기/대기 전환. (예전엔 몸 전체를 흔들어 "그냥 달리는" 느낌이었다.)
+- **검증**: 로컬 http.server + Playwright(스위프트셰이더).
+  - 로비 5종 단상 스크린샷 `downloads/ink_escape_tripo/lobby_5.png` — 방향·크기·발 위치 정상, 총 없음.
+  - 인게임(술래 화면의 3D 무대, 추적 카메라) `downloads/ink_escape_tripo/ingame_run_side.png` / `ingame_run_back.png` — 시바가 총을 오른손에 들고 달리는 모습, 찌그러짐·뒤집힘 없음.
+  - 1인칭 `downloads/ink_escape_tripo/first_person.png` — 총 손잡이를 앞발이 쥐고, 빨간 점이 모델 가늠쇠 위.
+  - 4종 × 대기/달리기 비교 시트 `downloads/ink_escape_tripo/kinds_sheet.png`.
+  - `pageerror 0`, 4xx/404 0. **이 환경에 node 가 없어 `npm test`·`tools/smoke.cjs` 는 여전히 못 돌렸다 — 다음 AI 가 먼저 돌릴 것.**
+- **남은 것**: 정지 자세가 바인드(A포즈)라 로비·대기 시 팔이 살짝 벌어져 있다. 대기 클립(idle)이 없어서이며, Tripo 에서 idle 을 뽑아 오면 `CharacterRig` 의 `pickClip(clips,'idle')` 한 줄로 붙일 수 있다. 왼팔은 달리기 클립 그대로 흔들린다(총은 오른손만).
 
 ### 2026-11-27 · 1인칭 동물 앞발 GLB 4종 (그림 → 3D 메시) · 손목 90도 꺾임 제거
 - **무엇을**: 1인칭 손이 코드 도형(공 조합)이라 손목이 90도로 꺾여 보이던 것을, 동물 4종(시바·곰·토끼·삼색고양이)의 **새 앞발 그림에서 만든 GLB 4종**으로 교체.
