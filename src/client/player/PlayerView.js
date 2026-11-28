@@ -6,7 +6,7 @@ import { CEILING_LAYER } from './SceneBuilder.js';
 import { WALL_H } from '../../shared/map/GameMap.js';
 import { FpsController } from './FpsController.js';
 import { Weapon } from './Weapon.js';
-import { InkRenderer } from '../render/InkRenderer.js';
+import { FrameRenderer } from '../render/FrameRenderer.js';
 import { CameraRecoil, FovPunch, CrosshairBloom } from './GunFeel.js';
 import { Shells } from './Shells.js';
 import { Hud } from './Hud.js';
@@ -30,7 +30,8 @@ export class PlayerView {
     this.renderer = new THREE.WebGLRenderer({ antialias: gfx.preset.antialias });
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.root.append(this.renderer.domElement);
-    this.ink = new InkRenderer(this.renderer, { fadeNear: 30, fadeFar: 75 });
+    // 그림체 한 문: 기본은 선 없는 렌더 + 후처리, '잉크 선'을 켜면 예전 잉크 만화 (render/FrameRenderer.js)
+    this.fx = new FrameRenderer(this.renderer, { ink: { fadeNear: 30, fadeFar: 75 } });
 
     this.view3d = new WorldRenderer({ session, palette, attributes, balance, sfx, skipPlayerId: session.me });
     this.scene = this.view3d.scene;
@@ -324,10 +325,11 @@ export class PlayerView {
       const r = this.renderer;
       r.autoClear = false;
       r.clear();
-      this.ink.render(this.scene, this.camera); // 잉크 스타일 (그래픽 '끄기'면 평소대로)
+      this.fx.begin(this.scene, this.camera);
+      this.fx.present(); // 후처리(블룸·톤매핑) 합치기 — 잉크 스타일이면 그 안에서 이미 끝났다
       if (this.weapon.view.visible) {
         r.clearDepth();
-        this.ink.render(this.weapon.vmScene, this.weapon.vmCam, { overlay: true });
+        this.fx.overlay(this.weapon.vmScene, this.weapon.vmCam); // 손·총은 후처리 밖에서 얹는다
       }
     }
   }
@@ -376,7 +378,7 @@ export class PlayerView {
     this.shells.dispose();
     this.view3d.dispose();
     this.hud.dispose();
-    this.ink.dispose();
+    this.fx.dispose();
     this.renderer.dispose();
     this.root.remove();
   }

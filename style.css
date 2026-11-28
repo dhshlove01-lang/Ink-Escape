@@ -627,6 +627,8 @@ h1.logo img { display: block; width: min(340px, 78%); height: auto; margin: 0 au
 
 /* 그래픽 품질 고르기 (언어 고르기와 같은 모양 + 앞 글씨) */
 .gfx-label { align-self: center; padding: 0 4px 0 10px; font-size: 12px; color: var(--muted); font-family: var(--font-body); }
+/* 잉크 선 토글은 품질과 다른 묶음 — 세로줄로 나눠 두 'Off'가 헷갈리지 않게 (2026-11-28) */
+.gfx-ink-label { margin-left: 8px; padding-left: 12px; border-left: 1px solid rgba(255,255,255,0.16); font-variant-numeric: tabular-nums; }
 
 /* 달리기 기력 (HP 막대 아래 얇은 막대) */
 .stam-bar { width: 100%; height: 6px; margin-top: 5px; border-radius: 3px; background: rgba(0,0,0,0.5); overflow: hidden; transition: opacity 0.4s; }

@@ -39,7 +39,7 @@ export function mountPerfOverlay() {
       `${t('perf.fps')} ${s.fps ? Math.round(s.fps) : '—'} · ${s.ms ? s.ms.toFixed(1) : '—'}ms`,
       `${t('perf.res')} ${res} (${Math.round(gfx.scale * 100)}%)`,
       `${t('perf.draw')} ${fmt(s.calls)} · ${t('perf.tris')} ${fmt(s.tris)}`,
-      `${t('perf.ink')} ${gfx.preset.ink !== false ? 'ON' : 'OFF'} · ${t('gfx.' + gfx.level)}`,
+      `${t('perf.ink')} ${gfx.ink ? 'ON' : 'OFF'} · ${t('gfx.' + gfx.level)}`,
     ].join('\n');
   }, 250);
 }

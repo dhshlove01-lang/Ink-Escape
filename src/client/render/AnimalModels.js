@@ -212,7 +212,7 @@ function primitiveAnimal(kind, { gun = true } = {}) {
     }
   }
   g.traverse((o) => {
-    if (o.isMesh) o.castShadow = false;
+    if (o.isMesh) o.castShadow = true; // 그림자 쓰는 화면(전장·로비)에서만 비용이 든다
   });
   g.userData.kind = kind;
   return g;

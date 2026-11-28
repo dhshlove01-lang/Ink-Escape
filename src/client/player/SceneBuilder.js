@@ -8,6 +8,7 @@ import {
 } from '../render/DungeonKit.js';
 import { EscapeGate } from '../render/EscapeGate.js';
 import { buildRoundHall, buildMapProps } from '../render/PalaceBuilder.js';
+import { buildPalaceAtmosphere } from '../render/PalaceAtmosphere.js';
 import { placeModel } from '../render/MapModels.js';
 
 // 맵 → 3D 장면. 어두운 낙서 던전 (돌벽 + 분필 낙서 + 횃불 + 소품 + 탈출문).
@@ -133,18 +134,38 @@ export function buildScene(map) {
   const floorTex = texture(theme.tex.floor, { repeat: [map.worldW / 3, map.worldH / 3] }) || tex.floor;
   const kit = createDungeonKit({ wallTex, floorTex, pillarTex });
 
-  // 조명은 2개뿐 (2026-11-27 최적화): 전체를 밝히는 반구광 + 셀 명암용 위쪽 빛.
-  // 횃불·샹들리에·문은 진짜 빛 대신 빛무리 그림만 (픽셀마다 조명 수만큼 계산하므로 9개 → 2개)
+  // 조명 (2026-11-28 art_direction_dark_palace.md 1단계): 진짜 조명은 반구광·키(그림자)·림 3개까지만.
+  // 횃불·샹들리에·문·창은 진짜 빛 대신 가짜 빛 웅덩이로 (PalaceAtmosphere) — 픽셀마다 조명 수만큼 계산하므로
+  const center = map.bounds ? { x: map.bounds.x, z: map.bounds.z } : { x: map.worldW / 2, z: map.worldH / 2 };
   scene.add(new THREE.HemisphereLight(theme.hemi.sky, theme.hemi.ground, theme.hemi.intensity));
   const key = new THREE.DirectionalLight(theme.key?.color ?? 0xffe2c4, theme.key?.intensity ?? 1.3);
-  key.position.set(0.45, 1, 0.3);
-  scene.add(key);
+  key.position.set(center.x + 26, 46, center.z + 18); // 높은 창으로 드는 빛
+  key.target.position.set(center.x, 0, center.z);
+  if (theme.key?.shadow !== false) {
+    key.castShadow = true;
+    key.shadow.mapSize.set(2048, 2048);
+    const s = map.bounds ? map.bounds.r + 12 : Math.max(map.worldW, map.worldH) * 0.7;
+    Object.assign(key.shadow.camera, { left: -s, right: s, top: s, bottom: -s, near: 1, far: 140 });
+    key.shadow.camera.updateProjectionMatrix();
+    key.shadow.bias = -0.0004;
+    key.shadow.normalBias = 0.045;
+    key.shadow.radius = 3; // PCFSoft — 반음영이 퍼진다
+  }
+  scene.add(key, key.target);
+  // 은은한 림(반대편 낮은 곳에서 차가운 빛) — 어두운 배경에서 캐릭터·소품 윤곽이 살아난다
+  if (theme.rim) {
+    const rim = new THREE.DirectionalLight(theme.rim.color, theme.rim.intensity);
+    rim.position.set(center.x - 24, 26, center.z - 38);
+    rim.target.position.set(center.x, 0, center.z);
+    scene.add(rim, rim.target);
+  }
 
   // 둥근 맵(궁전): 바닥·천장·둥근 벽은 PalaceBuilder, 안쪽 벽만 아래 상자로
   const round = map.bounds ? buildRoundHall(scene, map, theme, kit, CEILING_LAYER) : null;
 
   // 바닥
   const floor = new THREE.Mesh(new THREE.PlaneGeometry(map.worldW, map.worldH), kit.mats.floor);
+  floor.userData.noCast = true; // 바닥은 그림자를 받기만
   floor.visible = !round;
   floor.rotation.x = -Math.PI / 2;
   floor.position.set(map.worldW / 2, 0, map.worldH / 2);
@@ -155,6 +176,7 @@ export function buildScene(map) {
   ceilTex.repeat.set(map.worldW / 5, map.worldH / 5);
   ceilTex.needsUpdate = true;
   const ceiling = new THREE.Mesh(new THREE.PlaneGeometry(map.worldW, map.worldH), kit.mats.ceiling);
+  ceiling.userData.noCast = true;
   ceiling.rotation.x = Math.PI / 2; // 아래를 바라봄
   ceiling.position.set(map.worldW / 2, WALL_H, map.worldH / 2);
   ceiling.layers.set(CEILING_LAYER);
@@ -266,6 +288,11 @@ export function buildScene(map) {
 
   if (theme.decals) addDecals(scene, map);
 
+  // 공기·빛 (마왕 궁전): 따뜻한 빛 웅덩이·스테인드글라스 빛줄기·붉은 불티·바닥 안개
+  const atmosphere = map.bounds ? buildPalaceAtmosphere(scene, map, theme) : null;
+  // 그림자: 불투명한 것만 (반투명·가산 효과는 그림자를 만들지 않는다). 바닥·천장·카펫은 받기만
+  applyShadows(scene);
+
   let revealed = -1;
   let last = -1;
   return {
@@ -273,6 +300,7 @@ export function buildScene(map) {
     update(time) {
       const dt = last < 0 ? 0 : Math.min(0.05, Math.max(0, time - last));
       last = time;
+      atmosphere?.update(time);
       for (const t of torches) {
         t.f = 0.85 + Math.sin(time * 9 + t.phase) * 0.08 + Math.sin(time * 23 + t.phase * 2) * 0.05;
         t.flame.scale.set(0.7 * t.f, 0.95 * t.f, 1);
@@ -305,6 +333,17 @@ export function buildScene(map) {
 }
 
 // 벽(방 안쪽 면)과 바닥에 분필·빨간 낙서를 흩뿌린다. 같은 맵이면 모두에게 같은 자리 (고정 시드).
+// 그림자 깃발: 불투명한 메시는 빛을 받고(받기), 바닥·천장처럼 noCast 로 표시한 것만 안 던진다
+function applyShadows(scene) {
+  scene.traverse((o) => {
+    if (!o.isMesh && !o.isInstancedMesh) return;
+    const ms = Array.isArray(o.material) ? o.material : [o.material];
+    if (!ms.length || ms.some((m) => !m || m.transparent || m.blending === THREE.AdditiveBlending || m.depthWrite === false)) return;
+    o.receiveShadow = true;
+    o.castShadow = !o.userData.noCast;
+  });
+}
+
 function addDecals(scene, map) {
   if (!map.rooms?.length) return;
   const r = rand(23);

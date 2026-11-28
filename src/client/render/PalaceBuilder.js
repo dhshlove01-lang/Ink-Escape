@@ -55,8 +55,10 @@ export function buildRoundHall(scene, map, theme, kit, ceilingLayer) {
   // 바닥: 원 + 문 통로 아래
   const R = b.r + 1.5;
   const floorTex = tiled(theme.tex.floor, (R * 2) / tile.floor, (R * 2) / tile.floor);
-  const floorMat = floorTex ? new THREE.MeshStandardMaterial({ map: floorTex, roughness: 0.38, metalness: 0.15 }) : kit.mats.floor;
+  // 바닥: 윤기 있는 흑요석 대리석. roughness 를 올려 거울처럼 번지는 하이라이트(보라 띠)를 없했다 (2026-11-28: 0.38 → 0.7)
+  const floorMat = floorTex ? new THREE.MeshStandardMaterial({ map: floorTex, roughness: 0.7, metalness: 0.02 }) : kit.mats.floor;
   const floor = new THREE.Mesh(new THREE.CircleGeometry(R, 96), floorMat);
+  floor.userData.noCast = true; // 바닥은 그림자를 받기만
   floor.rotation.x = -Math.PI / 2;
   floor.position.set(b.x, 0, b.z);
   scene.add(floor);
@@ -64,6 +66,7 @@ export function buildRoundHall(scene, map, theme, kit, ceilingLayer) {
     const xs = d.cells.map((c) => c[0]), ys = d.cells.map((c) => c[1]);
     const w = (Math.max(...xs) - Math.min(...xs) + 1) * CELL, h = (Math.max(...ys) - Math.min(...ys) + 1) * CELL;
     const f = new THREE.Mesh(new THREE.PlaneGeometry(w + CELL * 2, h + CELL * 2), floorMat);
+    f.userData.noCast = true;
     f.rotation.x = -Math.PI / 2;
     f.position.set((Math.min(...xs) * CELL + Math.max(...xs) * CELL + CELL) / 2, -0.005, (Math.min(...ys) * CELL + Math.max(...ys) * CELL + CELL) / 2);
     scene.add(f);
@@ -71,6 +74,7 @@ export function buildRoundHall(scene, map, theme, kit, ceilingLayer) {
 
   // 천장 (플레이어 화면에만)
   const ceiling = new THREE.Mesh(new THREE.CircleGeometry(R, 64), kit.mats.ceiling);
+  ceiling.userData.noCast = true;
   ceiling.rotation.x = Math.PI / 2;
   ceiling.position.set(b.x, WALL_H, b.z);
   ceiling.layers.set(ceilingLayer);
@@ -95,6 +99,7 @@ export function buildRoundHall(scene, map, theme, kit, ceilingLayer) {
   for (const [t0, len] of arcs) scene.add(new THREE.Mesh(innerArc(b, t0, len, tile.wall[0], tile.wall[1]), wallMat));
   // 벽 위 테두리 (술래 카메라가 위에서 볼 때 벽 두께) + 바닥 걸레받이
   const rim = new THREE.Mesh(new THREE.RingGeometry(b.r, b.r + 2.2, 96), kit.mats.stoneTop);
+  rim.userData.noCast = true;
   rim.rotation.x = -Math.PI / 2;
   rim.position.set(b.x, WALL_H, b.z);
   scene.add(rim);
@@ -187,6 +192,7 @@ function carpet(p, theme) {
     new THREE.PlaneGeometry(p.w, p.len),
     tex ? new THREE.MeshStandardMaterial({ map: tex, roughness: 0.95 }) : lam(0x7a1020),
   );
+  m.userData.noCast = true; // 카펫도 그림자를 받기만
   m.rotation.x = -Math.PI / 2;
   m.rotation.z = p.ry || 0;
   m.position.set(p.x, 0.015, p.z);

@@ -40,7 +40,7 @@ export function langPicker() {
   return box;
 }
 
-// 그래픽 품질 (낮음 | 보통 | 높음) — 팬 소리가 크면 낮음
+// 그래픽 품질 (낮음 | 보통 | 높음) + 그림체(잉크 선 켬/끔) — 팬 소리가 크면 낮음
 export function gfxPicker() {
   const box = el('div', { class: 'lang-picker gfx-picker', role: 'group' });
   const draw = () => {
@@ -49,6 +49,10 @@ export function gfxPicker() {
     box.replaceChildren(
       el('span', { class: 'gfx-label' }, t('gfx.label')),
       ...gfx.levels.map((lv) => el('button', { class: 'lang-btn' + (lv === gfx.level ? ' on' : ''), 'aria-pressed': lv === gfx.level ? 'true' : 'false', onclick: () => gfx.set(lv) }, t('gfx.' + lv))),
+      el('span', { class: 'gfx-label gfx-ink-label' }, t('gfx.ink')),
+      ...[['off', false], ['on', true]].map(([key, v]) =>
+        el('button', { class: 'lang-btn' + (v === gfx.ink ? ' on' : ''), 'aria-pressed': v === gfx.ink ? 'true' : 'false', onclick: () => gfx.setInk(v) }, t('gfx.ink_' + key)),
+      ),
     );
   };
   draw();

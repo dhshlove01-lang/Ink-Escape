@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { placeModel } from '../render/MapModels.js';
-import { InkRenderer } from '../render/InkRenderer.js';
+import { FrameRenderer } from '../render/FrameRenderer.js';
 import { el } from './dom.js';
 import { createCharacterModel } from '../render/AnimalModels.js';
 import { makeTextures, flameTexture } from '../player/SceneBuilder.js';
@@ -29,7 +29,7 @@ export class CharacterStage {
     parent.append(this.root);
 
     this.renderer = new THREE.WebGLRenderer({ antialias: gfx.preset.antialias });
-    this.ink = new InkRenderer(this.renderer, { fadeNear: 30, fadeFar: 70 }); // 잉크 스타일 (그래픽 '끄기'면 평소대로)
+    this.fx = new FrameRenderer(this.renderer, { ink: { fadeNear: 30, fadeFar: 70 } }); // 선 없는 렌더 + 후처리 (기본)
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.root.append(this.renderer.domElement);
 
@@ -61,10 +61,22 @@ export class CharacterStage {
   buildLights() {
     const s = this.scene;
     // 조명 2개 (+결과 화면에서만 스포트라이트). 횃불은 빛무리 그림만 (2026-11-27 최적화)
-    s.add(new THREE.HemisphereLight(0xb4aae0, 0x4a3630, 2.4));
-    const key = new THREE.DirectionalLight(0xfff0d8, 1.6);
-    key.position.set(3.5, 6, 4.5);
-    s.add(key);
+    // 2026-11-28: 전장과 같은 차가운 밤빛 + 그림자 지는 키 라이트 (테마가 바뀌면 setTheme 이 색을 다시 맞춘다)
+    const th = themeFor(this.mapId || 'palace');
+    this.hemi = new THREE.HemisphereLight(th.hemi.sky, th.hemi.ground, th.hemi.intensity);
+    s.add(this.hemi);
+    const key = new THREE.DirectionalLight(th.key?.color ?? 0xfff0d8, th.key?.intensity ?? 1.6);
+    key.position.set(6, 13, 9);
+    key.target.position.set(0, 0.6, 0);
+    key.castShadow = true;
+    key.shadow.mapSize.set(1024, 1024);
+    Object.assign(key.shadow.camera, { left: -11, right: 11, top: 11, bottom: -11, near: 1, far: 40 });
+    key.shadow.camera.updateProjectionMatrix();
+    key.shadow.bias = -0.0005;
+    key.shadow.normalBias = 0.03;
+    key.shadow.radius = 3;
+    this.keyLight = key;
+    s.add(key, key.target);
     // 결과 화면용: 중앙 단상 위 스포트라이트 + 바닥 광채
     this.spot = new THREE.SpotLight(0xfff2d0, 0, 16, 0.5, 0.55, 1.2);
     this.spot.position.set(0, 7.5, 2.2);
@@ -86,6 +98,19 @@ export class CharacterStage {
     this.scene.background = new THREE.Color(th.background);
     this.scene.fog = new THREE.Fog(th.fog.color, 12, 36);
     this.scene.add(this.room);
+    // 조명 색도 테마를 따라간다 (궁전 = 차가운 밤빛)
+    this.hemi?.color.set(th.hemi.sky);
+    this.hemi?.groundColor.set(th.hemi.ground);
+    if (this.hemi) this.hemi.intensity = th.hemi.intensity;
+    this.keyLight?.color.set(th.key?.color ?? 0xfff0d8);
+    if (this.keyLight) this.keyLight.intensity = th.key?.intensity ?? 1.6;
+    this.room.traverse((o) => {
+      if (!o.isMesh && !o.isInstancedMesh) return;
+      const ms = Array.isArray(o.material) ? o.material : [o.material];
+      if (!ms.length || ms.some((m) => !m || m.transparent || m.blending === THREE.AdditiveBlending || m.depthWrite === false)) return;
+      o.receiveShadow = true;
+      o.castShadow = !o.userData.noCast;
+    });
   }
 
   // ── 캐릭터 배치 ───────────────────────────────────────────────
@@ -151,6 +176,7 @@ export class CharacterStage {
     );
     glow.rotation.x = -Math.PI / 2;
     glow.position.y = 0.208;
+    padTop.receiveShadow = padLip.receiveShadow = true; // 발밑 그림자가 단상에 떨어진다
     pad.add(padTop, padLip, ring, glow);
     this.scene.add(pad);
     bodyHolder.position.y = 0.2;
@@ -339,7 +365,8 @@ export class CharacterStage {
       this.camera.position.y = this.baseCam.y + Math.sin(t * 0.31 + 1) * 0.03;
       this.camera.lookAt(this.cameraLook);
     }
-    this.ink.render(this.scene, this.camera);
+    this.fx.begin(this.scene, this.camera);
+    this.fx.present();
   }
 
   resize() {
@@ -367,7 +394,7 @@ export class CharacterStage {
         else m?.dispose?.();
       }
     });
-    this.ink.dispose();
+    this.fx.dispose();
     this.renderer.dispose();
     this.root.remove();
   }
@@ -450,6 +477,7 @@ function buildThemeRoom(theme, fallback) {
   const { mats } = kit;
 
   const floor = new THREE.Mesh(new THREE.PlaneGeometry(40, 40), mats.floor);
+  floor.userData.noCast = true;
   floor.rotation.x = -Math.PI / 2;
   floor.position.z = 4;
   room.add(floor);

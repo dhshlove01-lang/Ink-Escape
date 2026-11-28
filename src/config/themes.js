@@ -14,14 +14,17 @@ export const THEMES = {
     banner: true, // 벽에 거는 천
   },
   // 대마왕의 궁전 (2026-11-27): 흑요석 대리석 바닥 + 금장 몰딩 석벽 + 진홍 카펫, Tripo 소품(왕좌·기둥·창·샹들리에)
+  // 2026-11-28: docs/art_direction_dark_palace.md — 차가운 밤빛(남색·보라) + 따뜻한 빛 웅덩이로 다크하게
   palace: {
     tex: { wall: 'tex.palace_wall', floor: 'tex.palace_floor', carpet: 'tex.palace_carpet' },
     tile: { wall: [4.5, 7], floor: 4, carpet: 2.4 }, // 텍스처 한 장의 실제 크기(m): 벽 [가로, 세로], 바닥 한 변, 카펫 길이
-    background: 0x0b0710,
-    fog: { color: 0x1c1222, near: 20, far: 90 },
-    hemi: { sky: 0xecd6e4, ground: 0x8a5a40, intensity: 5.2 }, // 진짜 점광원을 뺀 만큼 밝게 (따뜻한 횃불빛 느낌)
-    key: { color: 0xffe6c8, intensity: 2.6 },
+    background: 0x06050b,
+    fog: { color: 0x1a1330, near: 26, far: 120 }, // 멀수록 푸르게 잠기는 밤 안개 (실내라 옅게)
+    hemi: { sky: 0x8794d6, ground: 0x6e4a40, intensity: 6.4 }, // 위는 차가운 밤하늘, 아래는 따뜻한 돌바닥 반사 (형태가 읽히게 — 탑뷰 가독성 위해 5.8→6.4)
+    key: { color: 0xd8e2ff, intensity: 1.7 }, // 창으로 드는 차가운 달빛 (그림자·윤곽용)
+    rim: { color: 0x8a6cff, intensity: 0.6 }, // 뒤에서 비추는 은은한 림 — 실루엣 분리 (바닥에 보라 띠가 지지 않게 1.1 → 0.6)
     torch: 0xffa35a,
+    light: { pool: 0xff8a3c, poolDeep: 0xd8304a, ember: 0xff7a36, shaft: 0xb060ff, haze: 0x7a1230 }, // 가짜 빛(빛 웅덩이·빛줄기·불티·안개)
     decals: null,
     rune: false,
     banner: false,

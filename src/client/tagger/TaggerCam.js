@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { InkRenderer } from '../render/InkRenderer.js';
+import { FrameRenderer } from '../render/FrameRenderer.js';
 import { minPlayerDist } from '../../shared/augmentMath.js';
 import { Emitter } from '../Emitter.js';
 import { WALL_H } from '../../shared/map/GameMap.js';
@@ -72,7 +72,8 @@ export class TaggerCam extends Emitter {
     if (this.ready) return;
     this.ready = true;
     this.renderer = new THREE.WebGLRenderer({ antialias: gfx.preset.antialias });
-    this.ink = new InkRenderer(this.renderer, { fadeNear: 70, fadeFar: 150 }); // 위에서 멀리 보므로 선이 늦게 흐려짐
+    // 위에서 멀리 보므로 잉크 선은 늦게 흐려짐. 탑뷰는 맵 전체를 읽어야 하므로 비네팅을 줄이고 조금 더 밝게
+    this.fx = new FrameRenderer(this.renderer, { ink: { fadeNear: 70, fadeFar: 150 }, post: { exposure: 1.62, vignette: 0.1 } });
     this._offGfx = gfx.onChange(() => this.resize()); // 그래픽 설정·자동 해상도가 바뀌면
     this.renderer.setPixelRatio(gfx.pixelRatio(this.root.clientWidth || 1));
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -341,14 +342,15 @@ export class TaggerCam extends Emitter {
     if (this._acc < 1 / RENDER_FPS) return;
     this._acc = 0;
     this.view3d.update(dt, time, this.camera);
-    this.ink.render(this.scene, this.camera);
+    this.fx.begin(this.scene, this.camera);
+    this.fx.present();
   }
 
   dispose() {
     if (!this.ready) return;
     this.view3d.dispose();
     this._offGfx?.();
-    this.ink.dispose();
+    this.fx.dispose();
     this.renderer.dispose();
     this.root.remove();
   }

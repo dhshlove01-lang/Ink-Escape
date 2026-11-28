@@ -4,11 +4,19 @@ import { GRAPHICS, GRAPHICS_DEFAULT, BACKGROUND_FPS } from '../../config/graphic
 // 3D 화면(PlayerView·TaggerCam·CharacterStage)은 여기서 숫자만 받아 쓴다.
 
 const KEY = 'inkEscape.gfx';
+const INK_KEY = 'inkEscape.ink';
 const listeners = new Set();
 let level = GRAPHICS_DEFAULT;
 try {
   const v = localStorage.getItem(KEY);
   if (v && GRAPHICS[v]) level = v;
+} catch {}
+
+// 그림체 (2026-11-28): 기본은 **선 없는** 자연스러운 렌더(조명·공기감·후처리).
+// 예전 잉크 선 + 셀 명암은 화면의 '잉크 선' 버튼으로 따로 켜고 끈다.
+let inkStyle = false;
+try {
+  inkStyle = localStorage.getItem(INK_KEY) === '1';
 } catch {}
 
 // 자동 해상도 (2026-11-27): 경기 화면 프레임이 목표보다 느리면 그리는 해상도를 낮추고, 여유가 생기면 다시 올린다.
@@ -29,6 +37,23 @@ export const gfx = {
   },
   get preset() {
     return GRAPHICS[level];
+  },
+  /** 잉크 선 스타일 (기본 꺼짐 — 선 없는 렌더) */
+  get ink() {
+    return inkStyle;
+  },
+  /** 선 없는 후처리 렌더를 쓰는가 (품질이 후처리를 주고, 잉크 선은 꺼져 있을 때) */
+  get post() {
+    return !inkStyle && this.preset.post !== false;
+  },
+  setInk(v) {
+    v = !!v;
+    if (v === inkStyle) return;
+    inkStyle = v;
+    try {
+      localStorage.setItem(INK_KEY, v ? '1' : '0');
+    } catch {}
+    listeners.forEach((f) => f(level));
   },
   set(v) {
     if (!GRAPHICS[v] || v === level) return;

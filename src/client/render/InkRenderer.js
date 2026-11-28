@@ -150,7 +150,7 @@ export class InkRenderer {
   }
 
   get enabled() {
-    return gfx.preset.ink !== false;
+    return gfx.ink;
   }
 
   _targets() {
