@@ -36,6 +36,7 @@ export const IMAGE_DEFS = {
   'face.bear': A + 'ui/faces/bear.webp',
   'face.rabbit': A + 'ui/faces/rabbit.webp',
   'face.cat': A + 'ui/faces/cat.webp',
+  'face.devil': A + 'ui/faces/devil.webp', // 술래 악마 초상화 (없으면 코드 그림으로 대체)
   'icon.black': A + 'ui/icons/elem_black.webp',
   'icon.red': A + 'ui/icons/elem_red.webp',
   'icon.blue': A + 'ui/icons/elem_blue.webp',

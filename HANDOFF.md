@@ -138,7 +138,7 @@ URL=https://dhshlove01-lang.github.io/Ink-Escape/ NODE_PATH=$(npm root -g) node 
 | 우선 | 이미지 | 키 / 파일 | 지금 대체 | 쓰는 곳 |
 | --- | --- | --- | --- | --- |
 | ★ | 증강 아이콘 20장 (플레이어 10 + 술래 10) | `aug.<키>` (tummy·snack·paws·pierce·eraserShot·heart·cheer·eraserPro·swift·rescue / pencil·sharpener·twin·thick·sharp·wind·recycle·bigBrush·sticky·shadow) | 이모지 | 카드 고르기·HUD·술래 화면 (`AugmentPicker.augIcon`) — 피클 프롬프트는 예전에 드림 |
-| ★ | 술래 악마 얼굴 | `face.devil` → `assets/ui/faces/devil.webp` | 코드로 그린 얼굴 | 로비 캐릭터 카드·참가자 줄·HUD (`AnimalModels.drawAnimalFace`) — 4종은 있음 |
+| ✅ | 술래 악마 얼굴 | `face.devil` → `assets/ui/faces/devil.webp` (원본 `assets/source/devil_face.png`, 만드는 법 `tools/face_devil.py`) | ~~코드로 그린 얼굴~~ → 2026-11-28 다른 4종과 같은 3D 초상화로 교체 | 로비 캐릭터 카드·참가자 줄·HUD (`AnimalModels.drawAnimalFace`) |
 | ★ | 상태 이상 아이콘 4개: 화상·느려짐·독·무적 | (새 키 필요: `icon.burn` 등) | 🔥❄☠✨ 글자 | HUD 왼쪽 아래 (`Hud.js status`) |
 | ★ | 검정(가드) 속성 원거리 탄 | `vfx.proj_black` | 불꽃 그림(spark) 재사용 | 일반 몬스터 탄 (나머지 4색은 있음) |
 | ☆ | 회복 상자 아이콘 (초록) | (새 키) | 보급 상자 그림 하나로 같이 씀 | 술래 지도·탑뷰 표시, 상자 방향 안내 |
@@ -158,6 +158,16 @@ URL=https://dhshlove01-lang.github.io/Ink-Escape/ NODE_PATH=$(npm root -g) node 
 - 효과음은 아직 임시.
 
 ## 작업 기록
+
+### 2026-11-28 · 로비 이름표 한 줄 + 술래 악마 얼굴 아이콘 3D 통일 (사용자 사진 지적 → main 배포)
+- **무엇을 (사용자 지시)**: 로비 사진 2장(`IMG_1260`, `IMG_1261`) — ① 머리 위 노란 이름표가 `👑 이름` / `🎲 역할` 두 줄로 쌓여 오른쪽이 비어 보인다 → **한 줄**로 ② 캐릭터 카드 5종 중 `Devil Bat-Cat` 만 2D 플랫 아이콘이라 혼자 그림체가 다르다 → 앞 4종과 같은 3D 초상화로.
+- **이름표 한 줄 (`src/client/ui/CharacterStage.js` `makePlateTexture`)**: 내용은 `👑 이름 · 🎲 역할` + (READY/WIN 배지). 글자 폭을 재서 **상자 폭을 내용에 맞추고**(옛 고정 512px 캔버스 → 동적 폭), 캔버스를 2배(`PLATE_DS`)로 그려 또렷하게. 스프라이트는 높이 0.27m 고정 + 폭은 캔버스 비율, 5인 로비 간격(2.05m)에서 겹치지 않게 **최대 폭 1.78m**(넘으면 비율 유지로 축소). `f.plateY` 는 이제 **아랫변**이라 머리 위 여백이 두 줄일 때와 같다.
+  - **함정 2개 (다시 겪지 말 것)**: ⓐ 이모지(👑·🎲)는 `measureText` 폭과 실제 그려지는 폭이 달라 글자가 잘렸다 → 이모지는 **정해진 자리(슬롯)에 가운데로** 그리고 상자 폭은 이모지가 없는 글자 폭으로만 계산한다. ⓑ Jua 는 한글 음절별 조각(unicode-range)으로 나뉘어 있어 조각이 오기 전에 잰 폭은 실제보다 좁다 → `requestPlateFonts()` 가 `document.fonts.load('48px Jua', 이름·역할 글자)` 로 조각을 미리 불러온 뒤 `refreshPlates()` 로 다시 그린다. **`FontFaceSet.load` 첫 인자에 fallback 목록(`"Jua", "Malgun Gothic", sans-serif`)을 붙이면 Jua 조각이 안 불러와진다** — `48px Jua` 처럼 글꼴 이름만 준다.
+  - 캐릭터 카드 이름표(`style.css` `.animal > span`): 두 줄 자리를 늘 비워 둬서 영문 `Devil Bat-Cat` 만 두 줄이 되어도 카드마다 글자 높이가 같다.
+- **술래 악마 얼굴 (`assets/ui/faces/devil.webp`, `src/config/assets.js` 의 `face.devil`)**: 앞 4종과 **같은 방식**(이미지 AI 초상화 → 체커보드 배경 제거 → 192px 투명 webp)으로 맞췄다. 원본 `assets/source/devil_face.png`, 다시 만드는 법 `python3 tools/face_devil.py`(Pillow·numpy·scipy; 테두리에서 이어진 밝은 회색만 지우고 가장자리 색은 안쪽 색으로 바꿔 회색 테두리 제거). `drawAnimalFace` 가 `img('face.devil')` 을 먼저 쓰므로 로비 카드·참가자 줄·술래 HUD·결과 화면에 자동 적용되고, 이미지가 없을 때만 예전 코드 그림(`drawDevilFace`)으로 떨어진다.
+  - 참고: `assets/models/devil.glb` 를 직접 렌더해 얼굴 초상화를 만들 수도 있었지만(시험해 봄) 손에 든 연필이 얼굴 옆을 가로질러 카드 아이콘에 어울리지 않았다.
+- **검증**: Playwright(헤드리스, 1280×800·2배)로 한글·영문 로비, 캐릭터 5인 배치(긴 이름 + READY 배지), 술래 악마 선택 후 Tab 술래 화면까지 캡처해 눈으로 확인 — `pageerror 0`, `4xx/404 0`. 이름표 화면 크기: 1인 341×55px(이름 글자 32px), 5인 68~121×18px(이전 두 줄 이름표와 같은 글자 크기, 겹침 없음).
+- **남은 것**: 5인 로비에서 이름표 글자가 10px 수준이라 아주 작다(옛 두 줄 이름표도 같았다). 더 키우려면 무대 카메라를 당기거나 이름표 최대 폭을 늘려야 한다.
 
 ### 2026-11-28 · 선 없는 다크 궁전 렌더 1·2단계 + 사용자 지적 2곳 보완 (시험 적용 → main 배포)
 - **무엇을 (사용자 지시)**: "선 없이 자연스러운 다크한 마왕의 방"(`docs/art_direction_dark_palace.md`) 1·2단계를 게임 전체에 넣고, 시험 적용분에서 사용자가 고른 2곳만 다듬었다 — ① 낮은 시점(홀·탈출문)에서 바닥에 보라색 넓은 띠가 납작하게 깔리지 않게 ② 술래 3D 탑뷰의 맵·캐릭터 가독성. 곁들여 영문 헤더의 'Off' 중복 라벨 정리.

@@ -167,6 +167,8 @@ input {
 .animal-btns { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
 .animal { display: grid; justify-items: center; gap: 2px; background: var(--ink-3); border: 2px solid transparent; border-radius: 14px; padding: 5px 2px; font-size: 11px; line-height: 1.2; }
 .animal canvas { width: 44px; height: 44px; }
+/* 이름표 글자는 두 줄 자리를 늘 비워 둔다 — 'Devil Bat-Cat' 처럼 긴 이름만 두 줄이 되어도 카드마다 글자 높이가 같다 (2026-11-28) */
+.animal > span { display: flex; align-items: flex-start; justify-content: center; min-height: 2.4em; text-align: center; }
 .animal.on { border-color: var(--pencil); background: rgba(240,189,30,0.12); }
 .lobby-actions { margin-top: auto; padding-top: 10px; }
 .lobby-actions .btn.big { margin-top: 0; padding: 12px 20px; font-size: 24px; }

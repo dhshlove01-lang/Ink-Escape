@@ -52,6 +52,10 @@ export class CharacterStage {
     this.onResize = () => this.resize();
     window.addEventListener('resize', this.onResize);
     this._offGfx = gfx.onChange(this.onResize);
+    // 이름표는 웹폰트·이모지 글꼴이 다 불러와진 뒤에 다시 그린다 (먼저 그리면 글자가 잘린다)
+    this._onFonts = () => this.refreshPlates();
+    document.fonts?.ready?.then(this._onFonts);
+    document.fonts?.addEventListener?.('loadingdone', this._onFonts);
     this.resize();
     this.play();
   }
@@ -149,6 +153,7 @@ export class CharacterStage {
       this.figures.splice(this.figures.indexOf(f), 1);
     }
     this.layout();
+    this.requestPlateFonts();
   }
 
   addFigure(id) {
@@ -226,6 +231,7 @@ export class CharacterStage {
 
   setPlate(f, c, { mine, owner, solo, badge }) {
     const label = `${c.name}｜${badge?.text || ''}｜${c.role || ''}｜${mine ? 1 : 0}｜${owner ? 1 : 0}｜${solo ? 1 : 0}｜${getLang()}`;
+    f.plateArgs = { c, mine, owner, solo, badge }; // 글꼴이 늦게 준비되면 다시 그린다 (refreshPlates)
     if (f.label === label && f.plate) return;
     f.label = label;
     // 결과 화면은 제목(승리/패배)과 패널이 이미 알려주므로 이름표를 달지 않는다
@@ -235,16 +241,53 @@ export class CharacterStage {
     }
     if (!f.plate) {
       f.plate = new THREE.Sprite(new THREE.SpriteMaterial({ transparent: true, depthTest: false }));
-      f.plate.scale.set(1.4, 0.46, 1);
       this.scene.add(f.plate);
     }
     f.plateTex?.dispose();
-    f.plateTex = makePlateTexture({ name: c.name, badge, role: c.role, mine, owner, solo });
+    const plate = makePlateTexture({ name: c.name, badge, role: c.role, mine, owner, solo });
+    f.plateTex = plate.tex;
+    // 높이는 고정, 폭은 내용 길이대로. 5인 로비에서 이웃과 겹치지 않게 최대 폭만 자른다 (비율 유지).
+    let pw = PLATE_H_W * (plate.w / plate.h);
+    let ph = PLATE_H_W;
+    if (pw > PLATE_MAX_W) {
+      ph *= PLATE_MAX_W / pw;
+      pw = PLATE_MAX_W;
+    }
+    f.plate.scale.set(pw, ph, 1);
     f.plate.material.map = f.plateTex;
     f.plate.material.needsUpdate = true;
     f.plate.renderOrder = 20;
-    // 결과 화면에서는 이름표를 머리 위로 더 높이
-    f.plateY = this.mode === 'result' ? 1.95 : 1.85;
+    // 이름표 아랫변 높이 (머리 위 여백은 그대로 두고 위로 자란다)
+    f.plateY = this.mode === 'result' ? 1.72 : 1.62; // = 아랫변
+    f.plate.material.opacity = 1; // 크기를 바꾼 뒤 한 프레임 늦게 그려도 보이게
+  }
+
+  /** 이름표 글자에 쓰이는 글꼴 조각을 미리 불러온다 → 끝나면 이름표를 다시 그린다
+   *  (Jua 는 한글 음절별 조각으로 나뉘어 있어, 그 조각이 오기 전에 잰 폭은 실제 글자보다 좁다) */
+  requestPlateFonts() {
+    const fonts = document.fonts;
+    if (!fonts?.load) return;
+    const names = this.figures.map((f) => f.plateArgs?.c.name || '').join(' ');
+    const key = names + '|' + getLang();
+    if (key === this._plateFontsKey) return;
+    this._plateFontsKey = key;
+    const text = `${names} ${t('role.both')} ${t('role.taggerShort')} ${t('role.playerShort')} ${t('role.randomShort')} 👑🎲👁🔫·READY WIN 0123456789`;
+    // 주의: FontFaceSet.load 의 첫 인자는 글꼴 이름만 준다 (fallback 목록을 붙이면 Jua 조각이 안 불러와진다)
+    Promise.allSettled([
+      fonts.load(`${PLATE_NAME_PX}px Jua`, text),
+      fonts.load(`${PLATE_ROLE_PX}px Jua`, text),
+      fonts.load(`${PLATE_DOT_PX}px Jua`, text),
+    ]).then(() => this.refreshPlates());
+  }
+
+  /** 이름표를 모두 다시 그린다 — 웹폰트·이모지 글꼴은 늦게 불러와져서, 먼저 잰 폭으로 그린 이름표는 글자가 잘릴 수 있다 */
+  refreshPlates() {
+    for (const f of this.figures) {
+      const a = f.plateArgs;
+      if (!a || !f.plate) continue;
+      f.label = '';
+      this.setPlate(f, a.c, { mine: a.mine, owner: a.owner, solo: a.solo, badge: a.badge });
+    }
   }
 
   layout() {
@@ -348,7 +391,7 @@ export class CharacterStage {
       f.ring.material.opacity += ((on ? 0.55 + Math.sin(t * 3 + ph) * 0.15 : 0.12) - f.ring.material.opacity) * Math.min(1, dt * 6);
       f.glow.material.opacity += ((on ? 0.16 : 0.05) - f.glow.material.opacity) * Math.min(1, dt * 6);
       if (f.plate) {
-        f.plate.position.set(f.x, 0.2 + bob + f.plateY, f.z);
+        f.plate.position.set(f.x, 0.2 + bob + f.plateY + f.plate.scale.y / 2, f.z); // plateY = 아랫변
         f.plate.material.opacity = 1;
       }
     }
@@ -383,6 +426,7 @@ export class CharacterStage {
   dispose() {
     this.pause();
     window.removeEventListener('resize', this.onResize);
+    document.fonts?.removeEventListener?.('loadingdone', this._onFonts);
     this._offGfx?.();
     for (const f of this.figures) this.removeFigure(f);
     this.figures = [];
@@ -401,53 +445,119 @@ export class CharacterStage {
 }
 
 // ── 머리 위 이름표 (캔버스 → 스프라이트) ─────────────────────────
-const PLATE_W = 512;
-const PLATE_H = 168;
+// 한 줄: [👑 이름] · [🎲 역할] [READY] — 글자 폭을 재서 상자 폭을 내용에 맞춘다 (2026-11-28 사용자 요청).
+const PLATE_NAME_PX = 48;
+const PLATE_ROLE_PX = 31;
+const PLATE_DOT_PX = 36; // 이름과 역할 사이 가운뎃점
+const PLATE_BADGE_PX = 26;
+const PLATE_PAD_X = 26;
+const PLATE_PAD_Y = 15;
+const PLATE_GAP = 14; // 이름 · 역할 사이
+const PLATE_BADGE_GAP = 18;
+const PLATE_NAME_MAX = 12; // 이름이 너무 길면 … (한글 기준)
+const PLATE_DS = 2; // 캔버스를 2배로 그려 글자를 또렷하게
+const PLATE_H_W = 0.27; // 이름표 높이 (m). 옛 2줄 이름표(0.46)의 이름 글자 크기와 비슷하게
+const PLATE_MAX_W = 1.78; // 5인 로비 간격(2.05m)에서 이웃과 겹치지 않는 최대 폭 (m)
 
+const plateFont = (px, weight = '') => `${weight}${px}px "Jua", "Malgun Gothic", sans-serif`;
+
+function plateRoleText(role, solo) {
+  return solo ? t('role.both') : role === 'tagger' ? t('role.taggerShort') : role === 'player' ? t('role.playerShort') : t('role.randomShort');
+}
+
+/** 이름표 텍스처와 그 캔버스 크기 { tex, w, h } (w·h 는 캔버스 px, 3D 크기 계산에 쓴다)
+ *  이모지(👑·🎲)는 폭이 글꼴·렌더 단계마다 달라서 글자 폭 재기로는 상자 폭을 못 믿는다
+ *  → 이모지는 정해진 자리(슬롯)에 가운데로 그리고, 상자 폭은 이모지가 없는 글자 폭으로만 계산한다. */
 function makePlateTexture({ name, badge, role, mine, owner, solo }) {
+  const clippedName = name.length > PLATE_NAME_MAX ? name.slice(0, PLATE_NAME_MAX) + '…' : name;
+  const roleText = plateRoleText(role, solo);
+  const roleIcon = solo ? '🎲' : ROLE_ICON[role] || '🎲';
+  const badgeText = badge?.text || '';
+  const nameIconW = Math.round(PLATE_NAME_PX * 1.38); // 👑 자리
+  const roleIconW = Math.round(PLATE_ROLE_PX * 1.5); // 🎲 자리
+
+  const m = document.createElement('canvas').getContext('2d');
+  m.font = plateFont(PLATE_NAME_PX);
+  const nameW = m.measureText(clippedName).width;
+  m.font = plateFont(PLATE_ROLE_PX);
+  const roleW = m.measureText(roleText).width;
+  m.font = plateFont(PLATE_DOT_PX);
+  const dotW = m.measureText('·').width;
+  const badgeH = badgeText ? Math.round(PLATE_BADGE_PX * 1.65) : 0;
+  let badgeW = 0;
+  if (badgeText) {
+    m.font = `700 ${PLATE_BADGE_PX}px "Jua", system-ui, sans-serif`;
+    badgeW = Math.ceil(m.measureText(badgeText).width) + PLATE_BADGE_PX;
+  }
+
+  const textW = (owner ? nameIconW : 0) + nameW + PLATE_GAP + dotW + PLATE_GAP + roleIconW + roleW;
+  const W = Math.ceil(PLATE_PAD_X + textW + (badgeText ? PLATE_BADGE_GAP + badgeW : 0) + PLATE_PAD_X + 4); // 오른쪽은 글자 여백이 좁아 살짝 더
+  const H = Math.ceil(PLATE_PAD_Y * 2 + Math.max(PLATE_NAME_PX * 1.16, badgeH));
+
   const c = document.createElement('canvas');
-  c.width = PLATE_W;
-  c.height = PLATE_H;
+  c.width = W * PLATE_DS;
+  c.height = H * PLATE_DS;
   const g = c.getContext('2d');
+  g.scale(PLATE_DS, PLATE_DS);
+
   const accent = mine ? '#f0bd1e' : badge ? badge.color : '#3a3443';
-  const r = 26;
+  const r = Math.min(24, H / 2 - 4);
   g.fillStyle = 'rgba(13,11,16,0.82)';
-  roundRect(g, 6, 6, PLATE_W - 12, PLATE_H - 12, r);
+  roundRect(g, 3, 3, W - 6, H - 6, r);
   g.fill();
-  g.lineWidth = 6;
+  g.lineWidth = 5;
   g.strokeStyle = accent;
-  roundRect(g, 6, 6, PLATE_W - 12, PLATE_H - 12, r);
+  roundRect(g, 3, 3, W - 6, H - 6, r);
   g.stroke();
 
-  // 이름
-  g.font = '58px "Jua", "Malgun Gothic", sans-serif';
-  g.fillStyle = '#f3ecdd';
+  const cy = H / 2 + 1; // 글자 시각 중심을 살짝 아래로 (Jua 는 위쪽이 비어 보인다)
   g.textBaseline = 'middle';
+  g.textAlign = 'center';
+  let x = PLATE_PAD_X;
+
+  // 👑 (자리 가운데) → 이름 (크림색)
+  if (owner) {
+    g.font = plateFont(PLATE_NAME_PX);
+    g.fillStyle = '#f3ecdd';
+    g.fillText('👑', x + nameIconW / 2, cy);
+    x += nameIconW;
+  }
   g.textAlign = 'left';
-  const clipped = name.length > 9 ? name.slice(0, 9) + '…' : name;
-  g.fillText(`${owner ? '👑 ' : ''}${clipped}`, 34, 62);
+  g.fillStyle = '#f3ecdd';
+  g.fillText(clippedName, x, cy);
+  x += nameW + PLATE_GAP;
 
-  // 역할
-  const roleText = solo ? t('role.both') : role === 'tagger' ? t('role.taggerShort') : role === 'player' ? t('role.playerShort') : t('role.randomShort');
-  g.font = '34px "Jua", "Malgun Gothic", sans-serif';
+  // · 구분점
+  g.font = plateFont(PLATE_DOT_PX);
   g.fillStyle = '#9a92a6';
-  g.fillText(`${ROLE_ICON[role] || '🎲'} ${roleText}`, 34, 112);
+  g.fillText('·', x, cy);
+  x += dotW + PLATE_GAP;
 
-  // READY / WIN 배지
-  if (badge) {
+  // 🎲 (자리 가운데) → 역할 (회색)
+  g.textAlign = 'center';
+  g.font = plateFont(PLATE_ROLE_PX);
+  g.fillStyle = '#a49cb0';
+  g.fillText(roleIcon, x + roleIconW / 2, cy);
+  x += roleIconW;
+  g.textAlign = 'left';
+  g.fillText(roleText, x, cy);
+
+  // READY / WIN 배지 (오른쪽 끝, 세로 가운데)
+  if (badgeText) {
+    const bx = W - PLATE_PAD_X - badgeW;
     g.fillStyle = badge.color;
-    roundRect(g, PLATE_W - 186, 34, 152, 62, 18);
+    roundRect(g, bx, (H - badgeH) / 2, badgeW, badgeH, badgeH / 2);
     g.fill();
     g.fillStyle = '#0d0b10';
-    g.font = '700 36px system-ui, sans-serif';
+    g.font = `700 ${PLATE_BADGE_PX}px "Jua", system-ui, sans-serif`;
     g.textAlign = 'center';
-    g.fillText(badge.text, PLATE_W - 110, 66);
+    g.fillText(badgeText, bx + badgeW / 2, cy);
   }
 
   const tex = new THREE.CanvasTexture(c);
   tex.colorSpace = THREE.SRGBColorSpace;
   tex.anisotropy = 4;
-  return tex;
+  return { tex, w: W, h: H };
 }
 
 function roundRect(g, x, y, w, h, r) {
